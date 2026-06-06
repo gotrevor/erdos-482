@@ -43,10 +43,16 @@ same trap as the off-by-one above).
 "Generalize to other algebraic numbers" — open research direction, not a theorem (per original plan).
 
 ## Aristotle
-- `fca57695` (bridge) — DONE, independently proved `digit_bridge`, verified axiom-clean (cross-check). Harvested.
-- `96d83ca4` (digitsgen) — IN FLIGHT: general `digits_eq_floor_sub`. On return: download, verify in-kernel
-  + `#print axioms`, compare to local proof. Then submit the next bounded lemma (keep one in flight).
+- `fca57695` (bridge) — DONE, proved `digit_bridge`, verified axiom-clean. Harvested.
+- `96d83ca4` (digitsgen) — DONE, proved `digits_eq_floor_sub`, verified axiom-clean. Harvested.
+- `7ef053f3` (irrnonterm) — **IN FLIGHT**: general `digits_two_irrational_not_eventually_zero`
+  (already proved locally too). On return: download, verify in-kernel + `#print axioms`, compare,
+  then submit the next bounded lemma (keep one in flight).
 - Problem dirs live in `tools/aristotle/`.
+
+**NOTE:** Many more theorems were added after this doc's "What is proved" list (sequence structure,
+irrationality, non-termination both directions, reconstruction, 6-digit certificate). **`STATUS.md`
+has the complete, current theorem inventory** — read it first.
 
 ## Corpus / doctrine
 KB reference: `~/personal/claude/knowledge/core/projects/lean-journey/reference/` (not auto-loaded;
