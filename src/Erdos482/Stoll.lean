@@ -255,6 +255,41 @@ theorem stoll_pair1 {ε : ℝ} (hε0 : 1 - Real.sqrt 2 / 2 ≤ ε) (hε1 : ε < 
   rw [i1, i2] at key
   simpa using key
 
+/-! ## Faithful `t_i` framing: digits of `(α√2 − β)/2^l` = digits of `α√2`, shifted by `l` -/
+
+/-- For `m ≥ l`, `⌊((α√2 − β)/2^l)·2^m⌋ = ⌊α√2·2^(m−l)⌋ − β·2^(m−l)` (the integer `β·2^(m−l)`
+factors out of the floor). -/
+private lemma floor_t_pow (a b : ℤ) (l m : ℕ) (hm : l ≤ m) :
+    ⌊((a : ℝ) * Real.sqrt 2 - (b : ℝ)) / 2 ^ l * 2 ^ m⌋
+      = ⌊(a : ℝ) * Real.sqrt 2 * 2 ^ (m - l)⌋ - b * 2 ^ (m - l) := by
+  have hpow : (2:ℝ) ^ m = 2 ^ l * 2 ^ (m - l) := by rw [← pow_add, Nat.add_sub_cancel' hm]
+  have hne : (2:ℝ) ^ l ≠ 0 := by positivity
+  have e : ((a : ℝ) * Real.sqrt 2 - (b : ℝ)) / 2 ^ l * 2 ^ m
+      = (a : ℝ) * Real.sqrt 2 * 2 ^ (m - l) - ((b * 2 ^ (m - l) : ℤ) : ℝ) := by
+    rw [hpow]; field_simp; push_cast; ring
+  rw [e, Int.floor_sub_intCast]
+
+/-- **Theorem 3.2, faithful `t_i` form.**  The `j`-th binary digit of `α√2` equals the `(j+l)`-th
+binary digit of `t = (α√2 − β)/2^l`.  Combined with `stoll_digit`, this restates each pair's
+conclusion in terms of the paper's `t_i = (α_i√2 − β_i)/2^{l_i}` (e.g. pair 6's
+`t_6 = (759250125√2 − 314491699)/2^29`). -/
+theorem binDigit_div_pow (a b : ℤ) (l j : ℕ) (hj : 1 ≤ j) :
+    binDigit (((a : ℝ) * Real.sqrt 2 - (b : ℝ)) / 2 ^ l) (j + l)
+      = binDigit ((a : ℝ) * Real.sqrt 2) j := by
+  unfold binDigit
+  have h1 : ⌊((a : ℝ) * Real.sqrt 2 - (b : ℝ)) / 2 ^ l * 2 ^ (j + l)⌋
+      = ⌊(a : ℝ) * Real.sqrt 2 * 2 ^ j⌋ - b * 2 ^ j := by
+    have := floor_t_pow a b l (j + l) (Nat.le_add_left l j)
+    simpa [Nat.add_sub_cancel] using this
+  have h2 : ⌊((a : ℝ) * Real.sqrt 2 - (b : ℝ)) / 2 ^ l * 2 ^ (j + l - 1)⌋
+      = ⌊(a : ℝ) * Real.sqrt 2 * 2 ^ (j - 1)⌋ - b * 2 ^ (j - 1) := by
+    have := floor_t_pow a b l (j + l - 1) (by omega)
+    simpa [show j + l - 1 - l = j - 1 from by omega] using this
+  rw [h1, h2]
+  have hp : (2 : ℤ) ^ j = 2 * 2 ^ (j - 1) := by
+    rw [mul_comm, ← pow_succ, Nat.sub_add_cancel hj]
+  rw [hp]; ring
+
 /-! ## Floor of `c√2` via exact integer inequalities (no decimal approximation) -/
 
 /-- `⌊c√2⌋ = d` whenever `d² ≤ 2c²` and `2c² < (d+1)²` (with `0 < c`).  Both hypotheses are exact
