@@ -1664,6 +1664,36 @@ theorem fract_two_mul_branch (f : ℝ) (h0 : 0 ≤ f) (h1 : f < 1) :
   norm_num [Int.fract_eq_iff]
   exact ⟨fun h => ⟨h0, by linarith⟩, fun h => ⟨by linarith, by linarith, 1, by norm_num⟩⟩
 
+/-- **The pair-5 band bracket in explicit two-branch form.**  Writing `f = {√2·2^i}`, the band
+bracket at step `j = i+1` is `(2−√2)·f + √2·ε` when `f < ½` and `(2−√2)·f − 1 + √2·ε` when `f ≥ ½`
+(via `fract_two_mul`: `{√2·2^{i+1}} = fract(2f)`).  This is the structural identity underlying both
+`pair5_band_fails_below_half` and `pair5_band_fails_above_half`.  (Aristotle-proved, kernel-verified.) -/
+theorem pair5_band_branch (i : ℕ) (ε : ℝ) :
+    (Int.fract (Real.sqrt 2 * 2 ^ i) < 1 / 2 →
+        Int.fract (Real.sqrt 2 * 2 ^ (i + 1))
+            - Real.sqrt 2 * Int.fract (Real.sqrt 2 * 2 ^ i) + Real.sqrt 2 * ε
+          = (2 - Real.sqrt 2) * Int.fract (Real.sqrt 2 * 2 ^ i) + Real.sqrt 2 * ε) ∧
+      (1 / 2 ≤ Int.fract (Real.sqrt 2 * 2 ^ i) →
+        Int.fract (Real.sqrt 2 * 2 ^ (i + 1))
+            - Real.sqrt 2 * Int.fract (Real.sqrt 2 * 2 ^ i) + Real.sqrt 2 * ε
+          = (2 - Real.sqrt 2) * Int.fract (Real.sqrt 2 * 2 ^ i) - 1 + Real.sqrt 2 * ε) := by
+  set f := Int.fract (Real.sqrt 2 * 2 ^ i) with hf_def
+  have hf0 : (0 : ℝ) ≤ f := Int.fract_nonneg _
+  have hf1 : f < 1 := Int.fract_lt_one _
+  have key : Int.fract (Real.sqrt 2 * 2 ^ (i + 1)) = Int.fract (2 * f) := by
+    have : Real.sqrt 2 * 2 ^ (i + 1) = 2 * (Real.sqrt 2 * 2 ^ i) := by ring
+    rw [this, fract_two_mul]
+  constructor
+  · intro hlt
+    have hfract : Int.fract (2 * f) = 2 * f := by
+      rw [Int.fract_eq_self]; exact ⟨by linarith, by linarith⟩
+    rw [key, hfract]; ring
+  · intro hge
+    have hfract : Int.fract (2 * f) = 2 * f - 1 := by
+      have : ⌊2 * f⌋ = 1 := by rw [Int.floor_eq_iff]; constructor <;> push_cast <;> linarith
+      simp [Int.fract, this]
+    rw [key, hfract]; ring
+
 /-- **The band center is never hit.**  `{√2·2^n} ≠ ½` for every `n`: if it were `½`, then
 `√2 = (2⌊√2·2^n⌋+1)/2^(n+1)` would be rational, contradicting `irrational_sqrt_two`.  The pair-5
 band brackets degenerate exactly when `{√2·2^m} → ½`; this says the orbit never lands *on* `½`.
