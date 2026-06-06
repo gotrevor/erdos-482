@@ -17,7 +17,26 @@ polish on the *α√2* sub-case; §0 is the actual generalization the problem is
 - First milestone: Thm 1.2 **Case II** (binary, ε=½) as proof-of-concept the machinery parametrizes.
 - **Note:** St05 does NOT inherit pair-5's Diophantine wall — its proofs close uniformly (see the plan).
 
-## 1. Pair 5 full-interval (the special `t₅ = √2`, β=0 case) — the real open thread
+## 1. Pair 5 (special `t₅ = √2`, β=0) — ✅ RESOLVED 2026-06-06 (the full interval is NOT a theorem)
+
+**Outcome:** the online findings (`archive/findings/ON-LINE-FINDINGS-2026-06-06-pair5.md`) settled this.
+Stoll's full-interval pair-5 claim `[0.49599…, 0.50124…)` is **essentially false** (the digit identity
+fails at the stated lower endpoint at n=280); only **ε=½** works for all n — which is exactly the
+headline Graham–Pollak. The printed pair-5 closed form also has a **typo** (`v_{2k}=⌊tᵢ2^{k−2}⌋+2^{k−2}`
+gives v₂=½; correct is `⌊√2·2^{k−1}⌋+2^{k−1}`). So the honest content was formalized instead of chasing
+a false interval. **All committed & axiom-clean (trust base only):**
+- `stoll_pair5_closed_form` — Stoll's §4 explicit formula, typo-corrected (via `gp_pair`+`vv_half_eq_u`).
+- `pair5_estep_band` — exact band characterization: the ε-step lands iff `B_j(ε):={√2·2^j}−√2·{√2·2^{j−1}}+√2ε ∈ [0,1)`.
+- `stoll_pair5_conditional` — honest conditional full-interval theorem (base step + band ∀j ⟹ digits).
+- `pair5_band_at_half` (B_j(½)=crux(√2·2^j), always holds) + `stoll_pair5_half_via_band` (GP via band route).
+- `pair5_band_branch` (two-branch identity) + `pair5_band_fails_below_half`/`above_half` (precise obstruction, both sides).
+- Diophantine infra: `fract_two_mul`, `fract_two_mul_branch`, `fract_sqrt2_pow_ne_half`, `sqrt2_pow_far_from_halfint`, `sqrt2_badly_approximable`.
+
+The **admissible ε-set is exactly the band condition** (a Diophantine condition, possibly `{½}` if √2 is
+normal — open), not an elementary interval. This is the complete honest story; no open obligation remains
+on pair 5. (Historical analysis preserved below for the record.)
+
+<details><summary>Historical (pre-resolution) analysis — kept for the record</summary>
 
 Pair 5 is the only pair without a vv-based interval theorem. It's proved at ε=½ by the headline
 (`graham_pollak` via the `u` sequence), but Stoll's Theorem 3.2 asserts it for the whole interval
@@ -100,11 +119,25 @@ plausibly 🟠 generational). The headline already covers the key instance ε=½
 part that is not "elementary floors + finite computation." Treat as a long-term thread; the headline
 already covers its most important instance (ε=½).
 
-## 2. Master theorem (blocked on pair 5)
-Once pair 5 lands: `∀ ε, 1−√2/2 ≤ ε → ε < √2/2 → ∀ k ≥ 31, vv ε (2k+1) − 2 vv ε (2k−1) ∈ {0,1}`,
-proved by `rcases stoll_intervals_cover`, applying the matching `stoll_pair{i}` with `m := k − (lᵢ+2)`
-(re-index via omega; all pairs stable for `k ≥ 31` since max `lᵢ+2 = 31`), then `binDigit_mem_zero_one`.
-The 7 non-pair-5 cases already work; only the pair-5 interval case needs item 1.
+</details>
+
+## 1b. St05 Theorem 1.3 (g-ary general) — 🚧 IN PROGRESS (started 2026-06-06)
+The §0 NEXT TRACK is now underway. Verified numerically (`tools/sandbox/st05_thm13_verify.py`: w∈{√2,√3,π},
+g∈{2,3,10}, ε-endpoints, many n — all OK). Done & axiom-clean:
+- `General/Digits.lean` — `digitStep g x = ⌊gx⌋−g⌊x⌋`, range bound `0≤digitStep<g`; `gdigit` (Prop 2) + `gdigit_mem`.
+- `General/Thm13.lean` — `thm13_digit_of_oddClosed`: given the odd closed form `u(2k+1)=g^k+⌊t·g^k/g⌋`,
+  the difference `u(2n+1)−g·u(2n−1) = digitStep g (t·g^{n−1}/g) ∈ [0,g)`. This is Thm 1.3's conclusion
+  **modulo the closed-form induction**.
+- **Remaining:** the closed-form induction `thm13_closed` (recurrence ⟹ both closed forms) — submitted to
+  Aristotle (job `e0240fef`). When it returns: verify in-kernel, port onto a repo `gu` def, and chain
+  `thm13_closed → thm13_digit_of_oddClosed` for an UNCONDITIONAL Thm 1.3. Then Mantissa (1≤t<g), Prop 2
+  proper (identify `digitStep` with the actual base-g digit of `w`), Thm 1.2 Cases I/II, Cor 1.1/1.2.
+
+## 2. Master theorem (Theorem 3.2, full ε-range)
+For the 7 non-special pairs this is done. Pair 5 only holds at ε=½ (§1: the full interval is not a
+theorem), so a single "∀ ε in the admissible range" master theorem over all 8 pairs is **not provable as
+stated** — it would assert pair 5's false full-interval claim. The honest master statement is the 7-pair
+cover (`stoll_intervals_cover` + the `stoll_pair{i}`) plus pair-5-at-½ (`stoll_pair5_half`); both done.
 
 ## 3. ~~Open research direction (out of scope)~~ — SUPERSEDED 2026-06-06
 Previously: "'Generalize to other algebraic numbers' needs new mathematics, not a formalization gap."
