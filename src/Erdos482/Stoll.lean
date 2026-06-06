@@ -239,6 +239,62 @@ theorem stoll_pair1 {ε : ℝ} (hε0 : 1 - Real.sqrt 2 / 2 ≤ ε) (hε1 : ε < 
   rw [i1, i2] at key
   simpa using key
 
+/-! ## Floor of `c√2` via exact integer inequalities (no decimal approximation) -/
+
+/-- `⌊c√2⌋ = d` whenever `d² ≤ 2c²` and `2c² < (d+1)²` (with `0 < c`).  Both hypotheses are exact
+integer comparisons closed by `norm_num`, so this pins `⌊c√2⌋` for arbitrarily large `c` without any
+decimal bound on `√2`. -/
+private lemma floor_mul_sqrt2 (c d : ℕ) (hc : 0 < c) (h1 : (d : ℤ) ^ 2 ≤ 2 * (c : ℤ) ^ 2)
+    (h2 : 2 * (c : ℤ) ^ 2 < ((d : ℤ) + 1) ^ 2) :
+    ⌊(c : ℝ) * Real.sqrt 2⌋ = d := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hspos : (0:ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
+  have hs2 : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
+  have hcr : (0:ℝ) < (c : ℝ) := by exact_mod_cast hc
+  have h1r : (d : ℝ) ^ 2 ≤ 2 * (c : ℝ) ^ 2 := by exact_mod_cast h1
+  have h2r : 2 * (c : ℝ) ^ 2 < ((d : ℝ) + 1) ^ 2 := by exact_mod_cast h2
+  rw [Int.floor_eq_iff]
+  refine ⟨?_, ?_⟩
+  · push_cast
+    nlinarith [h1r, hs2, hsnn, mul_pos hcr hspos, sq_nonneg ((c : ℝ) * Real.sqrt 2 - d)]
+  · push_cast
+    nlinarith [h2r, hs2, hsnn, mul_pos hcr hspos, sq_nonneg ((c : ℝ) * Real.sqrt 2 + d + 1)]
+
+/-! ## Corollary 3.3 — the binary digits of `759250125·√2`
+
+Stoll's headline corollary: with `α = 759250125`, `l = 29`, and `ε = 1 − π²/e³` (which lies in pair
+6's interval — see `tools/aristotle/cor33mem`), the Graham–Pollak difference `v_{2k+1} − 2 v_{2k−1}`
+reads off the binary digits of `759250125·√2`.
+
+The `ε`-sensitive base case (`vv ε 61 = 2592242074`, `vv ε 62 = 3665983898`, where
+`⌊759250125·√2⌋ = 2³⁰` and `⌊1518500250·√2⌋ = 2³¹`) is a finite 62-step recurrence computation that
+holds exactly for `ε` in pair 6's tight interval `[0.5012400…, 0.5103528…)`; it is supplied here as a
+hypothesis (the only remaining obligation for an unconditional Cor 3.3 — see `PENDING_WORK.md`).
+Everything downstream is the axiom-clean general core. -/
+theorem cor33 {ε : ℝ} (hε0 : 1 - Real.sqrt 2 / 2 ≤ ε) (hε1 : ε < Real.sqrt 2 / 2)
+    (base61 : (vv ε 61 : ℤ) = 2592242074) (base62 : (vv ε 62 : ℤ) = 3665983898) (m : ℕ) :
+    (vv ε (2 * (m + 31) + 1) : ℤ) - 2 * (vv ε (2 * (m + 31) - 1) : ℤ)
+      = binDigit (759250125 * Real.sqrt 2) (m + 1) := by
+  have hf1 : ⌊(759250125 : ℝ) * Real.sqrt 2⌋ = 1073741824 :=
+    floor_mul_sqrt2 759250125 1073741824 (by norm_num) (by norm_num) (by norm_num)
+  have hf2 : ⌊(1518500250 : ℝ) * Real.sqrt 2⌋ = 2147483648 :=
+    floor_mul_sqrt2 1518500250 2147483648 (by norm_num) (by norm_num) (by norm_num)
+  have baseP : (vv ε (2 * (29 + 2) - 1) : ℤ)
+      = ⌊((759250125 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0⌋ + (759250125 : ℤ) * 2 ^ 1 := by
+    have he : ((759250125 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0 = (759250125 : ℝ) * Real.sqrt 2 := by
+      push_cast; ring
+    rw [show (2 * (29 + 2) - 1 : ℕ) = 61 from rfl, he, hf1, base61]; norm_num
+  have baseQ : (vv ε (2 * (29 + 2)) : ℤ)
+      = ⌊((759250125 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1⌋ + (759250125 : ℤ) * 2 ^ 1 := by
+    have he : ((759250125 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1 = (1518500250 : ℝ) * Real.sqrt 2 := by
+      push_cast; ring
+    rw [show (2 * (29 + 2) : ℕ) = 62 from rfl, he, hf2, base62]; norm_num
+  have key := stoll_digit 759250125 29 hε0 hε1 baseP baseQ m
+  have i1 : 2 * (29 + 2 + m) + 1 = 2 * (m + 31) + 1 := by ring
+  have i2 : 2 * (29 + 2 + m) - 1 = 2 * (m + 31) - 1 := by omega
+  rw [i1, i2] at key
+  simpa using key
+
 /-! ## Concrete instantiation: Pair 8 (`α = 3`, `l = 1`, `t = (3√2 − 1)/2`)
 
 Stoll's pair `i = 8`: `ε ∈ [(5/2)√2 − 3, √2/2)`, `α = 3`, `l = 1`, so `v_{2k+1} − 2 v_{2k−1}`
