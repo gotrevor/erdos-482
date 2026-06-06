@@ -14,6 +14,12 @@ special β=0 / `t=√2` case): proved at ε=½ by the headline, but its full-int
 needs a non-uniform ε-step analysis (see Outstanding).
 
 ## What's happened (newest first)
+- **2026-06-06 (review lap, late)**: Pair-5 deep dive. Added `vv_eq_u_of_evenstep` /
+  `stoll_pair5_of_evenstep` (pair 5 reduced to one hypothesis `Heven`; axiom-clean) and
+  `sqrt2_badly_approximable` (`1/(3q)≤|q√2−p|`, Aristotle-proved, kernel-verified). **CORRECTION**:
+  numerics show the `vv ε = u` model is a dead end — interior ε in the claimed pair-5 interval diverge
+  from √2's digits at n=452. Pair 5 now blocked on the `ON-LINE-REQUEST` (interval may be wrong). The
+  three lemmas are correct/axiom-clean but cover only ε=½. See PENDING_WORK §1.
 - **2026-06-06 (review lap, cont.)**: `stoll_gp_isBit` — **master theorem**: GP difference ∈ {0,1}
   for ε in any of the 7 proven pair intervals (k≥31). `vv_one_le_and_mono` (Aristotle-proved,
   kernel-verified). Pinned pair 5 as the lone gap: numerics show `vv ε = u` on `[ξ₁,ξ₂)` but the
