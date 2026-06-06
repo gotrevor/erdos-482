@@ -1484,5 +1484,38 @@ theorem stoll_pair5_of_evenstep {ε : ℝ}
   rw [vv_eq_u_of_evenstep Heven, vv_eq_u_of_evenstep Heven]
   exact graham_pollak k hk
 
+/-- **√2 is badly approximable** (irrationality measure 2, explicit constant): for every integer `p`
+and positive natural `q`, `1/(3q) ≤ |q√2 − p|`.  Equivalently `‖q√2‖ ≥ 1/(3q)` — the Diophantine
+input the pair-5 even-step (`Heven` in `vv_eq_u_of_evenstep`) needs, since √2's quadratic-irrational
+type keeps the floor-recurrence margin positive for all `j`.  (Aristotle-proved, kernel-verified.) -/
+theorem sqrt2_badly_approximable (p : ℤ) (q : ℕ) (hq : 1 ≤ q) :
+    (1 : ℝ) / (3 * q) ≤ |(q : ℝ) * Real.sqrt 2 - p| := by
+  by_contra! h_contra;
+  -- From the assumption |q√2 - p| < 1/(3q), we get |2q² - p²| < (q√2 + p)/(3q).
+  have h_abs : |(2 * (q : ℝ) ^ 2 - p ^ 2)| < (q * Real.sqrt 2 + p) / (3 * q) := by
+    -- Since $q \geq 1$, we have $q\sqrt{2} \geq \sqrt{2} > 1$, and $1/(3q) \leq 1/3$, so $q\sqrt{2} - p > q\sqrt{2} - 1/(3q) - (q\sqrt{2} - p)$ wait, simpler: since $|q\sqrt{2} - p| < 1/3$ and $q\sqrt{2} \geq \sqrt{2} > 1$, we get $p > q\sqrt{2} - 1/3 > 2/3$, so $p \geq 1$.
+    have h_p_ge_1 : (p : ℝ) ≥ 1 := by
+      rw [ lt_div_iff₀ ] at h_contra <;> norm_num <;> try linarith;
+      exact_mod_cast Int.le_of_lt_add_one ( by rw [ ← @Int.cast_lt ℝ ] ; push_cast; nlinarith [ abs_lt.mp ( show |↑q * Real.sqrt 2 - ↑p| < 1 / 3 by nlinarith [ show ( q : ℝ ) ≥ 1 by norm_cast ] ), Real.sqrt_nonneg 2, Real.sq_sqrt zero_le_two, show ( q : ℝ ) ≥ 1 by norm_cast ] );
+    rw [ abs_lt ] at *;
+    ring_nf at *; constructor <;> nlinarith [ show 0 < ( q : ℝ ) * Real.sqrt 2 by positivity, Real.mul_self_sqrt ( show 0 ≤ 2 by norm_num ) ] ;
+  -- Since $2q^2 - p^2$ is a nonzero integer, we have $|2q^2 - p^2| \geq 1$.
+  have h_nonzero : |(2 * (q : ℝ) ^ 2 - p ^ 2)| ≥ 1 := by
+    by_cases h_eq : (2 * (q : ℝ) ^ 2 - p ^ 2) = 0;
+    · -- If $2q^2 = p^2$, then $\sqrt{2} = \frac{p}{q}$, which contradicts the irrationality of $\sqrt{2}$.
+      have h_contra : Real.sqrt 2 = p / q ∨ Real.sqrt 2 = -p / q := by
+        grind;
+      exact False.elim <| irrational_sqrt_two <| h_contra.elim ( fun h => ⟨ p / q, by push_cast; linarith ⟩ ) fun h => ⟨ -p / q, by push_cast; ring_nf at *; linarith ⟩;
+    · exact mod_cast abs_pos.mpr h_eq;
+  -- From the assumption |q√2 - p| < 1/(3q), we get p > q(3 - √2).
+  have h_p_gt : (p : ℝ) > q * (3 - Real.sqrt 2) := by
+    rw [ lt_div_iff₀ ] at h_abs <;> first | positivity | nlinarith [ ( by norm_cast : ( 1 :ℝ ) ≤ q ) ] ;
+  -- From the assumption |q√2 - p| < 1/(3q), we get p < q√2 + 1/(3q).
+  have h_p_lt : (p : ℝ) < q * Real.sqrt 2 + 1 / (3 * q) := by
+    linarith [ abs_lt.mp h_contra ];
+  rcases q with ( _ | _ | q ) <;> norm_num at *;
+  · rcases p with ⟨ _ | _ | _ | p ⟩ <;> norm_num at * <;> nlinarith [ Real.sqrt_nonneg 2, Real.sq_sqrt zero_le_two ];
+  · nlinarith [ Real.sqrt_nonneg 2, Real.sq_sqrt zero_le_two, inv_mul_cancel₀ ( by linarith : ( q : ℝ ) + 1 + 1 ≠ 0 ), mul_le_mul_of_nonneg_left ( show ( q : ℝ ) ≥ 0 by positivity ) ( Real.sqrt_nonneg 2 ) ]
+
 end Erdos482
 
