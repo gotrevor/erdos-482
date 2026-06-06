@@ -30,7 +30,7 @@ private lemma eq8 {w : ℝ} (h0 : 0 ≤ w) (h1 : w < 1) :
 `0 ≤ w·(1−√2) + √2·ε < 1`.  (The headline uses `ε = 1/2`, recovered as `eq8` above.)  This is the
 general odd→even step needed by Stoll's Theorem 3.2 (BONUS); `crux` already supplies the general
 even→odd step (eq (7)). -/
-private lemma eq8_general {ε w : ℝ} (hε0 : 1 - Real.sqrt 2 / 2 ≤ ε) (hε1 : ε < Real.sqrt 2 / 2)
+lemma eq8_general {ε w : ℝ} (hε0 : 1 - Real.sqrt 2 / 2 ≤ ε) (hε1 : ε < Real.sqrt 2 / 2)
     (h0 : 0 ≤ w) (h1 : w < 1) :
     0 ≤ w * (1 - Real.sqrt 2) + Real.sqrt 2 * ε ∧
       w * (1 - Real.sqrt 2) + Real.sqrt 2 * ε < 1 := by
