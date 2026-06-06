@@ -997,4 +997,86 @@ theorem stoll_pair7 {ε : ℝ} (hlo : 79109 / 2 * Real.sqrt 2 - 55938 ≤ ε) (h
   simpa using key
 
 
+/-! ## Faithful `tᵢ`-form restatements (verbatim Theorem 3.2)
+
+The pair theorems above conclude in terms of `binDigit (αᵢ√2)`.  Stoll's Theorem 3.2 is stated for
+`tᵢ = (αᵢ√2 − βᵢ)·2^{−lᵢ}` (Section 4 decomposition).  `binDigit_div_pow` bridges the two: the
+`(m+1)`-th digit of `αᵢ√2` is the `(m+1+lᵢ)`-th digit of `tᵢ`.  Composing gives each pair's
+conclusion as a digit of `tᵢ` itself — the verbatim paper statement.  The digit index `m+1+lᵢ`
+equals `k−1` with `k = lᵢ+2+m`, matching the paper's "`v_{2k+1} − 2v_{2k−1}` = `k`-th digit of `tᵢ`". -/
+
+/-- **Theorem 3.2, pair 1 (verbatim `t₁` form).** `t₁ = √2 − 1`. -/
+theorem stoll_pair1_t {ε : ℝ} (hε0 : 1 - Real.sqrt 2 / 2 ≤ ε) (hε1 : ε < Real.sqrt 2 - 1) (m : ℕ) :
+    (vv ε (2 * (m + 2) + 1) : ℤ) - 2 * (vv ε (2 * (m + 2) - 1) : ℤ)
+      = binDigit (Real.sqrt 2 - 1) (m + 1) := by
+  have key := stoll_pair1 hε0 hε1 m
+  have conv := binDigit_div_pow 1 1 0 (m + 1) (by norm_num)
+  simp only [Int.cast_one, one_mul, pow_zero, div_one, add_zero] at conv
+  rw [key]; exact conv.symm
+
+/-- **Theorem 3.2, pair 2 (verbatim `t₂` form).** `t₂ = (11√2 − 5)/2³`. -/
+theorem stoll_pair2_t {ε : ℝ} (hlo : Real.sqrt 2 - 1 ≤ ε) (hhi : ε < 19 / 2 * Real.sqrt 2 - 13)
+    (m : ℕ) :
+    (vv ε (2 * (m + 5) + 1) : ℤ) - 2 * (vv ε (2 * (m + 5) - 1) : ℤ)
+      = binDigit (((11 : ℝ) * Real.sqrt 2 - 5) / 2 ^ 3) (m + 1 + 3) := by
+  have key := stoll_pair2 hlo hhi m
+  have conv := binDigit_div_pow 11 5 3 (m + 1) (by norm_num)
+  push_cast at conv
+  rw [key]; exact conv.symm
+
+/-- **Theorem 3.2, pair 3 (verbatim `t₃` form).** `t₃ = (45√2 − 19)/2⁵`. -/
+theorem stoll_pair3_t {ε : ℝ} (hlo : 19 / 2 * Real.sqrt 2 - 13 ≤ ε) (hhi : ε < 77 / 2 * Real.sqrt 2 - 54)
+    (m : ℕ) :
+    (vv ε (2 * (m + 7) + 1) : ℤ) - 2 * (vv ε (2 * (m + 7) - 1) : ℤ)
+      = binDigit (((45 : ℝ) * Real.sqrt 2 - 19) / 2 ^ 5) (m + 1 + 5) := by
+  have key := stoll_pair3 hlo hhi m
+  have conv := binDigit_div_pow 45 19 5 (m + 1) (by norm_num)
+  push_cast at conv
+  rw [key]; exact conv.symm
+
+/-- **Theorem 3.2, pair 4 (verbatim `t₄` form).** `t₄ = (181√2 − 75)/2⁷`. -/
+theorem stoll_pair4_t {ε : ℝ} (hlo : 77 / 2 * Real.sqrt 2 - 54 ≤ ε) (hhi : ε < 309 / 2 * Real.sqrt 2 - 218)
+    (m : ℕ) :
+    (vv ε (2 * (m + 9) + 1) : ℤ) - 2 * (vv ε (2 * (m + 9) - 1) : ℤ)
+      = binDigit (((181 : ℝ) * Real.sqrt 2 - 75) / 2 ^ 7) (m + 1 + 7) := by
+  have key := stoll_pair4 hlo hhi m
+  have conv := binDigit_div_pow 181 75 7 (m + 1) (by norm_num)
+  push_cast at conv
+  rw [key]; exact conv.symm
+
+/-- **Theorem 3.2, pair 7 (verbatim `t₇` form).** `t₇ = (46341√2 − 19195)/2¹⁵`. -/
+theorem stoll_pair7_t {ε : ℝ} (hlo : 79109 / 2 * Real.sqrt 2 - 55938 ≤ ε) (hhi : ε < 5 / 2 * Real.sqrt 2 - 3)
+    (m : ℕ) :
+    (vv ε (2 * (m + 17) + 1) : ℤ) - 2 * (vv ε (2 * (m + 17) - 1) : ℤ)
+      = binDigit (((46341 : ℝ) * Real.sqrt 2 - 19195) / 2 ^ 15) (m + 1 + 15) := by
+  have key := stoll_pair7 hlo hhi m
+  have conv := binDigit_div_pow 46341 19195 15 (m + 1) (by norm_num)
+  push_cast at conv
+  rw [key]; exact conv.symm
+
+/-- **Theorem 3.2, pair 8 (verbatim `t₈` form).** `t₈ = (3√2 − 1)/2`. -/
+theorem stoll_pair8_t {ε : ℝ} (hlo : 5 / 2 * Real.sqrt 2 - 3 ≤ ε) (hhi : ε < Real.sqrt 2 / 2)
+    (m : ℕ) :
+    (vv ε (2 * (m + 3) + 1) : ℤ) - 2 * (vv ε (2 * (m + 3) - 1) : ℤ)
+      = binDigit (((3 : ℝ) * Real.sqrt 2 - 1) / 2 ^ 1) (m + 1 + 1) := by
+  have key := stoll_pair8 hlo hhi m
+  have conv := binDigit_div_pow 3 1 1 (m + 1) (by norm_num)
+  push_cast at conv
+  rw [key]; exact conv.symm
+
+/-- **Corollary 3.3, UNCONDITIONAL, verbatim `t₆` form.**  Stoll's title result stated for
+`t₆ = (759250125√2 − 314491699)/2²⁹` itself: for the paper's sequence `w` (`ε = 1 − π²/e³`) and every
+`m`, `w_{2k+1} − 2 w_{2k−1}` (with `k = m + 31`) equals the `(m+30)`-th = `(k−1)`-th binary digit of
+`t₆`.  This is the digit sequence of `759250125√2/2²⁹` (`= t₆ + 314491699/2²⁹`), Stoll's
+"binary digits of 759250125√2". -/
+theorem cor33_unconditional_t (m : ℕ) :
+    (vv (1 - Real.pi ^ 2 / Real.exp 3) (2 * (m + 31) + 1) : ℤ)
+        - 2 * (vv (1 - Real.pi ^ 2 / Real.exp 3) (2 * (m + 31) - 1) : ℤ)
+      = binDigit (((759250125 : ℝ) * Real.sqrt 2 - 314491699) / 2 ^ 29) (m + 1 + 29) := by
+  have key := cor33_unconditional m
+  have conv := binDigit_div_pow 759250125 314491699 29 (m + 1) (by norm_num)
+  push_cast at conv
+  rw [key]; exact conv.symm
+
 end Erdos482
+
