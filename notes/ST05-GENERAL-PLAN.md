@@ -1,5 +1,28 @@
 # ST05 GENERAL PLAN — formalize the real #482 resolution (any `w>0`, any base `g`)
 
+> ## ✅✅ COMPLETE 2026-06-06 — the ENTIRE St05 paper is formalized & axiom-clean.
+> Every main theorem now has a machine-checked, `[propext, Classical.choice, Quot.sound]`-only proof
+> in `src/Erdos482/General/`:
+> - **Thm 1.3** (g-ary, ANY base, ANY `w>0`) — `Thm13Closed.lean`: `thm13_closed` (closed forms by
+>   joint induction, the piece the stalled Aristotle job couldn't crack — proved locally) +
+>   `thm13_digits` (digit extraction, end to end). **This is the headline #482 resolution.**
+> - **Thm 1.2 Case II** (binary, ε=½, ∞-family `j`) — `Thm12.lean`: `gv` recurrence, `thm12_caseII_eo`
+>   /`_oe`/`_closed`/`_digits`.
+> - **Thm 1.2 Case I** (binary, ε-INTERVAL `[1/3,2/3)`, ∞-family `j`) — `Thm12CaseI.lean`:
+>   `thm12_caseI_eo`/`_oe`/`_closed`/`_digits` (oe uniform over the whole ε-interval).
+> - **Thm 1.1** (Rabinowitz–Gilbert) — `Thm11.lean`: `thm11_rabinowitz_gilbert` (= Case I `j=1,ε=½`).
+> - **Cor 1.1** (both √2 binary families) — `Cor11.lean`: `cor11_binary_sqrt2` (Case II slice) +
+>   `cor11_binary_sqrt2_caseI` (Case I slice; `j=1`⇒Graham–Pollak).
+> - **Cor 1.2** (ternary √2) — `Cor12.lean`: `cor12_ternary_sqrt2`.
+> - **Prop 2** (g-ary digit extraction bridge) — `Digits.lean`: `realDigits_eq_digitStep` (general base).
+>
+> Numerics: `tools/sandbox/st05_thm13_verify.py` (Thm 1.3) + `st05_thm12_verify.py` (Thm 1.2 both cases,
+> all `j`, ε endpoints). The milestone notes below are kept for provenance.
+>
+> **Open polish (optional, not blocking):** connect the capstone digit output
+> `Real.digits (t·g^{n−1}/g) g 0` to mathlib's `Real.digits w g ·` of `w` itself (a mantissa-offset
+> index shift `m = ⌊log_g w⌋`); fetch **St06** (Acta Arith., sharper) when IMPAN egress returns.
+
 **Status:** scaffolded as a plan 2026-06-06, NOT started. Picks up the next time a lap chooses this track.
 **Goal:** formalize Stoll [St05] (Thms 1.1–1.3) — the construction that, for ANY positive real `w` and ANY
 integer base `g≥2`, gives an explicit floor-recurrence whose `u₂ₙ₊₁ − g·u₂ₙ₋₁` reads off the n-th g-ary

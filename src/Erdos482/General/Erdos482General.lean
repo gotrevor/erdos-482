@@ -1,0 +1,52 @@
+import Erdos482.General.Thm13Closed
+import Erdos482.General.Mantissa
+
+/-!
+# Erdős–Graham #482 — the general resolution (any `w > 0`, any base `g ≥ 2`)
+
+The headline deliverable of the St05 track, packaged as one statement.  Given any real `w > 0` and any
+integer base `g ≥ 2`, there is an explicit floor-recurrence `gu g a b ε` (with `a·b = g`, built from the
+base-`g` mantissa `t = w / g^{⌊log_g w⌋} ∈ [1, g)`) whose Graham–Pollak difference
+`gu(2n) − g·gu(2n−2)` is exactly the `n`-th base-`g` digit of `w` (as the mathlib digit
+`Real.digits (t·g^{n−1}/g) g 0`).  This is Erdős–Graham's "similar results for √m and other algebraic
+numbers" — made fully explicit and machine-checked.  Inherits `thm13_digits`: axiom-clean.
+
+We take the offset `ε = −1/g`, which lies in St05's admissible range `[−1/g, (g+1)(g−2)/g)` for **every**
+`g ≥ 2` (at `g = 2` the range is `[−1/2, 0)`, so `ε = 0` would fail — `ε = −1/g` is the safe uniform
+witness).
+-/
+
+namespace Erdos482.General
+
+open Real
+
+/-- **Erdős–Graham #482, resolved in full generality.**  For any `w > 0` and integer base `g ≥ 2`,
+with mantissa `t = w/g^{⌊log_g w⌋}`, there exist coefficients `a, b, ε` (with `a·b = g`) so that the
+recurrence `gu g a b ε` reads off the base-`g` digits of `w`:
+`gu(2n) − g·gu(2n−2) = Real.digits (t·g^{n−1}/g) g 0` for every `n ≥ 1`. -/
+theorem erdos482_resolution (g : ℕ) [NeZero g] (hg : 2 ≤ g) (w : ℝ) (hw : 0 < w) :
+    ∃ a b ε : ℝ, a * b = (g : ℝ) ∧
+      ∀ n, 1 ≤ n →
+        gu g a b ε (2 * n) - g * gu g a b ε (2 * n - 2)
+          = ((Real.digits
+              (w / (g : ℝ) ^ (⌊Real.logb g w⌋) * (g : ℝ) ^ (n - 1) / g) g 0 : ℕ) : ℤ) := by
+  have hgpos : (0 : ℝ) < (g : ℝ) := by positivity
+  have hg1 : (g : ℝ) - 1 ≠ 0 := by
+    have : (2 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+    linarith
+  set t : ℝ := w / (g : ℝ) ^ (⌊Real.logb g w⌋) with ht
+  obtain ⟨ht1, ht2⟩ := mantissa_mem g hg w hw
+  have htg : t + (g : ℝ) ≠ 0 := by have : (1 : ℝ) ≤ t := ht1; positivity
+  refine ⟨(g : ℝ) / (((g : ℝ) - 1) * (t + g)), ((g : ℝ) - 1) * (t + g), -1 / (g : ℝ), ?_, ?_⟩
+  · field_simp
+  · intro n hn
+    have hε0 : -1 / (g : ℝ) ≤ -1 / (g : ℝ) := le_refl _
+    have hg2 : (2 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+    have hε1 : -1 / (g : ℝ) < ((g : ℝ) + 1) * ((g : ℝ) - 2) / g := by
+      rw [div_lt_div_iff_of_pos_right hgpos]
+      nlinarith [hg2, mul_nonneg (show (0 : ℝ) ≤ (g : ℝ) - 2 by linarith)
+        (show (0 : ℝ) ≤ (g : ℝ) + 1 by linarith)]
+    exact thm13_digits g hg t ht1 ht2 (-1 / (g : ℝ))
+      ((g : ℝ) / (((g : ℝ) - 1) * (t + g))) (((g : ℝ) - 1) * (t + g)) rfl rfl hε0 hε1 n hn
+
+end Erdos482.General

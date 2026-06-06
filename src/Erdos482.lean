@@ -10,6 +10,7 @@ import Erdos482.General.Thm13Closed
 import Erdos482.General.Thm12
 import Erdos482.General.Thm12CaseI
 import Erdos482.General.Thm11
+import Erdos482.General.Erdos482General
 import Erdos482.General.Cor11
 import Erdos482.General.Cor12
 import Erdos482.General.Mantissa
