@@ -46,9 +46,10 @@ at ~17min). It proves St05 **Thm 1.3's closed-form joint induction** (recurrence
 the LAST piece needed for an UNCONDITIONAL Thm 1.3. Problem file: `tools/aristotle/thm13closed/Problem.lean`.
 **Next lap step 1:** `aristotle show e0240fef-…` ; if COMPLETE, `aristotle download`, extract, VERIFY
 in our kernel + `#print axioms`, then:
-  1. Port it onto a repo recurrence `gu` def (define `gu` in `General/Thm13.lean` matching the problem's
-     `hrec`/`hu0`; the problem statement is faithful to the verified numerics — gu-indexed,
-     `gu n = u_{n+1}`, step uses (a,ε) when index even, (b,1/(g-1)) when odd).
+  1. Port it onto the repo recurrence `gu` — ALREADY DEFINED in `General/Thm13.lean` (`gu g a b ε`,
+     `gu_zero`), matching the problem's `hrec`/`hu0` exactly (gu-indexed, `gu n = u_{n+1}`, step uses
+     (a,ε) when index even, (b,1/(g-1)) when odd). Instantiate the Aristotle proof's gu/hrec/hu0 with
+     this def (set `a := g/((g-1)(t+g))`, `b := g/a`) — no redefinition needed.
   2. Chain `thm13_closed → thm13_digit_of_oddClosed` (note: convert the `hB:(g-1)·gu(2k+1)=g^k−1`
      even-form and the `hA` odd-form; `thm13_digit_of_oddClosed` only needs the odd form `hA`, which is
      literally the `gu(2k)` closed form — mind the gu vs u indexing: `gu(2k)=u_{2k+1}`).
