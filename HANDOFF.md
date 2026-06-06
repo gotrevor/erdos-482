@@ -1,6 +1,6 @@
 # Handoff: Erdős #482 — pair 5 RESOLVED + St05 general track started
 
-**Date**: 2026-06-06 ~23:00 UTC · **Branch**: main · **HEAD**: `b127a52`
+**Date**: 2026-06-06 ~23:00 UTC · **Branch**: main · **HEAD**: `5cbe187` (lap end)
 
 ## 🎯 What we're doing
 Formalize Stoll's digit-extraction work for Erdős #482 (Lean 4 / mathlib v4.29.1). The headline
