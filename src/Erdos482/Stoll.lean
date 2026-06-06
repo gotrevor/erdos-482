@@ -239,4 +239,75 @@ theorem stoll_pair1 {ε : ℝ} (hε0 : 1 - Real.sqrt 2 / 2 ≤ ε) (hε1 : ε < 
   rw [i1, i2] at key
   simpa using key
 
+/-! ## Concrete instantiation: Pair 8 (`α = 3`, `l = 1`, `t = (3√2 − 1)/2`)
+
+Stoll's pair `i = 8`: `ε ∈ [(5/2)√2 − 3, √2/2)`, `α = 3`, `l = 1`, so `v_{2k+1} − 2 v_{2k−1}`
+reads off the binary digits of `3√2`.  Base case: the recurrence gives
+`vv ε 0..6 = 1,2,3,5,7,10,14`, stable across the whole interval. -/
+
+/-- Base case for pair 8: `vv ε 5 = 10`, `vv ε 6 = 14` for `ε ∈ [(5/2)√2 − 3, √2/2)`. -/
+private lemma stoll_pair8_base {ε : ℝ} (hlo : 5 / 2 * Real.sqrt 2 - 3 ≤ ε)
+    (hhi : ε < Real.sqrt 2 / 2) :
+    (vv ε 5 : ℤ) = 10 ∧ (vv ε 6 : ℤ) = 14 := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hspos : (0:ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hs1 : (1:ℝ) ≤ Real.sqrt 2 := by nlinarith [hs2, hsnn]
+  have hε : 0 ≤ ε := by nlinarith [hlo, hs2, hsnn]
+  have e0 : ((vv ε 0 : ℕ) : ℝ) = 1 := by simp [vv]
+  have h1 : (vv ε 1 : ℤ) = 2 := by
+    rw [show (1:ℕ) = 0 + 1 from rfl, vv_step_even ε hε 0 (by decide), e0, Int.floor_eq_iff]
+    constructor <;> push_cast <;> nlinarith [hlo, hhi, hs1, hs2, hspos]
+  have e1 : ((vv ε 1 : ℕ) : ℝ) = 2 := by exact_mod_cast h1
+  have h2 : (vv ε 2 : ℤ) = 3 := by
+    rw [show (2:ℕ) = 1 + 1 from rfl, vv_step_odd ε 1 (by decide), e1, Int.floor_eq_iff]
+    constructor <;> push_cast <;> nlinarith [hs1, hs2, hspos]
+  have e2 : ((vv ε 2 : ℕ) : ℝ) = 3 := by exact_mod_cast h2
+  have h3 : (vv ε 3 : ℤ) = 5 := by
+    rw [show (3:ℕ) = 2 + 1 from rfl, vv_step_even ε hε 2 (by decide), e2, Int.floor_eq_iff]
+    constructor <;> push_cast <;> nlinarith [hlo, hhi, hs1, hs2, hspos]
+  have e3 : ((vv ε 3 : ℕ) : ℝ) = 5 := by exact_mod_cast h3
+  have h4 : (vv ε 4 : ℤ) = 7 := by
+    rw [show (4:ℕ) = 3 + 1 from rfl, vv_step_odd ε 3 (by decide), e3, Int.floor_eq_iff]
+    constructor <;> push_cast <;> nlinarith [hs1, hs2, hspos]
+  have e4 : ((vv ε 4 : ℕ) : ℝ) = 7 := by exact_mod_cast h4
+  have h5 : (vv ε 5 : ℤ) = 10 := by
+    rw [show (5:ℕ) = 4 + 1 from rfl, vv_step_even ε hε 4 (by decide), e4, Int.floor_eq_iff]
+    constructor <;> push_cast <;> nlinarith [hlo, hhi, hs1, hs2, hspos]
+  have e5 : ((vv ε 5 : ℕ) : ℝ) = 10 := by exact_mod_cast h5
+  have h6 : (vv ε 6 : ℤ) = 14 := by
+    rw [show (6:ℕ) = 5 + 1 from rfl, vv_step_odd ε 5 (by decide), e5, Int.floor_eq_iff]
+    constructor <;> push_cast <;> nlinarith [hs1, hs2, hspos]
+  exact ⟨h5, h6⟩
+
+/-- **Stoll Theorem 3.2, pair 8.**  For every offset `ε ∈ [(5/2)√2 − 3, √2/2)` and every `m`,
+`v_{2k+1} − 2 v_{2k−1}` (with `k = m + 3`) equals the `(m+1)`-th binary digit of `3√2`. -/
+theorem stoll_pair8 {ε : ℝ} (hlo : 5 / 2 * Real.sqrt 2 - 3 ≤ ε) (hhi : ε < Real.sqrt 2 / 2)
+    (m : ℕ) :
+    (vv ε (2 * (m + 3) + 1) : ℤ) - 2 * (vv ε (2 * (m + 3) - 1) : ℤ)
+      = binDigit (3 * Real.sqrt 2) (m + 1) := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hε0 : 1 - Real.sqrt 2 / 2 ≤ ε := by nlinarith [hlo, hs2, hsnn]
+  obtain ⟨hb5, hb6⟩ := stoll_pair8_base hlo hhi
+  have baseP : (vv ε (2 * (1 + 2) - 1) : ℤ)
+      = ⌊((3 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0⌋ + (3 : ℤ) * 2 ^ 1 := by
+    have hf : ⌊((3 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0⌋ = 4 := by
+      have he : ((3 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0 = 3 * Real.sqrt 2 := by push_cast; ring
+      rw [he, Int.floor_eq_iff]
+      constructor <;> push_cast <;> nlinarith [hs2, hsnn]
+    rw [show (2 * (1 + 2) - 1 : ℕ) = 5 from rfl, hf, hb5]; norm_num
+  have baseQ : (vv ε (2 * (1 + 2)) : ℤ)
+      = ⌊((3 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1⌋ + (3 : ℤ) * 2 ^ 1 := by
+    have hf : ⌊((3 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1⌋ = 8 := by
+      have he : ((3 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1 = 6 * Real.sqrt 2 := by push_cast; ring
+      rw [he, Int.floor_eq_iff]
+      constructor <;> push_cast <;> nlinarith [hs2, hsnn]
+    rw [show (2 * (1 + 2) : ℕ) = 6 from rfl, hf, hb6]; norm_num
+  have key := stoll_digit 3 1 hε0 hhi baseP baseQ m
+  have i1 : 2 * (1 + 2 + m) + 1 = 2 * (m + 3) + 1 := by ring
+  have i2 : 2 * (1 + 2 + m) - 1 = 2 * (m + 3) - 1 := by omega
+  rw [i1, i2] at key
+  simpa using key
+
 end Erdos482
