@@ -1450,5 +1450,39 @@ theorem stoll_pair5_half (n : ℕ) (hn : 1 ≤ n) :
     (vv (1 / 2) (2 * n + 1) : ℤ) - 2 * (vv (1 / 2) (2 * n - 1) : ℤ) = binDigit (Real.sqrt 2) n := by
   rw [vv_half_eq_u, vv_half_eq_u]; exact graham_pollak n hn
 
+/-- **Pair 5 reduction (isolates the Diophantine core).**  If the even-index (ε-)steps of `vv ε`
+land on the headline sequence `u` — i.e. `⌊√2·(u(2j)+ε)⌋₊ = u(2j+1)` for every `j` — then
+`vv ε = u` entirely (the odd ½-steps match `u` automatically, being literally `u`'s recurrence).
+This reduces pair 5's full-interval statement to the single hypothesis `Heven`, which is the
+genuinely hard part: for `ε ∈ [ξ₁,ξ₂)` (pair 5's interval) `Heven` holds, but proving it needs a
+Diophantine bound on `‖√2·2^j‖` (√2 badly approximable; the per-step margin shrinks — see
+`PENDING_WORK.md §1`).  Axiom-free.  Combined with the headline `graham_pollak`, `Heven` ⟹ pair 5. -/
+theorem vv_eq_u_of_evenstep {ε : ℝ}
+    (Heven : ∀ j, ⌊Real.sqrt 2 * ((u (2 * j) : ℝ) + ε)⌋₊ = u (2 * j + 1)) :
+    ∀ n, vv ε n = u n := by
+  intro n
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+    show ⌊Real.sqrt 2 * ((vv ε n : ℝ) + (if Even n then ε else 1 / 2))⌋₊ = u (n + 1)
+    rw [ih]
+    by_cases hn : Even n
+    · rw [if_pos hn]
+      obtain ⟨j, rfl⟩ := hn
+      rw [show j + j = 2 * j from by ring]
+      exact Heven j
+    · rw [if_neg hn]; rfl
+
+/-- **Pair 5 modulo the Diophantine core.**  Given the even-step agreement `Heven` (which holds for
+every `ε` in pair 5's interval `[ξ₁,ξ₂)` — the open Diophantine lemma), `vv ε` reproduces the binary
+digits of `√2`: `vv ε (2k+1) − 2 vv ε (2k−1) = binDigit √2 k` for `k ≥ 1`.  Immediate from
+`vv_eq_u_of_evenstep` + `graham_pollak`.  Discharging `Heven` for the interval completes pair 5 (the
+last open case of Theorem 3.2). -/
+theorem stoll_pair5_of_evenstep {ε : ℝ}
+    (Heven : ∀ j, ⌊Real.sqrt 2 * ((u (2 * j) : ℝ) + ε)⌋₊ = u (2 * j + 1)) (k : ℕ) (hk : 1 ≤ k) :
+    (vv ε (2 * k + 1) : ℤ) - 2 * (vv ε (2 * k - 1) : ℤ) = binDigit (Real.sqrt 2) k := by
+  rw [vv_eq_u_of_evenstep Heven, vv_eq_u_of_evenstep Heven]
+  exact graham_pollak k hk
+
 end Erdos482
 
