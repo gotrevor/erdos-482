@@ -1,0 +1,13 @@
+name = "Erdos482"
+version = "0.1.0"
+keywords = ["math", "number-theory", "digits", "erdos"]
+defaultTargets = ["Erdos482"]
+srcDir = "src"
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.29.1"
+
+[[lean_lib]]
+name = "Erdos482"
