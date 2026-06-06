@@ -79,13 +79,12 @@ theorem irrational_fract_sqrt2 : Irrational (Int.fract (Real.sqrt 2)) := by
 
 /-- **The expansion is non-terminating.**  The binary digits of `Int.fract √2` are not eventually
 zero — if they were, `√2 − 1` would be a dyadic rational, contradicting irrationality.  Hence the
-Graham–Pollak difference sequence has infinitely many `1`s. -/
-theorem digits_sqrt2_not_eventually_zero :
-    ¬ ∃ N, ∀ i, N ≤ i → (Real.digits (Int.fract (Real.sqrt 2)) 2 i : ℕ) = 0 := by
+Graham–Pollak difference sequence has infinitely many `1`s.  Stated generally for any irrational
+`y ≥ 0` (the expansion of an irrational never terminates). -/
+theorem digits_two_irrational_not_eventually_zero
+    (y : ℝ) (hy0 : 0 ≤ y) (hyirr : Irrational y) :
+    ¬ ∃ N, ∀ i, N ≤ i → (Real.digits y 2 i : ℕ) = 0 := by
   rintro ⟨N, hN⟩
-  set y := Int.fract (Real.sqrt 2) with hy
-  have hyirr : Irrational y := irrational_fract_sqrt2
-  have hy0 : 0 ≤ y := Int.fract_nonneg _
   -- digit i = 0  ⟹  ⌊y·2^(i+1)⌋ = 2⌊y·2^i⌋
   have hstep : ∀ i, N ≤ i → ⌊y * 2 ^ (i + 1)⌋ = 2 * ⌊y * 2 ^ i⌋ := by
     intro i hi
@@ -137,6 +136,13 @@ theorem digits_sqrt2_not_eventually_zero :
   -- y = M/2^N is rational, contradicting irrationality
   apply hyirr
   exact ⟨(M : ℚ) / 2 ^ N, by rw [hyc, hc]; push_cast; ring⟩
+
+/-- **The √2 expansion is non-terminating.**  Corollary of the general irrational statement: the
+binary digits of `Int.fract √2` are not eventually zero, so the Graham–Pollak difference sequence
+has infinitely many `1`s. -/
+theorem digits_sqrt2_not_eventually_zero :
+    ¬ ∃ N, ∀ i, N ≤ i → (Real.digits (Int.fract (Real.sqrt 2)) 2 i : ℕ) = 0 :=
+  digits_two_irrational_not_eventually_zero _ (Int.fract_nonneg _) irrational_fract_sqrt2
 
 /-- **No all-ones tail.**  For any `y ≥ 0`, the base-2 `Real.digits` of `y` are never eventually
 `1` — the floor convention always yields the terminating-style (no `0.0111…`) representation.
