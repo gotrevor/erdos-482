@@ -5,3 +5,4 @@ import Erdos482.Digits
 import Erdos482.Stoll
 import Erdos482.Main
 import Erdos482.General.Digits
+import Erdos482.General.Thm13

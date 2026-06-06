@@ -183,6 +183,7 @@
   "active": "efd869cbcc11544b",
   "lastOpenFiles": [
     "src/Erdos482/CheckAx.lean",
+    "src/Erdos482/General/Thm13.lean",
     "src/Erdos482/General/Digits.lean",
     "src/Erdos482/General",
     "tools/sandbox/st05_thm13_verify.py",
@@ -193,7 +194,6 @@
     "tools/aristotle/dblexplicit/Problem.lean",
     "tools/aristotle/dblexplicit",
     "tools/aristotle/bandmargin/Problem.lean",
-    "tools/aristotle/nehalf/Problem.lean",
     "notes/ST05-GENERAL-PLAN.md",
     "papers/SOURCES.md"
   ]
