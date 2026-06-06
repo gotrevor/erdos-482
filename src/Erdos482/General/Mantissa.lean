@@ -40,4 +40,11 @@ theorem mantissa_mem (g : ℕ) (hg : 2 ≤ g) (w : ℝ) (hw : 0 < w) :
     have hsplit : b ^ (m + 1) = b * b ^ m := by rw [zpow_add_one₀ (by linarith)]; ring
     rw [hsplit] at hlt; linarith
 
+/-- **Mantissa reconstruction.**  `t · g^m = w` (`m = ⌊log_g w⌋`, `t = w/g^m`): the mantissa scaled
+back by `g^m` recovers `w`.  So `w` and `t` have the same base-`g` digits up to the shift by `m`. -/
+theorem mantissa_reconstruct (g : ℕ) (hg : 2 ≤ g) (w : ℝ) :
+    w / (g : ℝ) ^ (⌊Real.logb g w⌋) * (g : ℝ) ^ (⌊Real.logb g w⌋) = w := by
+  have hbpos : (0 : ℝ) < (g : ℝ) := by positivity
+  exact div_mul_cancel₀ w (zpow_ne_zero _ (ne_of_gt hbpos))
+
 end Erdos482.General
