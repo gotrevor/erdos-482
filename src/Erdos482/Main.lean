@@ -70,4 +70,12 @@ theorem binDigit_sqrt2_first_six :
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩ <;> unfold binDigit <;>
     norm_num [f0, f1, f2, f3, f4, f5, f6]
 
+/-- **Closing the loop.**  The base-2 digit sequence reconstructs `Int.fract √2` via
+`Real.ofDigits`.  Combined with `gp_digit_seq` (which identifies those digits with the
+Graham–Pollak differences `u(2(i+1)+1) − 2u(2(i+1)−1)`), this says the Graham–Pollak sequence
+recovers the entire binary expansion of `√2` after the point. -/
+theorem gp_reconstructs_sqrt2 :
+    Real.ofDigits (Real.digits (Int.fract (Real.sqrt 2)) 2) = Int.fract (Real.sqrt 2) :=
+  Real.ofDigits_digits (by norm_num) ⟨Int.fract_nonneg _, Int.fract_lt_one _⟩
+
 end Erdos482
