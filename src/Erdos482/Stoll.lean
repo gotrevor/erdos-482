@@ -1450,6 +1450,27 @@ theorem stoll_pair5_half (n : ℕ) (hn : 1 ≤ n) :
     (vv (1 / 2) (2 * n + 1) : ℤ) - 2 * (vv (1 / 2) (2 * n - 1) : ℤ) = binDigit (Real.sqrt 2) n := by
   rw [vv_half_eq_u, vv_half_eq_u]; exact graham_pollak n hn
 
+/-- **Stoll's explicit pair-5 closed form (`ε = ½`), typo-corrected.**
+Stoll's §4 dispatches the special case `i = 5` (`t₅ = √2`, `β = 0`) by directly exhibiting the
+closed form of the sequence "so that we do not have to bother about initial conditions".  The paper
+prints `v_{2k} = ⌊tᵢ·2^{k−2}⌋ + 2^{k−2}`, but that is a **typo**: at `k = 1` it gives the
+non-integer `v₂ = ½` whereas the recurrence yields `v₂ = 2`.  The corrected formula — verified in
+exact integer arithmetic (`archive/findings/ON-LINE-FINDINGS-2026-06-06-pair5.md`) — replaces the
+exponent `k−2` by `k−1` in **both** terms of `v_{2k}`, so the two share a single floor:
+
+  `v_{2k} = ⌊√2·2^{k−1}⌋ + 2^{k−1}`  and  `v_{2k+1} = ⌊√2·2^{k−1}⌋ + 2^k`,  `k ≥ 1`.
+
+In our 0-indexed `vv` (`vv ε n = v_{n+1}`) at `ε = ½` this is exactly the headline closed form
+`gp_pair (k−1)` (since `vv (1/2) = u`).  Stated here verbatim to make pair 5's treatment faithful
+to the paper. -/
+theorem stoll_pair5_closed_form (k : ℕ) (hk : 1 ≤ k) :
+    (vv (1 / 2) (2 * k - 1) : ℤ) = ⌊Real.sqrt 2 * 2 ^ (k - 1)⌋ + 2 ^ (k - 1) ∧
+      (vv (1 / 2) (2 * k) : ℤ) = ⌊Real.sqrt 2 * 2 ^ (k - 1)⌋ + 2 ^ k := by
+  obtain ⟨j, rfl⟩ : ∃ j, k = j + 1 := ⟨k - 1, by omega⟩
+  rw [vv_half_eq_u, vv_half_eq_u, Nat.add_sub_cancel,
+    show 2 * (j + 1) - 1 = 2 * j + 1 by omega, show 2 * (j + 1) = 2 * j + 2 by omega]
+  exact gp_pair j
+
 /-- **Pair 5 reduction (isolates the Diophantine core).**  If the even-index (ε-)steps of `vv ε`
 land on the headline sequence `u` — i.e. `⌊√2·(u(2j)+ε)⌋₊ = u(2j+1)` for every `j` — then
 `vv ε = u` entirely (the odd ½-steps match `u` automatically, being literally `u`'s recurrence).
