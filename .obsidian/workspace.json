@@ -183,6 +183,7 @@
   "active": "efd869cbcc11544b",
   "lastOpenFiles": [
     "src/Erdos482/AxCheckTmp.lean",
+    "src/Erdos482/General/Cor12.lean",
     "src/Erdos482/General/Thm13Closed.lean",
     "tools/aristotle/JOBS-thm13closed.md",
     "tools/aristotle/closed_full/Problem.lean",
@@ -193,7 +194,6 @@
     "tools/aristotle/closed_assembly",
     "tools/aristotle/eo_ineq",
     "tools/aristotle/eo_floor",
-    "e0240fef-d8a6-4c98-91c2-74f6401295ed-aristotle.tar.gz",
     "HANDOFF-2026-06-06-2300.md",
     "archive/findings/ON-LINE-FINDINGS-2026-06-06-pair5.md",
     "notes/ST05-GENERAL-PLAN.md",
