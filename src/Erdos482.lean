@@ -6,3 +6,4 @@ import Erdos482.Stoll
 import Erdos482.Main
 import Erdos482.General.Digits
 import Erdos482.General.Thm13
+import Erdos482.General.Mantissa

@@ -1,0 +1,43 @@
+import Mathlib
+
+/-!
+# Base-`g` mantissa (Stoll [St05], §1)
+
+For a real `w > 0` and integer base `g ≥ 2`, the mantissa `t = w / g^m` with `m = ⌊log_g w⌋` lies in
+`[1, g)`.  This is the normalisation feeding St05's recurrences (`General/Thm13`, `Thm12`).
+-/
+
+namespace Erdos482.General
+
+open Real
+
+/-- **The base-`g` mantissa lies in `[1, g)`.**  `m = ⌊log_g w⌋`, `t = w/g^m`, then `1 ≤ t < g`. -/
+theorem mantissa_mem (g : ℕ) (hg : 2 ≤ g) (w : ℝ) (hw : 0 < w) :
+    1 ≤ w / (g : ℝ) ^ (⌊Real.logb g w⌋) ∧
+      w / (g : ℝ) ^ (⌊Real.logb g w⌋) < (g : ℝ) := by
+  set b : ℝ := (g : ℝ) with hbdef
+  have hb1 : (1 : ℝ) < b := by rw [hbdef]; exact_mod_cast hg
+  have hbpos : (0 : ℝ) < b := by linarith
+  have hbne1 : b ≠ 1 := by linarith
+  set m : ℤ := ⌊Real.logb b w⌋ with hm
+  have hpow_pos : (0 : ℝ) < b ^ m := zpow_pos hbpos m
+  -- b^m ≤ w
+  have hle : b ^ m ≤ w := by
+    have h1 : b ^ (m : ℝ) ≤ b ^ Real.logb b w :=
+      (Real.rpow_le_rpow_left_iff hb1).mpr (Int.floor_le _)
+    rwa [Real.rpow_intCast, Real.rpow_logb hbpos hbne1 hw] at h1
+  -- w < b^(m+1)
+  have hlt : w < b ^ (m + 1) := by
+    have h2 : b ^ Real.logb b w < b ^ ((m : ℝ) + 1) :=
+      (Real.rpow_lt_rpow_left_iff hb1).mpr (Int.lt_floor_add_one _)
+    rw [Real.rpow_logb hbpos hbne1 hw] at h2
+    have hcast : b ^ ((m : ℝ) + 1) = b ^ (m + 1) := by
+      rw [← Real.rpow_intCast b (m + 1)]; push_cast; ring_nf
+    rwa [hcast] at h2
+  refine ⟨?_, ?_⟩
+  · rw [le_div_iff₀ hpow_pos]; linarith
+  · rw [div_lt_iff₀ hpow_pos]
+    have hsplit : b ^ (m + 1) = b * b ^ m := by rw [zpow_add_one₀ (by linarith)]; ring
+    rw [hsplit] at hlt; linarith
+
+end Erdos482.General

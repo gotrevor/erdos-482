@@ -182,18 +182,18 @@
   },
   "active": "efd869cbcc11544b",
   "lastOpenFiles": [
+    "src/Erdos482/CheckAx.lean",
+    "src/Erdos482/General/Mantissa.lean",
+    "tools/aristotle/mantissa/Problem.lean",
+    "tools/aristotle/mantissa",
     "tools/aristotle/thm13closed/Problem.lean",
     "tools/aristotle/thm13closed",
-    "src/Erdos482/CheckAx.lean",
     "src/Erdos482/General/Thm13.lean",
     "src/Erdos482/General/Digits.lean",
     "src/Erdos482/General",
     "tools/sandbox/st05_thm13_verify.py",
     "tools/sandbox",
     "archive/findings/ON-LINE-FINDINGS-2026-06-06-pair5.md",
-    "tools/aristotle/bandbranch/Problem.lean",
-    "tools/aristotle/bandbranch",
-    "tools/aristotle/dblexplicit/Problem.lean",
     "notes/ST05-GENERAL-PLAN.md",
     "papers/SOURCES.md"
   ]
