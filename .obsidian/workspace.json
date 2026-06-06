@@ -182,6 +182,7 @@
   },
   "active": "efd869cbcc11544b",
   "lastOpenFiles": [
+    "HANDOFF-2026-06-06-2300.md",
     "src/Erdos482/CheckAx.lean",
     "src/Erdos482/General/Mantissa.lean",
     "tools/aristotle/mantissa/Problem.lean",
@@ -192,7 +193,6 @@
     "src/Erdos482/General/Digits.lean",
     "src/Erdos482/General",
     "tools/sandbox/st05_thm13_verify.py",
-    "tools/sandbox",
     "archive/findings/ON-LINE-FINDINGS-2026-06-06-pair5.md",
     "notes/ST05-GENERAL-PLAN.md",
     "papers/SOURCES.md"
