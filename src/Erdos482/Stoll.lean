@@ -1685,5 +1685,35 @@ theorem sqrt2_pow_far_from_halfint (n : ℕ) (p : ℤ) :
   rw [h5] at h2
   linarith
 
+/-- **The precise obstruction: the ε-step fails below ½ when the orbit lands just above ½.**
+For `j ≥ 1`, if `{√2·2^{j−1}} ∈ [½, (1−√2ε)/(2−√2))` then the band bracket `B_j(ε)` is *negative*,
+so by `pair5_estep_band` the ε-step does not land on the headline value.  For `ε < ½` the upper
+threshold `(1−√2ε)/(2−√2)` exceeds `½` (it equals `½` exactly at `ε = ½`), so this sub-band just
+above `½` is nonempty — whenever the orbit `{√2·2^m}` enters it the recurrence breaks.  This is
+why no `ε < ½` is uniformly admissible (the symmetric statement below ½ handles `ε > ½`).  Proof is
+pure doubling-map branch arithmetic via `fract_two_mul` — no normality assumption. -/
+theorem pair5_band_fails_below_half (j : ℕ) (hj : 1 ≤ j) {ε : ℝ}
+    (hf_lo : 1 / 2 ≤ Int.fract (Real.sqrt 2 * 2 ^ (j - 1)))
+    (hf_hi : Int.fract (Real.sqrt 2 * 2 ^ (j - 1))
+        < (1 - Real.sqrt 2 * ε) / (2 - Real.sqrt 2)) :
+    ¬ (0 ≤ Int.fract (Real.sqrt 2 * 2 ^ j)
+            - Real.sqrt 2 * Int.fract (Real.sqrt 2 * 2 ^ (j - 1)) + Real.sqrt 2 * ε) := by
+  obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
+  simp only [Nat.add_sub_cancel] at *
+  set f := Int.fract (Real.sqrt 2 * 2 ^ i) with hf
+  have hf1 : f < 1 := Int.fract_lt_one _
+  -- doubling: {√2·2^(i+1)} = 2f − 1 (the orbit is in the upper half [½,1))
+  have hdouble : Int.fract (Real.sqrt 2 * 2 ^ (i + 1)) = 2 * f - 1 := by
+    have e : Real.sqrt 2 * 2 ^ (i + 1) = 2 * (Real.sqrt 2 * 2 ^ i) := by ring
+    have hfloor : ⌊2 * f⌋ = 1 := by
+      rw [Int.floor_eq_iff]; constructor <;> push_cast <;> linarith
+    rw [e, fract_two_mul, ← hf, Int.fract, hfloor]; push_cast; ring
+  rw [hdouble]
+  have hpos : (0:ℝ) < 2 - Real.sqrt 2 := by
+    nlinarith [Real.sq_sqrt (show (0:ℝ) ≤ 2 by norm_num), Real.sqrt_nonneg 2]
+  have hlin : f * (2 - Real.sqrt 2) < 1 - Real.sqrt 2 * ε := (lt_div_iff₀ hpos).mp hf_hi
+  intro hcontra
+  nlinarith [hlin, hcontra]
+
 end Erdos482
 
