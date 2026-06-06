@@ -1078,5 +1078,250 @@ theorem cor33_unconditional_t (m : ℕ) :
   push_cast at conv
   rw [key]; exact conv.symm
 
+set_option maxHeartbeats 1000000 in
+/-- **Pair 6 base case, FULL interval (eq 9).**  For every `ε` in the pair-6 interval
+`[1296121037√2/2 − 916495974, 79109√2/2 − 55938)`, the 62-step recurrence gives
+`vv ε 61 = 2592242074`, `vv ε 62 = 3665983898`.  Unlike `cor33_base_of_bounds` (which covers only
+an *interior* `ε` via rational `√2`-enclosures), this covers the **whole half-open interval**: the
+two endpoint-defining steps (indices 30, 58) are *exactly* tight, and close because the
+`√2`-coefficient of the **exact** product bounds `hpl`/`hph` cancels to `0` there
+(`√2·ξ₁ = 1296121037 − 916495974√2`, `√2·ξ₂ = 79109 − 55938√2`, via `√2·√2 = 2`).  All other steps
+have margin `≥ 0.0074`, closed by the 13-digit `√2` bounds.  This is Stoll's eq (9) for pair 6 and
+makes `stoll_pair6` hold for the full `ε`-interval, completing Theorem 3.2's pair 6. -/
+private lemma cor33_base_interval {ε : ℝ}
+    (hlo : (1296121037 : ℝ) * Real.sqrt 2 / 2 - 916495974 ≤ ε)
+    (hhi : ε < (79109 : ℝ) * Real.sqrt 2 / 2 - 55938) :
+    (vv ε 61 : ℤ) = 2592242074 ∧ (vv ε 62 : ℤ) = 3665983898 := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hspos : (0:ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hs2lo : (1414213562373 / 1000000000000 : ℝ) < Real.sqrt 2 := sqrt2_lo
+  have hs2hi : Real.sqrt 2 < (14142135623731 / 10000000000000 : ℝ) := sqrt2_hi
+  have hεpos : (0:ℝ) ≤ ε := by nlinarith [hlo, hs2lo]
+  have hpl : Real.sqrt 2 * ε ≥ 1296121037 - 916495974 * Real.sqrt 2 := by
+    have h := mul_le_mul_of_nonneg_left hlo hsnn
+    nlinarith [h, hs2]
+  have hph : Real.sqrt 2 * ε < 79109 - 55938 * Real.sqrt 2 := by
+    have h := mul_lt_mul_of_pos_left hhi hspos
+    nlinarith [h, hs2]
+  have v0 : (vv ε 0 : ℤ) = 1 := by simp [vv]
+  have v1 : (vv ε 1 : ℤ) = 2 := vv_even_to ε hεpos 0 (by decide) v0
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v2 : (vv ε 2 : ℤ) = 3 := vv_odd_to ε 1 (by decide) v1
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v3 : (vv ε 3 : ℤ) = 4 := vv_even_to ε hεpos 2 (by decide) v2
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v4 : (vv ε 4 : ℤ) = 6 := vv_odd_to ε 3 (by decide) v3
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v5 : (vv ε 5 : ℤ) = 9 := vv_even_to ε hεpos 4 (by decide) v4
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v6 : (vv ε 6 : ℤ) = 13 := vv_odd_to ε 5 (by decide) v5
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v7 : (vv ε 7 : ℤ) = 19 := vv_even_to ε hεpos 6 (by decide) v6
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v8 : (vv ε 8 : ℤ) = 27 := vv_odd_to ε 7 (by decide) v7
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v9 : (vv ε 9 : ℤ) = 38 := vv_even_to ε hεpos 8 (by decide) v8
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v10 : (vv ε 10 : ℤ) = 54 := vv_odd_to ε 9 (by decide) v9
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v11 : (vv ε 11 : ℤ) = 77 := vv_even_to ε hεpos 10 (by decide) v10
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v12 : (vv ε 12 : ℤ) = 109 := vv_odd_to ε 11 (by decide) v11
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v13 : (vv ε 13 : ℤ) = 154 := vv_even_to ε hεpos 12 (by decide) v12
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v14 : (vv ε 14 : ℤ) = 218 := vv_odd_to ε 13 (by decide) v13
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v15 : (vv ε 15 : ℤ) = 309 := vv_even_to ε hεpos 14 (by decide) v14
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v16 : (vv ε 16 : ℤ) = 437 := vv_odd_to ε 15 (by decide) v15
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v17 : (vv ε 17 : ℤ) = 618 := vv_even_to ε hεpos 16 (by decide) v16
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v18 : (vv ε 18 : ℤ) = 874 := vv_odd_to ε 17 (by decide) v17
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v19 : (vv ε 19 : ℤ) = 1236 := vv_even_to ε hεpos 18 (by decide) v18
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v20 : (vv ε 20 : ℤ) = 1748 := vv_odd_to ε 19 (by decide) v19
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v21 : (vv ε 21 : ℤ) = 2472 := vv_even_to ε hεpos 20 (by decide) v20
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v22 : (vv ε 22 : ℤ) = 3496 := vv_odd_to ε 21 (by decide) v21
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v23 : (vv ε 23 : ℤ) = 4944 := vv_even_to ε hεpos 22 (by decide) v22
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v24 : (vv ε 24 : ℤ) = 6992 := vv_odd_to ε 23 (by decide) v23
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v25 : (vv ε 25 : ℤ) = 9888 := vv_even_to ε hεpos 24 (by decide) v24
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v26 : (vv ε 26 : ℤ) = 13984 := vv_odd_to ε 25 (by decide) v25
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v27 : (vv ε 27 : ℤ) = 19777 := vv_even_to ε hεpos 26 (by decide) v26
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v28 : (vv ε 28 : ℤ) = 27969 := vv_odd_to ε 27 (by decide) v27
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v29 : (vv ε 29 : ℤ) = 39554 := vv_even_to ε hεpos 28 (by decide) v28
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v30 : (vv ε 30 : ℤ) = 55938 := vv_odd_to ε 29 (by decide) v29
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v31 : (vv ε 31 : ℤ) = 79108 := vv_even_to ε hεpos 30 (by decide) v30
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v32 : (vv ε 32 : ℤ) = 111876 := vv_odd_to ε 31 (by decide) v31
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v33 : (vv ε 33 : ℤ) = 158217 := vv_even_to ε hεpos 32 (by decide) v32
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v34 : (vv ε 34 : ℤ) = 223753 := vv_odd_to ε 33 (by decide) v33
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v35 : (vv ε 35 : ℤ) = 316435 := vv_even_to ε hεpos 34 (by decide) v34
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v36 : (vv ε 36 : ℤ) = 447507 := vv_odd_to ε 35 (by decide) v35
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v37 : (vv ε 37 : ℤ) = 632871 := vv_even_to ε hεpos 36 (by decide) v36
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v38 : (vv ε 38 : ℤ) = 895015 := vv_odd_to ε 37 (by decide) v37
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v39 : (vv ε 39 : ℤ) = 1265743 := vv_even_to ε hεpos 38 (by decide) v38
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v40 : (vv ε 40 : ℤ) = 1790031 := vv_odd_to ε 39 (by decide) v39
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v41 : (vv ε 41 : ℤ) = 2531486 := vv_even_to ε hεpos 40 (by decide) v40
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v42 : (vv ε 42 : ℤ) = 3580062 := vv_odd_to ε 41 (by decide) v41
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v43 : (vv ε 43 : ℤ) = 5062972 := vv_even_to ε hεpos 42 (by decide) v42
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v44 : (vv ε 44 : ℤ) = 7160124 := vv_odd_to ε 43 (by decide) v43
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v45 : (vv ε 45 : ℤ) = 10125945 := vv_even_to ε hεpos 44 (by decide) v44
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v46 : (vv ε 46 : ℤ) = 14320249 := vv_odd_to ε 45 (by decide) v45
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v47 : (vv ε 47 : ℤ) = 20251891 := vv_even_to ε hεpos 46 (by decide) v46
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v48 : (vv ε 48 : ℤ) = 28640499 := vv_odd_to ε 47 (by decide) v47
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v49 : (vv ε 49 : ℤ) = 40503782 := vv_even_to ε hεpos 48 (by decide) v48
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v50 : (vv ε 50 : ℤ) = 57280998 := vv_odd_to ε 49 (by decide) v49
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v51 : (vv ε 51 : ℤ) = 81007564 := vv_even_to ε hεpos 50 (by decide) v50
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v52 : (vv ε 52 : ℤ) = 114561996 := vv_odd_to ε 51 (by decide) v51
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v53 : (vv ε 53 : ℤ) = 162015129 := vv_even_to ε hεpos 52 (by decide) v52
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v54 : (vv ε 54 : ℤ) = 229123993 := vv_odd_to ε 53 (by decide) v53
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v55 : (vv ε 55 : ℤ) = 324030259 := vv_even_to ε hεpos 54 (by decide) v54
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v56 : (vv ε 56 : ℤ) = 458247987 := vv_odd_to ε 55 (by decide) v55
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v57 : (vv ε 57 : ℤ) = 648060518 := vv_even_to ε hεpos 56 (by decide) v56
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v58 : (vv ε 58 : ℤ) = 916495974 := vv_odd_to ε 57 (by decide) v57
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v59 : (vv ε 59 : ℤ) = 1296121037 := vv_even_to ε hεpos 58 (by decide) v58
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v60 : (vv ε 60 : ℤ) = 1832991949 := vv_odd_to ε 59 (by decide) v59
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  have v61 : (vv ε 61 : ℤ) = 2592242074 := vv_even_to ε hεpos 60 (by decide) v60
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi, hpl, hph])
+  have v62 : (vv ε 62 : ℤ) = 3665983898 := vv_odd_to ε 61 (by decide) v61
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+    (by push_cast; rw [mul_add]; linarith [hs2lo, hs2hi])
+  exact ⟨v61, v62⟩
+
+/-- **Stoll Theorem 3.2, pair 6 (full interval).**  For *every* offset
+`ε ∈ [1296121037√2/2 − 916495974, 79109√2/2 − 55938)` (pair 6's interval `[ξ₁₆, ξ₂₆)`) and every
+`m`, `v_{2k+1} − 2 v_{2k−1}` (`k = m + 31`) equals the `(m+1)`-th binary digit of `759250125√2`.
+This is the pair-6 row of Theorem 3.2 for its *whole* `ε`-interval — `cor33_unconditional` is the
+special case `ε = 1 − π²/e³` (interior to this interval). -/
+theorem stoll_pair6 {ε : ℝ}
+    (hlo : (1296121037 : ℝ) * Real.sqrt 2 / 2 - 916495974 ≤ ε)
+    (hhi : ε < (79109 : ℝ) * Real.sqrt 2 / 2 - 55938) (m : ℕ) :
+    (vv ε (2 * (m + 31) + 1) : ℤ) - 2 * (vv ε (2 * (m + 31) - 1) : ℤ)
+      = binDigit (759250125 * Real.sqrt 2) (m + 1) := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hε0 : 1 - Real.sqrt 2 / 2 ≤ ε := by nlinarith [hlo, hs2, hsnn]
+  have hε1 : ε < Real.sqrt 2 / 2 := by nlinarith [hhi, hs2, hsnn]
+  obtain ⟨b61, b62⟩ := cor33_base_interval hlo hhi
+  exact cor33 hε0 hε1 b61 b62 m
+
+/-- **Stoll Theorem 3.2, pair 6 (full interval, verbatim `t₆` form).**
+`t₆ = (759250125√2 − 314491699)/2²⁹`.  For every `ε ∈ [ξ₁₆, ξ₂₆)`, `v_{2k+1} − 2 v_{2k−1}`
+(`k = m + 31`) is the `(m+30)`-th = `(k−1)`-th binary digit of `t₆`. -/
+theorem stoll_pair6_t {ε : ℝ}
+    (hlo : (1296121037 : ℝ) * Real.sqrt 2 / 2 - 916495974 ≤ ε)
+    (hhi : ε < (79109 : ℝ) * Real.sqrt 2 / 2 - 55938) (m : ℕ) :
+    (vv ε (2 * (m + 31) + 1) : ℤ) - 2 * (vv ε (2 * (m + 31) - 1) : ℤ)
+      = binDigit (((759250125 : ℝ) * Real.sqrt 2 - 314491699) / 2 ^ 29) (m + 1 + 29) := by
+  have key := stoll_pair6 hlo hhi m
+  have conv := binDigit_div_pow 759250125 314491699 29 (m + 1) (by norm_num)
+  push_cast at conv
+  rw [key]; exact conv.symm
+
 end Erdos482
 
