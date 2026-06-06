@@ -1546,6 +1546,46 @@ theorem pair5_estep_band (j : ℕ) (hj : 1 ≤ j) {ε : ℝ} (hε : 0 ≤ ε) :
   · rintro ⟨h1, h2⟩; exact ⟨by linarith [hB], by linarith [hB]⟩
   · rintro ⟨h1, h2⟩; exact ⟨by linarith [hB], by linarith [hB]⟩
 
+/-- **Pair 5 — the honest conditional full-interval theorem.**  Bundles `pair5_estep_band` and
+`stoll_pair5_of_evenstep` into the sharp positive statement.  If `ε ≥ 0` satisfies
+- the **base step** `⌊√2·(1+ε)⌋ = 2` (the `j = 0` ε-step, `u₀=1 ↦ u₁=2`), and
+- the **band condition** `B_j(ε) := {√2·2^j} − √2·{√2·2^{j−1}} + √2·ε ∈ [0,1)` for every `j ≥ 1`,
+
+then `vv ε` reproduces the binary digits of √2: `vv ε (2k+1) − 2·vv ε (2k−1) = binDigit √2 k`
+for all `k ≥ 1`.  This is the precise form of Stoll's pair-5 claim (cf. remark (d), which conditions
+interval extension on the orbit `{√2·2^m}`): the admissible ε-set is *exactly* `{ε : the band
+condition holds ∀ j}`, an infinitary Diophantine condition — not an elementary interval.  At `ε = ½`
+every `B_j(½) = crux (√2·2^j) ∈ [0,1)` and the base step holds, recovering Graham–Pollak
+unconditionally; Stoll's stated interval is only the small-horizon (`j ≲ 28`) approximation to this
+set (`archive/findings/ON-LINE-FINDINGS-2026-06-06-pair5.md`).  Axiom-free. -/
+theorem stoll_pair5_conditional {ε : ℝ} (hε : 0 ≤ ε)
+    (hbase : ⌊Real.sqrt 2 * (1 + ε)⌋₊ = 2)
+    (hband : ∀ j, 1 ≤ j →
+      0 ≤ Int.fract (Real.sqrt 2 * 2 ^ j)
+            - Real.sqrt 2 * Int.fract (Real.sqrt 2 * 2 ^ (j - 1)) + Real.sqrt 2 * ε ∧
+        Int.fract (Real.sqrt 2 * 2 ^ j)
+            - Real.sqrt 2 * Int.fract (Real.sqrt 2 * 2 ^ (j - 1)) + Real.sqrt 2 * ε < 1)
+    (k : ℕ) (hk : 1 ≤ k) :
+    (vv ε (2 * k + 1) : ℤ) - 2 * (vv ε (2 * k - 1) : ℤ) = binDigit (Real.sqrt 2) k := by
+  refine stoll_pair5_of_evenstep (fun j => ?_) k hk
+  rcases Nat.eq_zero_or_pos j with hj | hj
+  · subst hj
+    have hu1 : u 1 = 2 := by
+      have h := (gp_pair 0).1
+      have hf : ⌊Real.sqrt 2⌋ = 1 := by
+        have h1 : (1:ℝ) ≤ Real.sqrt 2 := by
+          nlinarith [Real.sq_sqrt (show (0:ℝ) ≤ 2 by norm_num), Real.sqrt_nonneg 2]
+        have h2 : Real.sqrt 2 < 2 := by
+          nlinarith [Real.sq_sqrt (show (0:ℝ) ≤ 2 by norm_num), Real.sqrt_nonneg 2]
+        rw [Int.floor_eq_iff]; constructor <;> push_cast <;> linarith
+      simp only [Nat.mul_zero, Nat.zero_add, pow_zero, mul_one, hf] at h
+      exact_mod_cast h
+    have hu0 : (u (2 * 0) : ℝ) = 1 := by norm_num [show u (2 * 0) = 1 from rfl]
+    show ⌊Real.sqrt 2 * ((u (2 * 0) : ℝ) + ε)⌋₊ = u (2 * 0 + 1)
+    rw [hu0, show (2 * 0 + 1 : ℕ) = 1 from rfl, hu1, hbase]
+  · have hj' : 1 ≤ j := hj
+    exact (pair5_estep_band j hj' hε).mpr (hband j hj')
+
 /-- **√2 is badly approximable** (irrationality measure 2, explicit constant): for every integer `p`
 and positive natural `q`, `1/(3q) ≤ |q√2 − p|`.  Equivalently `‖q√2‖ ≥ 1/(3q)` — the Diophantine
 input the pair-5 even-step (`Heven` in `vv_eq_u_of_evenstep`) needs, since √2's quadratic-irrational
