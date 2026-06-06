@@ -78,4 +78,17 @@ theorem gp_reconstructs_sqrt2 :
     Real.ofDigits (Real.digits (Int.fract (Real.sqrt 2)) 2) = Int.fract (Real.sqrt 2) :=
   Real.ofDigits_digits (by norm_num) ⟨Int.fract_nonneg _, Int.fract_lt_one _⟩
 
+/-- **The digit `1` occurs infinitely often.**  The Graham–Pollak difference
+`u(2(i+1)+1) − 2u(2(i+1)−1)` is not eventually `0` — since `√2` is irrational its binary expansion
+does not terminate.  (Each difference is a bit by `binDigit_mem_zero_one`, so "not eventually 0"
+means "equal to 1 infinitely often".) -/
+theorem gp_diff_one_infinitely :
+    ¬ ∃ N, ∀ i, N ≤ i → (u (2 * (i + 1) + 1) : ℤ) - 2 * (u (2 * (i + 1) - 1) : ℤ) = 0 := by
+  rintro ⟨N, hN⟩
+  apply digits_sqrt2_not_eventually_zero
+  refine ⟨N, fun i hi => ?_⟩
+  have h := gp_digit_seq i
+  rw [hN i hi] at h
+  exact_mod_cast h.symm
+
 end Erdos482

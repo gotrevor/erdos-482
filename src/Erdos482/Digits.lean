@@ -77,4 +77,65 @@ theorem irrational_fract_sqrt2 : Irrational (Int.fract (Real.sqrt 2)) := by
   rw [he]
   simpa using (irrational_sqrt_two).sub_natCast 1
 
+/-- **The expansion is non-terminating.**  The binary digits of `Int.fract √2` are not eventually
+zero — if they were, `√2 − 1` would be a dyadic rational, contradicting irrationality.  Hence the
+Graham–Pollak difference sequence has infinitely many `1`s. -/
+theorem digits_sqrt2_not_eventually_zero :
+    ¬ ∃ N, ∀ i, N ≤ i → (Real.digits (Int.fract (Real.sqrt 2)) 2 i : ℕ) = 0 := by
+  rintro ⟨N, hN⟩
+  set y := Int.fract (Real.sqrt 2) with hy
+  have hyirr : Irrational y := irrational_fract_sqrt2
+  have hy0 : 0 ≤ y := Int.fract_nonneg _
+  -- digit i = 0  ⟹  ⌊y·2^(i+1)⌋ = 2⌊y·2^i⌋
+  have hstep : ∀ i, N ≤ i → ⌊y * 2 ^ (i + 1)⌋ = 2 * ⌊y * 2 ^ i⌋ := by
+    intro i hi
+    have h := digits_eq_floor_sub y hy0 i
+    rw [hN i hi] at h
+    push_cast at h; omega
+  -- chain:  ⌊y·2^(N+k)⌋ = 2^k · ⌊y·2^N⌋
+  have hchain : ∀ k, ⌊y * 2 ^ (N + k)⌋ = 2 ^ k * ⌊y * 2 ^ N⌋ := by
+    intro k
+    induction k with
+    | zero => simp
+    | succ k ih =>
+      have h1 : ⌊y * 2 ^ (N + k + 1)⌋ = 2 * ⌊y * 2 ^ (N + k)⌋ := hstep (N + k) (by omega)
+      rw [show N + (k + 1) = (N + k) + 1 from by ring, h1, ih, pow_succ]; ring
+  set M : ℤ := ⌊y * 2 ^ N⌋ with hM
+  set c : ℝ := (M : ℝ) / 2 ^ N with hc
+  have hpowN : (0:ℝ) < 2 ^ N := by positivity
+  -- c ≤ y
+  have hle : c ≤ y := by
+    rw [hc, div_le_iff₀ hpowN]
+    have := Int.floor_le (y * 2 ^ N); rw [← hM] at this; linarith
+  -- y < c + 1/2^(N+k)  for every k
+  have hlt : ∀ k, y < c + 1 / 2 ^ (N + k) := by
+    intro k
+    have hpos : (0:ℝ) < 2 ^ (N + k) := by positivity
+    have h := Int.lt_floor_add_one (y * 2 ^ (N + k))
+    rw [hchain k] at h
+    push_cast at h
+    have hpe : (2:ℝ) ^ (N + k) = 2 ^ N * 2 ^ k := by rw [pow_add]
+    have hck : c * 2 ^ (N + k) = (M : ℝ) * 2 ^ k := by rw [hc, hpe]; field_simp
+    have hfin : y - c < 1 / 2 ^ (N + k) := by
+      rw [lt_div_iff₀ hpos]
+      have hexp : (y - c) * 2 ^ (N + k) = y * 2 ^ (N + k) - c * 2 ^ (N + k) := by ring
+      rw [hexp, hck]; nlinarith [h]
+    linarith [hfin]
+  -- conclude y = c
+  have hyc : y = c := by
+    rcases lt_or_eq_of_le hle with hlt' | heq
+    · exfalso
+      obtain ⟨k, hk⟩ := exists_pow_lt_of_lt_one (by linarith : (0:ℝ) < y - c)
+        (by norm_num : (1:ℝ) / 2 < 1)
+      have h2 : (1:ℝ) / 2 ^ (N + k) ≤ (1 / 2) ^ k := by
+        rw [div_pow, one_pow]
+        apply one_div_le_one_div_of_le (by positivity)
+        exact pow_le_pow_right₀ (by norm_num) (by omega)
+      have := hlt k
+      linarith [hk, h2]
+    · exact heq.symm
+  -- y = M/2^N is rational, contradicting irrationality
+  apply hyirr
+  exact ⟨(M : ℚ) / 2 ^ N, by rw [hyc, hc]; push_cast; ring⟩
+
 end Erdos482
