@@ -1376,5 +1376,16 @@ theorem stoll_intervals_cover {ε : ℝ} (h0 : 1 - Real.sqrt 2 / 2 ≤ ε) (h8 :
   · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl ⟨h6, h⟩))))))
   · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr ⟨h7, h8⟩))))))
 
+/-- **Structural: `vv` is `≥ 1` and (weakly) monotone** for any nonnegative offset `ε`.  Mirrors the
+headline's `u_pos`/`u_strictMono`; reusable infrastructure for any uniform statement over the
+sequence. (Strict monotonicity fails near the start for small `ε`, so only `≤` holds universally.) -/
+theorem vv_one_le_and_mono (ε : ℝ) (hε : 0 ≤ ε) (n : ℕ) :
+    1 ≤ vv ε n ∧ vv ε n ≤ vv ε (n + 1) := by
+  have h_lower_bound : ∀ n, 1 ≤ vv ε n := by
+    intro n; induction' n with n ih <;> norm_num [ *, vv ]
+    exact one_le_mul_of_one_le_of_one_le ( Real.le_sqrt_of_sq_le ( by norm_num ) ) ( le_add_of_le_of_nonneg ( mod_cast ih ) ( by positivity ) )
+  refine' ⟨ h_lower_bound _, Nat.le_floor _ ⟩
+  split_ifs <;> nlinarith [ Real.sqrt_nonneg 2, Real.sq_sqrt zero_le_two, show ( vv ε n : ℝ ) ≥ 1 by exact_mod_cast h_lower_bound n ]
+
 end Erdos482
 
