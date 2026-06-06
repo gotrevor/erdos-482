@@ -33,6 +33,8 @@ _Refresh each review lap._
 - `u_pos`, `u_strictMono` — the sequence is `≥ 1` and strictly increasing.
 - `irrational_fract_sqrt2`, `digits_sqrt2_not_eventually_zero`, `gp_diff_one_infinitely` —
   the expansion is that of an irrational and does **not** terminate (digit `1` occurs ∞ often).
+- `digits_two_irrational_not_eventually_zero` (general: any irrational `y≥0` has non-terminating
+  base-2 digits) and `digits_two_not_eventually_one` (general: no `0.0111…` tail for any `y≥0`).
 
 ## Open / next
 - **BONUS (Stoll Thm 3.2 + Cor 3.3):** the 8 GP-style (α,β) pairs and the `759250125√2` corollary.
