@@ -1,6 +1,8 @@
 # PENDING_WORK — Erdős #482
 
-Headline is COMPLETE and axiom-clean (see STATUS.md). One open item remains.
+Headline COMPLETE and axiom-clean (see STATUS.md). Also done this lap: sequence structure
+(`u_pos`, `u_strictMono`), irrationality (`irrational_fract_sqrt2`), and **non-termination**
+(`digits_sqrt2_not_eventually_zero`, `gp_diff_one_infinitely`). One open item remains.
 
 ## Open item: BONUS — Stoll Theorem 3.2 (8 GP pairs) + Corollary 3.3 (759250125√2)
 

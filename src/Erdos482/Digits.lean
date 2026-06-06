@@ -64,8 +64,8 @@ theorem binDigit_mem_zero_one (x : ℝ) (n : ℕ) (hn : 1 ≤ n) :
   exact floor_two_mul_sub (x * 2 ^ (n - 1))
 
 /-- The fractional part `√2 − 1` whose binary digits we extract is irrational — so the digit
-sequence is the genuine expansion of an irrational number (it is not eventually constant; see
-`PENDING_WORK.md` for the non-termination refinement). -/
+sequence is the genuine expansion of an irrational number (non-termination: see
+`digits_sqrt2_not_eventually_zero` below). -/
 theorem irrational_fract_sqrt2 : Irrational (Int.fract (Real.sqrt 2)) := by
   have hs2 : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
   have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2

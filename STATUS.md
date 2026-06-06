@@ -26,7 +26,13 @@ _Refresh each review lap._
   `0,1,1,0,1,…` matching `√2 = 1.0110101…₂`).
 - `graham_pollak (n)` — HEADLINE: `u(2n+1) − 2u(2n−1) = binDigit √2 n`.
 - `digit_bridge (x)` — for `1 ≤ x < 2`, `Real.digits (Int.fract x) 2 i = ⌊x·2^(i+1)⌋ − 2⌊x·2^i⌋`.
-- `graham_pollak_digits (n)` — canonical form against mathlib's `Real.digits`.
+- `graham_pollak_digits (n)`, `gp_digit_seq (i)` — canonical forms against mathlib's `Real.digits`.
+- `gp_reconstructs_sqrt2` — `Real.ofDigits (digits (fract √2) 2) = fract √2` (closes the loop).
+- `binDigit_mem_zero_one`, `floor_two_mul_sub` — `binDigit` is a genuine bit.
+- `binDigit_sqrt2_first_six` — concrete certificate: digits `0,1,1,0,1,0`.
+- `u_pos`, `u_strictMono` — the sequence is `≥ 1` and strictly increasing.
+- `irrational_fract_sqrt2`, `digits_sqrt2_not_eventually_zero`, `gp_diff_one_infinitely` —
+  the expansion is that of an irrational and does **not** terminate (digit `1` occurs ∞ often).
 
 ## Open / next
 - **BONUS (Stoll Thm 3.2 + Cor 3.3):** the 8 GP-style (α,β) pairs and the `759250125√2` corollary.
