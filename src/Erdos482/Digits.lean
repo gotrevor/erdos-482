@@ -138,4 +138,55 @@ theorem digits_sqrt2_not_eventually_zero :
   apply hyirr
   exact ⟨(M : ℚ) / 2 ^ N, by rw [hyc, hc]; push_cast; ring⟩
 
+/-- **No all-ones tail.**  For any `y ≥ 0`, the base-2 `Real.digits` of `y` are never eventually
+`1` — the floor convention always yields the terminating-style (no `0.0111…`) representation.
+This holds for every real, not just `√2`, and rules out the dyadic-tail ambiguity. -/
+theorem digits_two_not_eventually_one (y : ℝ) (hy0 : 0 ≤ y) :
+    ¬ ∃ N, ∀ i, N ≤ i → (Real.digits y 2 i : ℕ) = 1 := by
+  rintro ⟨N, hN⟩
+  have hstep : ∀ i, N ≤ i → ⌊y * 2 ^ (i + 1)⌋ = 2 * ⌊y * 2 ^ i⌋ + 1 := by
+    intro i hi
+    have h := digits_eq_floor_sub y hy0 i
+    rw [hN i hi] at h; push_cast at h; omega
+  have hchain : ∀ k, ⌊y * 2 ^ (N + k)⌋ = 2 ^ k * ⌊y * 2 ^ N⌋ + (2 ^ k - 1) := by
+    intro k
+    induction k with
+    | zero => simp
+    | succ k ih =>
+      have h1 : ⌊y * 2 ^ (N + k + 1)⌋ = 2 * ⌊y * 2 ^ (N + k)⌋ + 1 := hstep (N + k) (by omega)
+      rw [show N + (k + 1) = (N + k) + 1 from by ring, h1, ih, pow_succ]; ring
+  set M : ℤ := ⌊y * 2 ^ N⌋ with hM
+  set c : ℝ := ((M : ℝ) + 1) / 2 ^ N with hc
+  have hpowN : (0:ℝ) < 2 ^ N := by positivity
+  -- y < c  (from the floor at index N)
+  have hlt : y < c := by
+    rw [hc, lt_div_iff₀ hpowN]
+    have := Int.lt_floor_add_one (y * 2 ^ N); rw [← hM] at this; linarith
+  -- c - 1/2^(N+k) ≤ y  for every k
+  have hge : ∀ k, c - 1 / 2 ^ (N + k) ≤ y := by
+    intro k
+    have hpos : (0:ℝ) < 2 ^ (N + k) := by positivity
+    have h := Int.floor_le (y * 2 ^ (N + k))
+    rw [hchain k] at h
+    push_cast at h
+    have hpe : (2:ℝ) ^ (N + k) = 2 ^ N * 2 ^ k := by rw [pow_add]
+    have hck : c * 2 ^ (N + k) = ((M : ℝ) + 1) * 2 ^ k := by rw [hc, hpe]; field_simp
+    have hfin : c - y ≤ 1 / 2 ^ (N + k) := by
+      rw [le_div_iff₀ hpos]
+      have hexp : (c - y) * 2 ^ (N + k) = c * 2 ^ (N + k) - y * 2 ^ (N + k) := by ring
+      rw [hexp, hck]; nlinarith [h]
+    linarith [hfin]
+  -- Archimedean: c ≤ y, contradicting y < c
+  have hcle : c ≤ y := by
+    by_contra hlt'
+    obtain ⟨k, hk⟩ := exists_pow_lt_of_lt_one (by linarith : (0:ℝ) < c - y)
+      (by norm_num : (1:ℝ) / 2 < 1)
+    have h2 : (1:ℝ) / 2 ^ (N + k) ≤ (1 / 2) ^ k := by
+      rw [div_pow, one_pow]
+      apply one_div_le_one_div_of_le (by positivity)
+      exact pow_le_pow_right₀ (by norm_num) (by omega)
+    have := hge k
+    linarith [hk, h2]
+  linarith [hlt, hcle]
+
 end Erdos482
