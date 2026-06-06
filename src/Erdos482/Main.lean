@@ -34,11 +34,21 @@ theorem graham_pollak_digits (n : ℕ) (hn : 1 ≤ n) :
   unfold binDigit
   rw [Nat.sub_add_cancel hn]
 
-/-- **Faithfulness certificate.**  The first three Graham–Pollak digits are `0, 1, 1`, matching the
-binary expansion `√2 = 1.0110101…₂`.  Anchors the whole edifice to concrete numbers. -/
-theorem binDigit_sqrt2_first_three :
+/-- **Canonical digit sequence (0-based).**  Reindexed `graham_pollak_digits`: for every `i`,
+`u(2(i+1)+1) − 2·u(2(i+1)−1)` is exactly `Real.digits (Int.fract √2) 2 i`, the `i`-th binary digit
+of the fractional part of `√2`.  So the whole Graham–Pollak difference sequence *is* the binary
+expansion of `√2` after the point. -/
+theorem gp_digit_seq (i : ℕ) :
+    (u (2 * (i + 1) + 1) : ℤ) - 2 * (u (2 * (i + 1) - 1) : ℤ)
+      = ((Real.digits (Int.fract (Real.sqrt 2)) 2 i : ℕ) : ℤ) := by
+  simpa using graham_pollak_digits (i + 1) (by omega)
+
+/-- **Faithfulness certificate.**  The first six Graham–Pollak digits are `0, 1, 1, 0, 1, 0`,
+matching the binary expansion `√2 = 1.0110101…₂`.  Anchors the whole edifice to concrete numbers. -/
+theorem binDigit_sqrt2_first_six :
     binDigit (Real.sqrt 2) 1 = 0 ∧ binDigit (Real.sqrt 2) 2 = 1 ∧
-      binDigit (Real.sqrt 2) 3 = 1 := by
+      binDigit (Real.sqrt 2) 3 = 1 ∧ binDigit (Real.sqrt 2) 4 = 0 ∧
+      binDigit (Real.sqrt 2) 5 = 1 ∧ binDigit (Real.sqrt 2) 6 = 0 := by
   have hs2 : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
   have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
   have lo : (1.41:ℝ) < Real.sqrt 2 := by nlinarith [hs2, hsnn]
@@ -51,6 +61,13 @@ theorem binDigit_sqrt2_first_three :
     rw [Int.floor_eq_iff]; constructor <;> · push_cast; nlinarith [lo, hi]
   have f3 : ⌊Real.sqrt 2 * 8⌋ = 11 := by
     rw [Int.floor_eq_iff]; constructor <;> · push_cast; nlinarith [lo, hi]
-  refine ⟨?_, ?_, ?_⟩ <;> unfold binDigit <;> norm_num [f0, f1, f2, f3]
+  have f4 : ⌊Real.sqrt 2 * 16⌋ = 22 := by
+    rw [Int.floor_eq_iff]; constructor <;> · push_cast; nlinarith [lo, hi]
+  have f5 : ⌊Real.sqrt 2 * 32⌋ = 45 := by
+    rw [Int.floor_eq_iff]; constructor <;> · push_cast; nlinarith [lo, hi]
+  have f6 : ⌊Real.sqrt 2 * 64⌋ = 90 := by
+    rw [Int.floor_eq_iff]; constructor <;> · push_cast; nlinarith [lo, hi]
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩ <;> unfold binDigit <;>
+    norm_num [f0, f1, f2, f3, f4, f5, f6]
 
 end Erdos482
