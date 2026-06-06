@@ -1586,6 +1586,33 @@ theorem stoll_pair5_conditional {ε : ℝ} (hε : 0 ≤ ε)
   · have hj' : 1 ≤ j := hj
     exact (pair5_estep_band j hj' hε).mpr (hband j hj')
 
+/-- **The band condition holds for every `j` at `ε = ½`** (unconditionally, via `crux`).  The
+`ε = ½` band bracket `B_j(½) = {√2·2^j} − √2·{√2·2^{j−1}} + √2·½` is *exactly* `crux (√2·2^j)`
+(since `√2·2^j / 2 = √2·2^{j−1}`), hence lies in `[0,1)` for all `j ≥ 1`.  This is the positive
+half of pair 5: `ε = ½` satisfies the band condition at every step, so it is admissible. -/
+theorem pair5_band_at_half (j : ℕ) (hj : 1 ≤ j) :
+    0 ≤ Int.fract (Real.sqrt 2 * 2 ^ j)
+          - Real.sqrt 2 * Int.fract (Real.sqrt 2 * 2 ^ (j - 1)) + Real.sqrt 2 * (1 / 2) ∧
+      Int.fract (Real.sqrt 2 * 2 ^ j)
+          - Real.sqrt 2 * Int.fract (Real.sqrt 2 * 2 ^ (j - 1)) + Real.sqrt 2 * (1 / 2) < 1 := by
+  obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
+  simp only [Nat.add_sub_cancel]
+  have hx : Real.sqrt 2 * 2 ^ (i + 1) / 2 = Real.sqrt 2 * 2 ^ i := by ring
+  have hc := crux (Real.sqrt 2 * 2 ^ (i + 1))
+  rw [hx] at hc
+  exact ⟨by linarith [hc.1], by linarith [hc.2]⟩
+
+/-- **Pair 5 at `ε = ½`, derived through the band machinery** (independent of the `vv = u` route).
+Feeds the unconditional `pair5_band_at_half` (plus the trivial base step `⌊√2·(3/2)⌋ = 2`) into
+`stoll_pair5_conditional`.  Reproduces `stoll_pair5_half`/Graham–Pollak purely from the band
+characterization — a cross-check that the band route is sound and that `ε = ½` is admissible. -/
+theorem stoll_pair5_half_via_band (k : ℕ) (hk : 1 ≤ k) :
+    (vv (1 / 2) (2 * k + 1) : ℤ) - 2 * (vv (1 / 2) (2 * k - 1) : ℤ) = binDigit (Real.sqrt 2) k := by
+  refine stoll_pair5_conditional (by norm_num) ?_ (fun j hj => pair5_band_at_half j hj) k hk
+  rw [Nat.floor_eq_iff (by positivity)]
+  refine ⟨?_, ?_⟩ <;> push_cast <;>
+    nlinarith [Real.sq_sqrt (show (0:ℝ) ≤ 2 by norm_num), Real.sqrt_nonneg 2]
+
 /-- **√2 is badly approximable** (irrationality measure 2, explicit constant): for every integer `p`
 and positive natural `q`, `1/(3q) ≤ |q√2 − p|`.  Equivalently `‖q√2‖ ≥ 1/(3q)` — the Diophantine
 input the pair-5 even-step (`Heven` in `vv_eq_u_of_evenstep`) needs, since √2's quadratic-irrational
