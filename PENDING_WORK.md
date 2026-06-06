@@ -43,11 +43,22 @@ general `stoll_pair` core also cannot represent pair 5 (digit-phase off by 1; no
 the base value 3). This is why Stoll treats pair 5 specially and why its interval is the specific
 `[0.49599…, 0.50124…)`.
 
-**🔑 CLEANEST REFORMULATION (found this lap, numerically verified to n=300):** for ε ∈ [ξ₁,ξ₂),
-`vv ε n = vv (1/2) n = u n` **for all n** (exact equality, including at ξ₁; diverges at ξ₂, n=59).
-So pair 5 ⟺ **`∀ ε ∈ [ξ₁,ξ₂), ∀ n, vv ε n = u n`**, after which the headline `graham_pollak` gives
-the digits for free. The induction's even-step (ε-step) needs `⌊√2(u_{2j}+ε)⌋ = ⌊√2(u_{2j}+½)⌋`, i.e.
-the ε-shift `√2(ε−½)` doesn't cross the floor boundary `{√2(u_{2j}+½)}`.
+**🛑 CORRECTION (later same lap — the `vv = u` reformulation is a DEAD END; read this before retrying):**
+`vv ε = u` holds on `[ξ₁,ξ₂)` only for SMALL n. Verified far out: for the interior midpoint,
+`vv ε` **diverges from `u` at n=905**, and the digit-difference `d_n` **first differs from √2's digit
+at n=452**. So interior ε in the claimed interval `[309/2√2−218, 1296121037/2√2−916495974)` do NOT
+reproduce √2's digits at large n. Either (a) this interval is WRONG/misread (the transcribed pair-5
+eqs were already flagged suspect — predicted `vv3=2`, true `4`), or (b) the valid ε-set is subtler
+than a full interval (possibly Cantor-like), or (c) the digit index has a phase I haven't pinned.
+**`Heven` (∀ j) is therefore satisfiable essentially only at ε=½** — so `vv_eq_u_of_evenstep` /
+`stoll_pair5_of_evenstep` (both committed, CORRECT axiom-clean conditionals) re-prove only the ε=½
+case, NOT the interval. **Do not chase `vv = u` further.** Pair 5 needs the actual paper argument
+(see `ON-LINE-REQUEST.md`) before more Lean work — formalizing against a wrong interval is wasted.
+`sqrt2_badly_approximable` (committed, axiom-clean) is the likely Diophantine lever but only once the
+correct statement is known.
+
+**Superseded earlier guess (kept for the record):** "for ε ∈ [ξ₁,ξ₂), `vv ε n = u n` for all n; pair
+5 ⟺ that + `graham_pollak`." FALSE for all n (see correction above).
 
 **⚠️ This is genuinely Diophantine (NOT finite).** The per-step margin `min({√2(u_{2j}+½)}, 1−…)`
 **shrinks as n grows**: ≥0.0037 for n<400, but **1.4e-6 at step 1811** (verified, prec=2200 ≫ needed
