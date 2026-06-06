@@ -1,28 +1,39 @@
 # PENDING_WORK — Erdős #482
 
-Headline COMPLETE and axiom-clean (see STATUS.md). Also done this lap: sequence structure
-(`u_pos`, `u_strictMono`), irrationality (`irrational_fract_sqrt2`), and **non-termination**
-(`digits_sqrt2_not_eventually_zero`, `gp_diff_one_infinitely`). One open item remains.
+Headline (Graham–Pollak / √2) COMPLETE and axiom-clean. **BONUS (Stoll Thm 3.2 + Cor 3.3) now also
+COMPLETE and axiom-clean** — see STATUS.md. This was the "paper-blocked" item; it is done, including
+the unconditional title result `cor33_unconditional` (digits of `759250125√2`).
 
-## Open item: BONUS — Stoll Theorem 3.2 (8 GP pairs) + Corollary 3.3 (759250125√2)
+## Remaining (all optional polish / open directions)
 
-**Blocked on:** the paper's exact parametrized recurrence + the (α,β,l,γ) pair table + Cor 3.3's
-numeric facts. Filed in `ON-LINE-REQUEST.md` (2026-06-06). DO NOT guess the parametrization — verified
-this lap that even changing the additive constant ε away from 1/2 breaks the identities (e.g.
-ε = 1−√2/2 gives u₁ = 1, not 2), so the generalization is subtle and must come from the paper.
+### 1. Faithful `t_i` framing (cosmetic) — Aristotle `31ac9af6` (tconn) in flight
+Our pair theorems state the result as "digits of `α_i√2`"; the paper says "digits of `t_i`" with
+`t_i = (α_i√2 − β_i)/2^{l_i}`. These are the same sequence shifted by `l_i`:
+`binDigit ((α√2−β)/2^l) (j+l) = binDigit (α√2) j` (j ≥ 1) — numerically verified, submitted to
+Aristotle. Once proved, restate `stoll_pair{i}` in `t_i` form for a verbatim match to Theorem 3.2.
+Three attack paths if doing it locally:
+1. Unfold `binDigit`; `t·2^{j+l} = α√2·2^j − β·2^j`; `Int.floor_sub_intCast` pulls out the integer
+   `β·2^j`; the `−β·2^j` and `−2·β·2^{j-1}` cancel. (ℕ-exponent care: `j+l-1 = (j-1)+l` needs `j≥1`.)
+2. Prove a single-floor lemma `⌊t·2^{m}⌋ = ⌊α√2·2^{m-l}⌋ − β·2^{m-l}` for `m≥l`, then `binDigit`
+   is its difference.
+3. Hand to Aristotle (done) and port.
 
-### Three attack paths (once the paper text arrives)
-1. **Replay `gp_pair` per pair.** The machinery is ready: `crux` is the universal eq (7),
-   `eq8_general` is the full-interval eq (8). For each (α,β,l,γ) row, state the faithful pair of floor
-   identities (the α-scaled analogue of `gp_pair`) and replay the `floorA`/`floorB` + induction
-   skeleton in `Induction.lean`. Bridge to digits via the already-general `digits_eq_floor_sub`.
-2. **Generalize `floorA`/`floorB` to (α,β,l,γ) first**, then instantiate all 8 pairs as corollaries —
-   less duplication if the 8 proofs are truly the same template (the paper says they are).
-3. **Cor 3.3 numerics** (`759250125√2`): isolate the single interval membership the paper uses
-   (it mentions an ε₆-interval and a bound like `1 − π²/e⁴`); discharge with `norm_num` + mathlib's
-   `Real.pi`/`Real.exp` bounds. Architect this as a standalone Aristotle job if the bounds are stiff.
+### 2. Pair 6 "for all ε in [ξ₁,ξ₂)" theorem (deferred)
+`cor33`/`cor33_unconditional` cover pair 6 for the *specific* `ε = 1−π²/e³` (interior to the
+interval). A "for all `ε ∈ [ξ₁,ξ₂)`" version (like pairs 1–4,7,8) is harder: the base values shift at
+the endpoints, so the tight base-case steps need the EXACT √2-expressed ξ endpoints (Stoll's eq 9),
+not loose rational bounds. The pair-6 interval is razor-thin (`[0.50124,0.51035)`) with billion-scale
+`α`. Mechanically the 62 steps are like `cor33_base_of_bounds` but each tight step closes by
+`nlinarith` against the exact ξ endpoint. Attack: generalize the eq-9 base-case argument abstractly
+(prove the base for any pair from `α+β=2^{l+1}` + the interval), which would also simplify pairs 1–8.
 
-### If still blocked on the paper next lap
-- Harvest any `ON-LINE-FINDINGS-*.md` first.
-- Keep the Aristotle loop alive (cross-checks / standalone sub-lemmas).
-- The headline result is publishable as-is; the bonus is strictly additive.
+### 3. Open research direction (out of scope per HANDOFF)
+"Generalize to other algebraic numbers" — needs new mathematics, not a formalization gap.
+
+## Notes for whoever continues
+- The general core `stoll_pair`/`stoll_digit` is the reusable heart; any new pair = one base case
+  (`vv_even_to`/`vv_odd_to` per step) + `floor_mul_sqrt2` for the two base floors + `stoll_digit`.
+- `cor33_base_of_bounds` and the pair-7 base use `set_option maxHeartbeats` (1M / 4M) — the long
+  `nlinarith`/`linarith` chains exceed the 200k default. Keep that when editing.
+- Base-case lemmas are **script-generated** (see the lap journal / git log); regenerate, don't
+  hand-edit 62 steps.
