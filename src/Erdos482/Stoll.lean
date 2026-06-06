@@ -1323,5 +1323,58 @@ theorem stoll_pair6_t {ε : ℝ}
   push_cast at conv
   rw [key]; exact conv.symm
 
+/-! ## Completeness: the 8 intervals are disjoint and exactly cover `[1−√2/2, √2/2)`
+
+Stoll's Theorem 3.2 partitions the admissible offset range.  The eight `[ξ₁ᵢ, ξ₂ᵢ)` are consecutive
+(`ξ₂ᵢ = ξ₁,ᵢ₊₁`), so it suffices that the nine endpoints are strictly increasing; then every
+`ε ∈ [1−√2/2, √2/2)` lies in exactly one pair interval, and `stoll_pair{1..8}` extracts the digits
+of the corresponding `tᵢ`.  This realizes the full Theorem 3.2 over the whole admissible range. -/
+
+/-- The nine interval endpoints `1−√2/2 < √2−1 < 19√2/2−13 < 77√2/2−54 < 309√2/2−218 <
+1296121037√2/2−916495974 < 79109√2/2−55938 < 5√2/2−3 < √2/2` are strictly increasing, so the eight
+pair intervals are nonempty and pairwise disjoint. -/
+theorem stoll_endpoints_strictMono :
+    1 - Real.sqrt 2 / 2 < Real.sqrt 2 - 1 ∧
+    Real.sqrt 2 - 1 < 19 / 2 * Real.sqrt 2 - 13 ∧
+    (19 : ℝ) / 2 * Real.sqrt 2 - 13 < 77 / 2 * Real.sqrt 2 - 54 ∧
+    (77 : ℝ) / 2 * Real.sqrt 2 - 54 < 309 / 2 * Real.sqrt 2 - 218 ∧
+    (309 : ℝ) / 2 * Real.sqrt 2 - 218 < 1296121037 / 2 * Real.sqrt 2 - 916495974 ∧
+    (1296121037 : ℝ) / 2 * Real.sqrt 2 - 916495974 < 79109 / 2 * Real.sqrt 2 - 55938 ∧
+    (79109 : ℝ) / 2 * Real.sqrt 2 - 55938 < 5 / 2 * Real.sqrt 2 - 3 ∧
+    (5 : ℝ) / 2 * Real.sqrt 2 - 3 < Real.sqrt 2 / 2 := by
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hlo : (1414213562373 / 1000000000000 : ℝ) < Real.sqrt 2 := sqrt2_lo
+  have hhi : Real.sqrt 2 < (14142135623731 / 10000000000000 : ℝ) := sqrt2_hi
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;> nlinarith [hs2, hlo, hhi]
+
+/-- **Completeness of Theorem 3.2.**  Every admissible offset `ε ∈ [1−√2/2, √2/2)` lies in exactly
+one of the eight pair intervals `[ξ₁ᵢ, ξ₂ᵢ)`.  Combined with `stoll_pair{1..8}`, this shows the
+parametrized recurrence reproduces the binary digits of the corresponding `tᵢ` for the *whole*
+admissible range of `ε` — the full content of Stoll's Theorem 3.2. -/
+theorem stoll_intervals_cover {ε : ℝ} (h0 : 1 - Real.sqrt 2 / 2 ≤ ε) (h8 : ε < Real.sqrt 2 / 2) :
+    (1 - Real.sqrt 2 / 2 ≤ ε ∧ ε < Real.sqrt 2 - 1) ∨
+    (Real.sqrt 2 - 1 ≤ ε ∧ ε < 19 / 2 * Real.sqrt 2 - 13) ∨
+    ((19 : ℝ) / 2 * Real.sqrt 2 - 13 ≤ ε ∧ ε < 77 / 2 * Real.sqrt 2 - 54) ∨
+    ((77 : ℝ) / 2 * Real.sqrt 2 - 54 ≤ ε ∧ ε < 309 / 2 * Real.sqrt 2 - 218) ∨
+    ((309 : ℝ) / 2 * Real.sqrt 2 - 218 ≤ ε ∧ ε < 1296121037 / 2 * Real.sqrt 2 - 916495974) ∨
+    ((1296121037 : ℝ) / 2 * Real.sqrt 2 - 916495974 ≤ ε ∧ ε < 79109 / 2 * Real.sqrt 2 - 55938) ∨
+    ((79109 : ℝ) / 2 * Real.sqrt 2 - 55938 ≤ ε ∧ ε < 5 / 2 * Real.sqrt 2 - 3) ∨
+    ((5 : ℝ) / 2 * Real.sqrt 2 - 3 ≤ ε ∧ ε < Real.sqrt 2 / 2) := by
+  rcases lt_or_ge ε (Real.sqrt 2 - 1) with h | h1
+  · exact Or.inl ⟨h0, h⟩
+  rcases lt_or_ge ε (19 / 2 * Real.sqrt 2 - 13) with h | h2
+  · exact Or.inr (Or.inl ⟨h1, h⟩)
+  rcases lt_or_ge ε (77 / 2 * Real.sqrt 2 - 54) with h | h3
+  · exact Or.inr (Or.inr (Or.inl ⟨h2, h⟩))
+  rcases lt_or_ge ε (309 / 2 * Real.sqrt 2 - 218) with h | h4
+  · exact Or.inr (Or.inr (Or.inr (Or.inl ⟨h3, h⟩)))
+  rcases lt_or_ge ε (1296121037 / 2 * Real.sqrt 2 - 916495974) with h | h5
+  · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inl ⟨h4, h⟩))))
+  rcases lt_or_ge ε (79109 / 2 * Real.sqrt 2 - 55938) with h | h6
+  · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl ⟨h5, h⟩)))))
+  rcases lt_or_ge ε (5 / 2 * Real.sqrt 2 - 3) with h | h7
+  · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl ⟨h6, h⟩))))))
+  · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr ⟨h7, h8⟩))))))
+
 end Erdos482
 
