@@ -715,4 +715,251 @@ theorem stoll_pair2 {ε : ℝ} (hlo : Real.sqrt 2 - 1 ≤ ε) (hhi : ε < 19 / 2
   rw [i1, i2] at key
   simpa using key
 
+set_option maxHeartbeats 800000 in
+/-- Base case for pair 3 (α=45, l=5): `vv ε 13 = 153`, `vv ε 14 = 217` for
+`ε ∈ [19 / 2 * √2 - 13, 77 / 2 * √2 - 54)`. -/
+private lemma stoll_pair3_base {ε : ℝ} (hlo : 19 / 2 * Real.sqrt 2 - 13 ≤ ε) (hhi : ε < 77 / 2 * Real.sqrt 2 - 54) :
+    (vv ε 13 : ℤ) = 153 ∧ (vv ε 14 : ℤ) = 217 := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hspos : (0:ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hs1 : (1:ℝ) ≤ Real.sqrt 2 := by nlinarith [hs2, hsnn]
+  have hε : 0 ≤ ε := by nlinarith [hlo, hs2, hsnn]
+  have v0 : (vv ε 0 : ℤ) = 1 := by simp [vv]
+  have v1 : (vv ε 1 : ℤ) = 2 := vv_even_to ε hε 0 (by decide) v0
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v2 : (vv ε 2 : ℤ) = 3 := vv_odd_to ε 1 (by decide) v1
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v3 : (vv ε 3 : ℤ) = 4 := vv_even_to ε hε 2 (by decide) v2
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v4 : (vv ε 4 : ℤ) = 6 := vv_odd_to ε 3 (by decide) v3
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v5 : (vv ε 5 : ℤ) = 9 := vv_even_to ε hε 4 (by decide) v4
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v6 : (vv ε 6 : ℤ) = 13 := vv_odd_to ε 5 (by decide) v5
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v7 : (vv ε 7 : ℤ) = 19 := vv_even_to ε hε 6 (by decide) v6
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v8 : (vv ε 8 : ℤ) = 27 := vv_odd_to ε 7 (by decide) v7
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v9 : (vv ε 9 : ℤ) = 38 := vv_even_to ε hε 8 (by decide) v8
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v10 : (vv ε 10 : ℤ) = 54 := vv_odd_to ε 9 (by decide) v9
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v11 : (vv ε 11 : ℤ) = 76 := vv_even_to ε hε 10 (by decide) v10
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v12 : (vv ε 12 : ℤ) = 108 := vv_odd_to ε 11 (by decide) v11
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v13 : (vv ε 13 : ℤ) = 153 := vv_even_to ε hε 12 (by decide) v12
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v14 : (vv ε 14 : ℤ) = 217 := vv_odd_to ε 13 (by decide) v13
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  exact ⟨v13, v14⟩
+/-- **Stoll Theorem 3.2, pair 3.**  For `ε ∈ [19 / 2 * √2 - 13, 77 / 2 * √2 - 54)`,
+`v_{2k+1} − 2 v_{2k−1}` (k=m+7) is the (m+1)-th binary digit of `45√2`. -/
+theorem stoll_pair3 {ε : ℝ} (hlo : 19 / 2 * Real.sqrt 2 - 13 ≤ ε) (hhi : ε < 77 / 2 * Real.sqrt 2 - 54) (m : ℕ) :
+    (vv ε (2 * (m + 7) + 1) : ℤ) - 2 * (vv ε (2 * (m + 7) - 1) : ℤ)
+      = binDigit (45 * Real.sqrt 2) (m + 1) := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hε0 : 1 - Real.sqrt 2 / 2 ≤ ε := by nlinarith [hlo, hs2, hsnn]
+  have hε1 : ε < Real.sqrt 2 / 2 := by nlinarith [hhi, hs2, hsnn]
+  obtain ⟨hbp, hbq⟩ := stoll_pair3_base hlo hhi
+  have hf1 : ⌊(45 : ℝ) * Real.sqrt 2⌋ = 63 :=
+    floor_mul_sqrt2 45 63 (by norm_num) (by norm_num) (by norm_num)
+  have hf2 : ⌊(90 : ℝ) * Real.sqrt 2⌋ = 127 :=
+    floor_mul_sqrt2 90 127 (by norm_num) (by norm_num) (by norm_num)
+  have baseP : (vv ε (2 * (5 + 2) - 1) : ℤ) = ⌊((45 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0⌋ + (45 : ℤ) * 2 ^ 1 := by
+    have he : ((45 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0 = (45 : ℝ) * Real.sqrt 2 := by push_cast; ring
+    rw [show (2 * (5 + 2) - 1 : ℕ) = 13 from rfl, he, hf1, hbp]; norm_num
+  have baseQ : (vv ε (2 * (5 + 2)) : ℤ) = ⌊((45 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1⌋ + (45 : ℤ) * 2 ^ 1 := by
+    have he : ((45 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1 = (90 : ℝ) * Real.sqrt 2 := by push_cast; ring
+    rw [show (2 * (5 + 2) : ℕ) = 14 from rfl, he, hf2, hbq]; norm_num
+  have key := stoll_digit 45 5 hε0 hε1 baseP baseQ m
+  have i1 : 2 * (5 + 2 + m) + 1 = 2 * (m + 7) + 1 := by ring
+  have i2 : 2 * (5 + 2 + m) - 1 = 2 * (m + 7) - 1 := by omega
+  rw [i1, i2] at key
+  simpa using key
+
+set_option maxHeartbeats 800000 in
+/-- Base case for pair 4 (α=181, l=7): `vv ε 17 = 617`, `vv ε 18 = 873` for
+`ε ∈ [77 / 2 * √2 - 54, 309 / 2 * √2 - 218)`. -/
+private lemma stoll_pair4_base {ε : ℝ} (hlo : 77 / 2 * Real.sqrt 2 - 54 ≤ ε) (hhi : ε < 309 / 2 * Real.sqrt 2 - 218) :
+    (vv ε 17 : ℤ) = 617 ∧ (vv ε 18 : ℤ) = 873 := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hspos : (0:ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hs1 : (1:ℝ) ≤ Real.sqrt 2 := by nlinarith [hs2, hsnn]
+  have hε : 0 ≤ ε := by nlinarith [hlo, hs2, hsnn]
+  have v0 : (vv ε 0 : ℤ) = 1 := by simp [vv]
+  have v1 : (vv ε 1 : ℤ) = 2 := vv_even_to ε hε 0 (by decide) v0
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v2 : (vv ε 2 : ℤ) = 3 := vv_odd_to ε 1 (by decide) v1
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v3 : (vv ε 3 : ℤ) = 4 := vv_even_to ε hε 2 (by decide) v2
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v4 : (vv ε 4 : ℤ) = 6 := vv_odd_to ε 3 (by decide) v3
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v5 : (vv ε 5 : ℤ) = 9 := vv_even_to ε hε 4 (by decide) v4
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v6 : (vv ε 6 : ℤ) = 13 := vv_odd_to ε 5 (by decide) v5
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v7 : (vv ε 7 : ℤ) = 19 := vv_even_to ε hε 6 (by decide) v6
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v8 : (vv ε 8 : ℤ) = 27 := vv_odd_to ε 7 (by decide) v7
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v9 : (vv ε 9 : ℤ) = 38 := vv_even_to ε hε 8 (by decide) v8
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v10 : (vv ε 10 : ℤ) = 54 := vv_odd_to ε 9 (by decide) v9
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v11 : (vv ε 11 : ℤ) = 77 := vv_even_to ε hε 10 (by decide) v10
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v12 : (vv ε 12 : ℤ) = 109 := vv_odd_to ε 11 (by decide) v11
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v13 : (vv ε 13 : ℤ) = 154 := vv_even_to ε hε 12 (by decide) v12
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v14 : (vv ε 14 : ℤ) = 218 := vv_odd_to ε 13 (by decide) v13
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v15 : (vv ε 15 : ℤ) = 308 := vv_even_to ε hε 14 (by decide) v14
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v16 : (vv ε 16 : ℤ) = 436 := vv_odd_to ε 15 (by decide) v15
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v17 : (vv ε 17 : ℤ) = 617 := vv_even_to ε hε 16 (by decide) v16
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v18 : (vv ε 18 : ℤ) = 873 := vv_odd_to ε 17 (by decide) v17
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  exact ⟨v17, v18⟩
+/-- **Stoll Theorem 3.2, pair 4.**  For `ε ∈ [77 / 2 * √2 - 54, 309 / 2 * √2 - 218)`,
+`v_{2k+1} − 2 v_{2k−1}` (k=m+9) is the (m+1)-th binary digit of `181√2`. -/
+theorem stoll_pair4 {ε : ℝ} (hlo : 77 / 2 * Real.sqrt 2 - 54 ≤ ε) (hhi : ε < 309 / 2 * Real.sqrt 2 - 218) (m : ℕ) :
+    (vv ε (2 * (m + 9) + 1) : ℤ) - 2 * (vv ε (2 * (m + 9) - 1) : ℤ)
+      = binDigit (181 * Real.sqrt 2) (m + 1) := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hε0 : 1 - Real.sqrt 2 / 2 ≤ ε := by nlinarith [hlo, hs2, hsnn]
+  have hε1 : ε < Real.sqrt 2 / 2 := by nlinarith [hhi, hs2, hsnn]
+  obtain ⟨hbp, hbq⟩ := stoll_pair4_base hlo hhi
+  have hf1 : ⌊(181 : ℝ) * Real.sqrt 2⌋ = 255 :=
+    floor_mul_sqrt2 181 255 (by norm_num) (by norm_num) (by norm_num)
+  have hf2 : ⌊(362 : ℝ) * Real.sqrt 2⌋ = 511 :=
+    floor_mul_sqrt2 362 511 (by norm_num) (by norm_num) (by norm_num)
+  have baseP : (vv ε (2 * (7 + 2) - 1) : ℤ) = ⌊((181 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0⌋ + (181 : ℤ) * 2 ^ 1 := by
+    have he : ((181 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0 = (181 : ℝ) * Real.sqrt 2 := by push_cast; ring
+    rw [show (2 * (7 + 2) - 1 : ℕ) = 17 from rfl, he, hf1, hbp]; norm_num
+  have baseQ : (vv ε (2 * (7 + 2)) : ℤ) = ⌊((181 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1⌋ + (181 : ℤ) * 2 ^ 1 := by
+    have he : ((181 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1 = (362 : ℝ) * Real.sqrt 2 := by push_cast; ring
+    rw [show (2 * (7 + 2) : ℕ) = 18 from rfl, he, hf2, hbq]; norm_num
+  have key := stoll_digit 181 7 hε0 hε1 baseP baseQ m
+  have i1 : 2 * (7 + 2 + m) + 1 = 2 * (m + 9) + 1 := by ring
+  have i2 : 2 * (7 + 2 + m) - 1 = 2 * (m + 9) - 1 := by omega
+  rw [i1, i2] at key
+  simpa using key
+
+set_option maxHeartbeats 4000000 in
+/-- Base case for pair 7 (α=46341, l=15): `vv ε 33 = 158218`, `vv ε 34 = 223754` for
+`ε ∈ [79109 / 2 * √2 - 55938, 5 / 2 * √2 - 3)`. -/
+private lemma stoll_pair7_base {ε : ℝ} (hlo : 79109 / 2 * Real.sqrt 2 - 55938 ≤ ε) (hhi : ε < 5 / 2 * Real.sqrt 2 - 3) :
+    (vv ε 33 : ℤ) = 158218 ∧ (vv ε 34 : ℤ) = 223754 := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hspos : (0:ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hs1 : (1:ℝ) ≤ Real.sqrt 2 := by nlinarith [hs2, hsnn]
+  have hε : 0 ≤ ε := by nlinarith [hlo, hs2, hsnn]
+  have v0 : (vv ε 0 : ℤ) = 1 := by simp [vv]
+  have v1 : (vv ε 1 : ℤ) = 2 := vv_even_to ε hε 0 (by decide) v0
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v2 : (vv ε 2 : ℤ) = 3 := vv_odd_to ε 1 (by decide) v1
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v3 : (vv ε 3 : ℤ) = 4 := vv_even_to ε hε 2 (by decide) v2
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v4 : (vv ε 4 : ℤ) = 6 := vv_odd_to ε 3 (by decide) v3
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v5 : (vv ε 5 : ℤ) = 9 := vv_even_to ε hε 4 (by decide) v4
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v6 : (vv ε 6 : ℤ) = 13 := vv_odd_to ε 5 (by decide) v5
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v7 : (vv ε 7 : ℤ) = 19 := vv_even_to ε hε 6 (by decide) v6
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v8 : (vv ε 8 : ℤ) = 27 := vv_odd_to ε 7 (by decide) v7
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v9 : (vv ε 9 : ℤ) = 38 := vv_even_to ε hε 8 (by decide) v8
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v10 : (vv ε 10 : ℤ) = 54 := vv_odd_to ε 9 (by decide) v9
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v11 : (vv ε 11 : ℤ) = 77 := vv_even_to ε hε 10 (by decide) v10
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v12 : (vv ε 12 : ℤ) = 109 := vv_odd_to ε 11 (by decide) v11
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v13 : (vv ε 13 : ℤ) = 154 := vv_even_to ε hε 12 (by decide) v12
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v14 : (vv ε 14 : ℤ) = 218 := vv_odd_to ε 13 (by decide) v13
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v15 : (vv ε 15 : ℤ) = 309 := vv_even_to ε hε 14 (by decide) v14
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v16 : (vv ε 16 : ℤ) = 437 := vv_odd_to ε 15 (by decide) v15
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v17 : (vv ε 17 : ℤ) = 618 := vv_even_to ε hε 16 (by decide) v16
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v18 : (vv ε 18 : ℤ) = 874 := vv_odd_to ε 17 (by decide) v17
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v19 : (vv ε 19 : ℤ) = 1236 := vv_even_to ε hε 18 (by decide) v18
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v20 : (vv ε 20 : ℤ) = 1748 := vv_odd_to ε 19 (by decide) v19
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v21 : (vv ε 21 : ℤ) = 2472 := vv_even_to ε hε 20 (by decide) v20
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v22 : (vv ε 22 : ℤ) = 3496 := vv_odd_to ε 21 (by decide) v21
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v23 : (vv ε 23 : ℤ) = 4944 := vv_even_to ε hε 22 (by decide) v22
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v24 : (vv ε 24 : ℤ) = 6992 := vv_odd_to ε 23 (by decide) v23
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v25 : (vv ε 25 : ℤ) = 9888 := vv_even_to ε hε 24 (by decide) v24
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v26 : (vv ε 26 : ℤ) = 13984 := vv_odd_to ε 25 (by decide) v25
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v27 : (vv ε 27 : ℤ) = 19777 := vv_even_to ε hε 26 (by decide) v26
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v28 : (vv ε 28 : ℤ) = 27969 := vv_odd_to ε 27 (by decide) v27
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v29 : (vv ε 29 : ℤ) = 39554 := vv_even_to ε hε 28 (by decide) v28
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v30 : (vv ε 30 : ℤ) = 55938 := vv_odd_to ε 29 (by decide) v29
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v31 : (vv ε 31 : ℤ) = 79109 := vv_even_to ε hε 30 (by decide) v30
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v32 : (vv ε 32 : ℤ) = 111877 := vv_odd_to ε 31 (by decide) v31
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v33 : (vv ε 33 : ℤ) = 158218 := vv_even_to ε hε 32 (by decide) v32
+    (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos]) (by push_cast; nlinarith [hlo, hhi, hs1, hs2, hspos])
+  have v34 : (vv ε 34 : ℤ) = 223754 := vv_odd_to ε 33 (by decide) v33
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  exact ⟨v33, v34⟩
+/-- **Stoll Theorem 3.2, pair 7.**  For `ε ∈ [79109 / 2 * √2 - 55938, 5 / 2 * √2 - 3)`,
+`v_{2k+1} − 2 v_{2k−1}` (k=m+17) is the (m+1)-th binary digit of `46341√2`. -/
+theorem stoll_pair7 {ε : ℝ} (hlo : 79109 / 2 * Real.sqrt 2 - 55938 ≤ ε) (hhi : ε < 5 / 2 * Real.sqrt 2 - 3) (m : ℕ) :
+    (vv ε (2 * (m + 17) + 1) : ℤ) - 2 * (vv ε (2 * (m + 17) - 1) : ℤ)
+      = binDigit (46341 * Real.sqrt 2) (m + 1) := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hε0 : 1 - Real.sqrt 2 / 2 ≤ ε := by nlinarith [hlo, hs2, hsnn]
+  have hε1 : ε < Real.sqrt 2 / 2 := by nlinarith [hhi, hs2, hsnn]
+  obtain ⟨hbp, hbq⟩ := stoll_pair7_base hlo hhi
+  have hf1 : ⌊(46341 : ℝ) * Real.sqrt 2⌋ = 65536 :=
+    floor_mul_sqrt2 46341 65536 (by norm_num) (by norm_num) (by norm_num)
+  have hf2 : ⌊(92682 : ℝ) * Real.sqrt 2⌋ = 131072 :=
+    floor_mul_sqrt2 92682 131072 (by norm_num) (by norm_num) (by norm_num)
+  have baseP : (vv ε (2 * (15 + 2) - 1) : ℤ) = ⌊((46341 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0⌋ + (46341 : ℤ) * 2 ^ 1 := by
+    have he : ((46341 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0 = (46341 : ℝ) * Real.sqrt 2 := by push_cast; ring
+    rw [show (2 * (15 + 2) - 1 : ℕ) = 33 from rfl, he, hf1, hbp]; norm_num
+  have baseQ : (vv ε (2 * (15 + 2)) : ℤ) = ⌊((46341 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1⌋ + (46341 : ℤ) * 2 ^ 1 := by
+    have he : ((46341 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1 = (92682 : ℝ) * Real.sqrt 2 := by push_cast; ring
+    rw [show (2 * (15 + 2) : ℕ) = 34 from rfl, he, hf2, hbq]; norm_num
+  have key := stoll_digit 46341 15 hε0 hε1 baseP baseQ m
+  have i1 : 2 * (15 + 2 + m) + 1 = 2 * (m + 17) + 1 := by ring
+  have i2 : 2 * (15 + 2 + m) - 1 = 2 * (m + 17) - 1 := by omega
+  rw [i1, i2] at key
+  simpa using key
+
+
 end Erdos482
