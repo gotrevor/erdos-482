@@ -10,40 +10,40 @@ For `x` with `1 ≤ x < 2` (so `Int.fract x = x − 1`), the `i`-th base-2 digit
 equals Stoll's floor-difference digit `⌊x·2^(i+1)⌋ − 2·⌊x·2^i⌋`.  This certifies that our
 `binDigit` is the standard binary-digit notion. -/
 
-/-- The general digit bridge: `Real.digits (Int.fract x) 2 i` (the `i`-th binary digit of the
-fractional part) equals `⌊x·2^(i+1)⌋ − 2·⌊x·2^i⌋`. -/
+/-- **General digit-floor identity.**  For any `y ≥ 0`, the `i`-th base-2 digit of `y` (in mathlib's
+`Real.digits`) is the floor-difference `⌊y·2^(i+1)⌋ − 2·⌊y·2^i⌋` (the `y < 1` domain restriction is
+not needed for this identity). -/
+theorem digits_eq_floor_sub (y : ℝ) (hy0 : 0 ≤ y) (i : ℕ) :
+    ((Real.digits y 2 i : ℕ) : ℤ) = ⌊y * 2 ^ (i + 1)⌋ - 2 * ⌊y * 2 ^ i⌋ := by
+  set N : ℤ := ⌊y * 2 ^ (i + 1)⌋ with hN
+  set M : ℤ := ⌊y * 2 ^ i⌋ with hM
+  have hz : y * 2 ^ (i + 1) = 2 * (y * 2 ^ i) := by ring
+  have hy := Int.floor_le (y * 2 ^ i)
+  have hy' := Int.lt_floor_add_one (y * 2 ^ i)
+  have hNlb : 2 * M ≤ N := by rw [hN, hz, Int.le_floor]; push_cast; linarith
+  have hNub : N ≤ 2 * M + 1 := by
+    have h : ⌊2 * (y * 2 ^ i)⌋ < 2 * M + 2 := by rw [Int.floor_lt]; push_cast; linarith
+    rw [hN, hz]; omega
+  have hdval : ((Real.digits y 2 i : ℕ) : ℤ) = ((⌊y * 2 ^ (i + 1)⌋₊ % 2 : ℕ) : ℤ) := by
+    simp only [Real.digits, Fin.val_ofNat, Nat.cast_ofNat]
+  have hpos : (0:ℝ) ≤ y * 2 ^ (i + 1) := mul_nonneg hy0 (by positivity)
+  have hfn : (⌊y * 2 ^ (i + 1)⌋₊ : ℤ) = N := by rw [Int.natCast_floor_eq_floor hpos]
+  rw [hdval]; omega
+
+/-- The digit bridge for `1 ≤ x < 2` (so `Int.fract x = x − 1`): the `i`-th binary digit of the
+fractional part equals Stoll's floor-difference `⌊x·2^(i+1)⌋ − 2·⌊x·2^i⌋`.  Certifies that
+`binDigit` is the standard binary-digit notion.  A corollary of `digits_eq_floor_sub`. -/
 theorem digit_bridge (x : ℝ) (hx1 : 1 ≤ x) (hx2 : x < 2) (i : ℕ) :
     ((Real.digits (Int.fract x) 2 i : ℕ) : ℤ)
       = ⌊x * 2 ^ (i + 1)⌋ - 2 * ⌊x * 2 ^ i⌋ := by
   have hfloor : ⌊x⌋ = 1 := by
-    rw [Int.floor_eq_iff]
-    refine ⟨by exact_mod_cast hx1, by push_cast; linarith⟩
-  have hfr : Int.fract x = x - 1 := by
-    rw [← Int.self_sub_floor, hfloor]; push_cast; ring
-  set N : ℤ := ⌊x * 2 ^ (i + 1)⌋ with hN
-  set M : ℤ := ⌊x * 2 ^ i⌋ with hM
-  have hz : x * 2 ^ (i + 1) = 2 * (x * 2 ^ i) := by ring
-  have hy := Int.floor_le (x * 2 ^ i)
-  have hy' := Int.lt_floor_add_one (x * 2 ^ i)
-  have hNlb : 2 * M ≤ N := by
-    rw [hN, hz, Int.le_floor]; push_cast; linarith
-  have hNub : N ≤ 2 * M + 1 := by
-    have h : ⌊2 * (x * 2 ^ i)⌋ < 2 * M + 2 := by
-      rw [Int.floor_lt]; push_cast; linarith
-    rw [hN, hz]; omega
-  -- digit side as a Nat mod
-  have hdval : ((Real.digits (Int.fract x) 2 i : ℕ) : ℤ)
-      = ((⌊Int.fract x * 2 ^ (i + 1)⌋₊ % 2 : ℕ) : ℤ) := by
-    simp only [Real.digits, Fin.val_ofNat, Nat.cast_ofNat]
-  have hpos : (0:ℝ) ≤ Int.fract x * 2 ^ (i + 1) := by
-    rw [hfr]; have : (0:ℝ) ≤ x - 1 := by linarith
-    positivity
-  have hfn : (⌊Int.fract x * 2 ^ (i + 1)⌋₊ : ℤ) = N - 2 ^ (i + 1) := by
-    rw [Int.natCast_floor_eq_floor hpos, hfr,
-      show (x - 1) * 2 ^ (i + 1) = x * 2 ^ (i + 1) - ((2 ^ (i + 1) : ℤ) : ℝ) by push_cast; ring,
-      Int.floor_sub_intCast]
+    rw [Int.floor_eq_iff]; refine ⟨by exact_mod_cast hx1, by push_cast; linarith⟩
+  have hfr : Int.fract x = x - 1 := by rw [← Int.self_sub_floor, hfloor]; push_cast; ring
+  rw [digits_eq_floor_sub (Int.fract x) (Int.fract_nonneg x), hfr,
+    show (x - 1) * 2 ^ (i + 1) = x * 2 ^ (i + 1) - ((2 ^ (i + 1) : ℤ) : ℝ) by push_cast; ring,
+    show (x - 1) * 2 ^ i = x * 2 ^ i - ((2 ^ i : ℤ) : ℝ) by push_cast; ring,
+    Int.floor_sub_intCast, Int.floor_sub_intCast]
   have hpow : (2:ℤ) ^ (i + 1) = 2 * 2 ^ i := by ring
-  rw [hdval]
   omega
 
 /-- Floor doubling: `⌊2z⌋ − 2⌊z⌋ ∈ {0,1}`. -/
