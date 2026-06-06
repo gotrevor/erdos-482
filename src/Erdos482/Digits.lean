@@ -46,4 +46,21 @@ theorem digit_bridge (x : ℝ) (hx1 : 1 ≤ x) (hx2 : x < 2) (i : ℕ) :
   rw [hdval]
   omega
 
+/-- Floor doubling: `⌊2z⌋ − 2⌊z⌋ ∈ {0,1}`. -/
+theorem floor_two_mul_sub (z : ℝ) :
+    ⌊2 * z⌋ - 2 * ⌊z⌋ = 0 ∨ ⌊2 * z⌋ - 2 * ⌊z⌋ = 1 := by
+  have hlb : 2 * ⌊z⌋ ≤ ⌊2 * z⌋ := by
+    rw [Int.le_floor]; push_cast; linarith [Int.floor_le z]
+  have hub : ⌊2 * z⌋ < 2 * ⌊z⌋ + 2 := by
+    rw [Int.floor_lt]; push_cast; linarith [Int.lt_floor_add_one z]
+  omega
+
+/-- `binDigit x n` is a genuine bit: it is `0` or `1` (for `n ≥ 1`). -/
+theorem binDigit_mem_zero_one (x : ℝ) (n : ℕ) (hn : 1 ≤ n) :
+    binDigit x n = 0 ∨ binDigit x n = 1 := by
+  unfold binDigit
+  have hpow : (2:ℝ) * 2 ^ (n - 1) = 2 ^ n := by rw [← pow_succ', Nat.sub_add_cancel hn]
+  rw [show x * 2 ^ n = 2 * (x * 2 ^ (n - 1)) by rw [← hpow]; ring]
+  exact floor_two_mul_sub (x * 2 ^ (n - 1))
+
 end Erdos482
