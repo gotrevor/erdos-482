@@ -60,4 +60,28 @@ theorem gdigit_mem (g : ℕ) (hg : 1 ≤ g) (t : ℝ) (n : ℕ) :
     0 ≤ gdigit g t (n + 1) ∧ gdigit g t (n + 1) < (g : ℤ) := by
   rw [gdigit_succ_eq]; exact digitStep_mem g hg _
 
+/-- **Proposition 2 (St05) — mathlib bridge, general base.**  For `y ≥ 0` and base `g` (`NeZero g`),
+mathlib's `i`-th base-`g` digit of `y` is exactly the floor difference `⌊y·g^{i+1}⌋ − g·⌊y·g^i⌋ =
+digitStep g (y·g^i)`.  Generalizes the repo's base-2 `Erdos482.digits_eq_floor_sub` to any base —
+the bridge that identifies St05's recurrence output with the actual base-`g` digits of `w`. -/
+theorem realDigits_eq_digitStep (g : ℕ) [NeZero g] (y : ℝ) (hy0 : 0 ≤ y) (i : ℕ) :
+    ((Real.digits y g i : ℕ) : ℤ) = digitStep g (y * (g : ℝ) ^ i) := by
+  have hg : 1 ≤ g := Nat.one_le_iff_ne_zero.mpr (NeZero.ne g)
+  set N : ℤ := ⌊y * (g : ℝ) ^ (i + 1)⌋ with hN
+  set M : ℤ := ⌊y * (g : ℝ) ^ i⌋ with hM
+  have hds : digitStep g (y * (g : ℝ) ^ i) = N - g * M := by
+    unfold digitStep
+    rw [hN, hM, show (g : ℝ) * (y * (g : ℝ) ^ i) = y * (g : ℝ) ^ (i + 1) by ring]
+  obtain ⟨hlo, hhi⟩ := digitStep_mem g hg (y * (g : ℝ) ^ i)
+  rw [hds] at hlo hhi
+  have hdval : ((Real.digits y g i : ℕ) : ℤ) = ((⌊y * (g : ℝ) ^ (i + 1)⌋₊ % g : ℕ) : ℤ) := by
+    simp only [Real.digits, Fin.val_ofNat]
+  have hpos : (0 : ℝ) ≤ y * (g : ℝ) ^ (i + 1) := mul_nonneg hy0 (by positivity)
+  have hfn : (⌊y * (g : ℝ) ^ (i + 1)⌋₊ : ℤ) = N := by rw [Int.natCast_floor_eq_floor hpos]
+  -- N % g = N − g·M : the part `g·M` is killed mod g, and `N − g·M ∈ [0,g)`.
+  have hmod : N % (g : ℤ) = N - g * M := by
+    conv_lhs => rw [show N = (N - g * M) + g * M by ring]
+    rw [Int.add_mul_emod_self_left, Int.emod_eq_of_lt hlo hhi]
+  rw [hds, hdval, Int.natCast_mod, hfn, hmod]
+
 end Erdos482.General
