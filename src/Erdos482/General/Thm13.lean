@@ -21,6 +21,19 @@ namespace Erdos482.General
 
 open Real
 
+/-- **St05 Theorem 1.3 recurrence** (0-indexed, `gu g a b ε n = u_{n+1}`, `u₁ = 1`).  The step from
+index `n` uses the `(a, ε)` offset when `n` is even (i.e. original odd index `n+1`) and
+`(b, 1/(g−1))` when `n` is odd.  With `a = g/((g−1)(t+g))`, `b = g/a = (g−1)(t+g)`, this is the
+recurrence whose closed forms are `gu(2k) = g^k + ⌊t·g^{k−1}⌋`, `(g−1)·gu(2k+1) = g^k − 1` — the
+object the Aristotle closed-form induction (`tools/aristotle/thm13closed`, job `e0240fef`) ports onto. -/
+noncomputable def gu (g : ℕ) (a b ε : ℝ) : ℕ → ℤ
+  | 0 => 1
+  | n + 1 =>
+      if Even n then ⌊a * ((gu g a b ε n : ℝ) + ε)⌋
+      else ⌊b * ((gu g a b ε n : ℝ) + 1 / ((g : ℝ) - 1))⌋
+
+@[simp] theorem gu_zero (g : ℕ) (a b ε : ℝ) : gu g a b ε 0 = 1 := rfl
+
 /-- **St05 Theorem 1.3, digit-extraction step (from the odd-index closed form).**  If `u : ℕ → ℤ`
 satisfies `u(2k+1) = g^k + ⌊t·g^k/g⌋` for all `k`, then for every `n ≥ 1`,
 `u(2n+1) − g·u(2n−1) = digitStep g (t·g^{n−1}/g)`, a base-`g` digit lying in `[0,g)`. -/
