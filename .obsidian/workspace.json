@@ -183,6 +183,12 @@
   "active": "efd869cbcc11544b",
   "lastOpenFiles": [
     "src/Erdos482/CheckAx.lean",
+    "tools/aristotle/bandmargin/Problem.lean",
+    "tools/aristotle/nehalf/Problem.lean",
+    "tools/aristotle/fractdbl/Problem.lean",
+    "tools/aristotle/bandmargin",
+    "tools/aristotle/nehalf",
+    "tools/aristotle/fractdbl",
     "notes/ST05-GENERAL-PLAN.md",
     "papers/SOURCES.md",
     "notes",

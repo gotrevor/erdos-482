@@ -1505,6 +1505,47 @@ theorem stoll_pair5_of_evenstep {ε : ℝ}
   rw [vv_eq_u_of_evenstep Heven, vv_eq_u_of_evenstep Heven]
   exact graham_pollak k hk
 
+/-- **Pair-5 ε-step — exact band characterization (the Diophantine obstruction, made precise).**
+For `j ≥ 1` and `ε ≥ 0`, the `j`-th conjunct of `Heven` (the even-index ε-step of `vv ε` landing on
+the headline value `u(2j+1)`) holds **iff** the explicit *band bracket*
+
+  `B_j(ε) := {√2·2^j} − √2·{√2·2^{j−1}} + √2·ε`   (`{·} = Int.fract`)
+
+lies in `[0,1)`.  This turns the vague "pair 5 needs Diophantine machinery" into a precise
+statement: pair 5's full-interval question *is* "keep every `B_j(ε)` in `[0,1)`", an infinitary
+condition forcing `{√2·2^m}` to avoid a band around `½`.  At `ε = ½`, `B_j(½)` is exactly
+`crux (√2·2^j)`, so it lies in `[0,1)` for **every** `j` automatically (= Graham–Pollak); for
+`ε ≠ ½` it fails at some finite `j` (verified: at the stated lower endpoint, `j = 280`; see
+`archive/findings/ON-LINE-FINDINGS-2026-06-06-pair5.md`).  Axiom-free. -/
+theorem pair5_estep_band (j : ℕ) (hj : 1 ≤ j) {ε : ℝ} (hε : 0 ≤ ε) :
+    ⌊Real.sqrt 2 * ((u (2 * j) : ℝ) + ε)⌋₊ = u (2 * j + 1) ↔
+      0 ≤ Int.fract (Real.sqrt 2 * 2 ^ j)
+            - Real.sqrt 2 * Int.fract (Real.sqrt 2 * 2 ^ (j - 1)) + Real.sqrt 2 * ε ∧
+        Int.fract (Real.sqrt 2 * 2 ^ j)
+            - Real.sqrt 2 * Int.fract (Real.sqrt 2 * 2 ^ (j - 1)) + Real.sqrt 2 * ε < 1 := by
+  obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
+  simp only [Nat.add_sub_cancel]
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  -- closed forms of the headline sequence (`gp_pair`)
+  have hu2j : (u (2 * (i + 1)) : ℝ) = (⌊Real.sqrt 2 * 2 ^ i⌋ : ℝ) + 2 ^ (i + 1) := by
+    have h := (gp_pair i).2
+    rw [show 2 * (i + 1) = 2 * i + 2 by ring]; exact_mod_cast h
+  have hu2j1 : (u (2 * (i + 1) + 1) : ℝ) = (⌊Real.sqrt 2 * 2 ^ (i + 1)⌋ : ℝ) + 2 ^ (i + 1) := by
+    have h := (gp_pair (i + 1)).1; exact_mod_cast h
+  -- the bracket identity: √2·(u(2j)+ε) − u(2j+1) = B_j(ε)
+  have hB : Real.sqrt 2 * ((u (2 * (i + 1)) : ℝ) + ε) - (u (2 * (i + 1) + 1) : ℝ)
+      = Int.fract (Real.sqrt 2 * 2 ^ (i + 1))
+          - Real.sqrt 2 * Int.fract (Real.sqrt 2 * 2 ^ i) + Real.sqrt 2 * ε := by
+    rw [Int.fract, Int.fract, hu2j, hu2j1]
+    linear_combination (2 ^ i : ℝ) * hs2
+  have harg : (0:ℝ) ≤ Real.sqrt 2 * ((u (2 * (i + 1)) : ℝ) + ε) :=
+    mul_nonneg hsnn (by positivity)
+  rw [Nat.floor_eq_iff harg]
+  constructor
+  · rintro ⟨h1, h2⟩; exact ⟨by linarith [hB], by linarith [hB]⟩
+  · rintro ⟨h1, h2⟩; exact ⟨by linarith [hB], by linarith [hB]⟩
+
 /-- **√2 is badly approximable** (irrationality measure 2, explicit constant): for every integer `p`
 and positive natural `q`, `1/(3q) ≤ |q√2 − p|`.  Equivalently `‖q√2‖ ≥ 1/(3q)` — the Diophantine
 input the pair-5 even-step (`Heven` in `vv_eq_u_of_evenstep`) needs, since √2's quadratic-irrational
