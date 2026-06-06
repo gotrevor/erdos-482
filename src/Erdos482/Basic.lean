@@ -20,10 +20,4 @@ noncomputable def u : ℕ → ℕ
 (`noncomputable`: `Int.floor` on `ℝ` is.) -/
 noncomputable def binDigit (t : ℝ) (n : ℕ) : ℤ := ⌊t * 2 ^ n⌋ - 2 * ⌊t * 2 ^ (n - 1)⌋
 
-/-- HEADLINE (Graham–Pollak).  ⚠️ First lap: confirm the exact index form against Stoll eqs (1)–(2)
-before trusting this statement (faithfulness > fluency). -/
-theorem graham_pollak (n : ℕ) (hn : 1 ≤ n) :
-    (u (2 * n + 1) : ℤ) - 2 * (u (2 * n - 1) : ℤ) = binDigit (Real.sqrt 2) n := by
-  sorry
-
 end Erdos482
