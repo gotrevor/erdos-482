@@ -169,4 +169,74 @@ theorem stoll_digit (a : ℤ) (l : ℕ) {ε : ℝ} (hε0 : 1 - Real.sqrt 2 / 2 �
   rw [Nat.add_sub_cancel]
   ring
 
+/-! ## Concrete instantiation: Pair 1 (`α = 1`, `l = 0`, `t = √2 − 1`)
+
+Stoll's pair `i = 1`: `ε ∈ [1 − √2/2, √2 − 1)`, `α = 1`, `l = 0`.  Since `α = 1`, the extracted
+number is `√2` itself — so a *whole interval* of offsets `ε` (not just `½`) reproduces the binary
+digits of `√2`, via `t = √2 − 1 = fract √2`.  This discharges the base case `(vv ε 3, vv ε 4)` from
+the recurrence using the `ε`-interval bounds, then applies `stoll_digit`. -/
+
+/-- Base case for pair 1: the recurrence gives `vv ε 3 = 3`, `vv ε 4 = 4` for any
+`ε ∈ [1 − √2/2, √2 − 1)`.  (The `ε`-steps `vv 1`, `vv 3` use the interval bounds; the `½`-steps
+`vv 2`, `vv 4` are numeric.) -/
+private lemma stoll_pair1_base {ε : ℝ} (hε0 : 1 - Real.sqrt 2 / 2 ≤ ε) (hε1 : ε < Real.sqrt 2 - 1) :
+    (vv ε 3 : ℤ) = 3 ∧ (vv ε 4 : ℤ) = 4 := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hspos : (0:ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hs1 : (1:ℝ) ≤ Real.sqrt 2 := by nlinarith [hs2, hsnn]
+  have hε : 0 ≤ ε := by nlinarith [hε0, hs2, hsnn]
+  have e0 : ((vv ε 0 : ℕ) : ℝ) = 1 := by simp [vv]
+  -- vv 1 = 1
+  have h1 : (vv ε 1 : ℤ) = 1 := by
+    rw [show (1:ℕ) = 0 + 1 from rfl, vv_step_even ε hε 0 (by decide), e0, Int.floor_eq_iff]
+    constructor <;> push_cast <;> nlinarith [hε1, hε, hs1, hs2, hspos]
+  have e1 : ((vv ε 1 : ℕ) : ℝ) = 1 := by exact_mod_cast h1
+  -- vv 2 = 2
+  have h2 : (vv ε 2 : ℤ) = 2 := by
+    rw [show (2:ℕ) = 1 + 1 from rfl, vv_step_odd ε 1 (by decide), e1, Int.floor_eq_iff]
+    constructor <;> push_cast <;> nlinarith [hs1, hs2, hspos]
+  have e2 : ((vv ε 2 : ℕ) : ℝ) = 2 := by exact_mod_cast h2
+  -- vv 3 = 3
+  have h3 : (vv ε 3 : ℤ) = 3 := by
+    rw [show (3:ℕ) = 2 + 1 from rfl, vv_step_even ε hε 2 (by decide), e2, Int.floor_eq_iff]
+    constructor <;> push_cast <;> nlinarith [hε1, hε0, hs1, hs2, hspos]
+  have e3 : ((vv ε 3 : ℕ) : ℝ) = 3 := by exact_mod_cast h3
+  -- vv 4 = 4
+  have h4 : (vv ε 4 : ℤ) = 4 := by
+    rw [show (4:ℕ) = 3 + 1 from rfl, vv_step_odd ε 3 (by decide), e3, Int.floor_eq_iff]
+    constructor <;> push_cast <;> nlinarith [hs1, hs2, hspos]
+  exact ⟨h3, h4⟩
+
+/-- **Stoll Theorem 3.2, pair 1.**  For every offset `ε ∈ [1 − √2/2, √2 − 1)` and every `m`,
+`v_{2k+1} − 2 v_{2k−1}` (with `k = m + 2`) equals the `(m+1)`-th binary digit of `√2`.  A whole
+interval of offsets reproduces the binary expansion of `√2` (cf. Stoll's Remark (b)). -/
+theorem stoll_pair1 {ε : ℝ} (hε0 : 1 - Real.sqrt 2 / 2 ≤ ε) (hε1 : ε < Real.sqrt 2 - 1) (m : ℕ) :
+    (vv ε (2 * (m + 2) + 1) : ℤ) - 2 * (vv ε (2 * (m + 2) - 1) : ℤ)
+      = binDigit (Real.sqrt 2) (m + 1) := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  -- the pair-1 interval sits inside the universal interval
+  have hε1' : ε < Real.sqrt 2 / 2 := by nlinarith [hε1, hs2, hsnn]
+  obtain ⟨hb3, hb4⟩ := stoll_pair1_base hε0 hε1
+  have baseP : (vv ε (2 * (0 + 2) - 1) : ℤ)
+      = ⌊((1 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0⌋ + (1 : ℤ) * 2 ^ 1 := by
+    have hf : ⌊((1 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0⌋ = 1 := by
+      have he : ((1 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0 = Real.sqrt 2 := by push_cast; ring
+      rw [he, Int.floor_eq_iff]
+      constructor <;> push_cast <;> nlinarith [hs2, hsnn]
+    rw [show (2 * (0 + 2) - 1 : ℕ) = 3 from rfl, hf, hb3]; norm_num
+  have baseQ : (vv ε (2 * (0 + 2)) : ℤ)
+      = ⌊((1 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1⌋ + (1 : ℤ) * 2 ^ 1 := by
+    have hf : ⌊((1 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1⌋ = 2 := by
+      have he : ((1 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1 = Real.sqrt 2 * 2 := by push_cast; ring
+      rw [he, Int.floor_eq_iff]
+      constructor <;> push_cast <;> nlinarith [hs2, hsnn]
+    rw [show (2 * (0 + 2) : ℕ) = 4 from rfl, hf, hb4]; norm_num
+  have key := stoll_digit 1 0 hε0 hε1' baseP baseQ m
+  have i1 : 2 * (0 + 2 + m) + 1 = 2 * (m + 2) + 1 := by ring
+  have i2 : 2 * (0 + 2 + m) - 1 = 2 * (m + 2) - 1 := by omega
+  rw [i1, i2] at key
+  simpa using key
+
 end Erdos482
