@@ -43,4 +43,18 @@ theorem thm13_digit_of_oddClosed (g : ℕ) (hg : 1 ≤ g) (t : ℝ) (u : ℕ →
   · rw [hdig]; exact (digitStep_mem g hg _).1
   · rw [hdig]; exact (digitStep_mem g hg _).2
 
+/-- **St05 Theorem 1.3 conclusion as a literal mathlib digit.**  Chaining
+`thm13_digit_of_oddClosed` with the general Prop-2 bridge `realDigits_eq_digitStep`: under the
+odd-index closed form, `u(2n+1) − g·u(2n−1)` is exactly mathlib's leading base-`g` digit
+`Real.digits (t·g^{n−1}/g) g 0` (`g ≥ 2`, `t ≥ 0`, `n ≥ 1`).  This identifies St05's recurrence
+output with a bona-fide base-`g` digit in mathlib's API. -/
+theorem thm13_digit_realDigits (g : ℕ) [NeZero g] (hg : 2 ≤ g) (t : ℝ) (ht : 0 ≤ t) (u : ℕ → ℤ)
+    (hodd : ∀ k, u (2 * k + 1) = (g : ℤ) ^ k + ⌊t * (g : ℝ) ^ k / g⌋)
+    (n : ℕ) (hn : 1 ≤ n) :
+    u (2 * n + 1) - g * u (2 * n - 1)
+      = ((Real.digits (t * (g : ℝ) ^ (n - 1) / g) g 0 : ℕ) : ℤ) := by
+  have hy0 : 0 ≤ t * (g : ℝ) ^ (n - 1) / g := by positivity
+  rw [(thm13_digit_of_oddClosed g (by omega) t u hodd n hn).1,
+    realDigits_eq_digitStep g (t * (g : ℝ) ^ (n - 1) / g) hy0 0, pow_zero, mul_one]
+
 end Erdos482.General
