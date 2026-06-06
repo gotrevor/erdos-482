@@ -1619,5 +1619,44 @@ theorem sqrt2_badly_approximable (p : ℤ) (q : ℕ) (hq : 1 ≤ q) :
   · rcases p with ⟨ _ | _ | _ | p ⟩ <;> norm_num at * <;> nlinarith [ Real.sqrt_nonneg 2, Real.sq_sqrt zero_le_two ];
   · nlinarith [ Real.sqrt_nonneg 2, Real.sq_sqrt zero_le_two, inv_mul_cancel₀ ( by linarith : ( q : ℝ ) + 1 + 1 ≠ 0 ), mul_le_mul_of_nonneg_left ( show ( q : ℝ ) ≥ 0 by positivity ) ( Real.sqrt_nonneg 2 ) ]
 
+/-- **The binary-shift (doubling) map on `Int.fract`.**  For every real `x`,
+`fract (2·x) = fract (2·fract x)`.  This is the map underlying the band recurrence: the pair-5 band
+brackets are governed by the orbit `{√2·2^j}`, and `{√2·2^(j+1)} = fract (2·{√2·2^j})`.
+(Aristotle-proved, kernel-verified.) -/
+theorem fract_two_mul (x : ℝ) :
+    Int.fract (2 * x) = Int.fract (2 * Int.fract x) := by
+  rw [eq_comm, Int.fract_eq_fract]
+  exact ⟨-⌊x⌋ * 2, by push_cast; linarith [Int.fract_add_floor x]⟩
+
+/-- **The band center is never hit.**  `{√2·2^n} ≠ ½` for every `n`: if it were `½`, then
+`√2 = (2⌊√2·2^n⌋+1)/2^(n+1)` would be rational, contradicting `irrational_sqrt_two`.  The pair-5
+band brackets degenerate exactly when `{√2·2^m} → ½`; this says the orbit never lands *on* `½`.
+(Aristotle-proved, kernel-verified.) -/
+theorem fract_sqrt2_pow_ne_half (n : ℕ) :
+    Int.fract (Real.sqrt 2 * 2 ^ n) ≠ 1 / 2 := by
+  by_contra h
+  obtain ⟨k, hk⟩ : ∃ k : ℤ, Real.sqrt 2 * 2 ^ n = k + 1 / 2 := ⟨_, eq_add_of_sub_eq' h⟩
+  exact irrational_sqrt_two
+    ⟨(k + 1 / 2) / 2 ^ n, by push_cast [← hk]; rw [mul_div_cancel_right₀ _ (by positivity)]⟩
+
+/-- **Quantitative band-avoidance** (from `sqrt2_badly_approximable`).  `√2·2^n` stays at distance
+`≥ 1/(3·2^(n+2))` from *every* half-integer `p + ½`.  So as `n` grows the orbit `{√2·2^n}` can
+approach the band center `½` no faster than `2^{-n}` — the per-step pair-5 margin shrinks at most
+geometrically, matching the numerics (binding index climbs `28→333→1400→…`) in the findings doc.
+Combined with `pair5_estep_band` this is the quantitative skeleton of why the admissible ε-set
+collapses toward `{½}`. -/
+theorem sqrt2_pow_far_from_halfint (n : ℕ) (p : ℤ) :
+    (1 : ℝ) / (3 * 2 ^ (n + 2)) ≤ |Real.sqrt 2 * 2 ^ n - ((p : ℝ) + 1 / 2)| := by
+  have h1 : 1 ≤ 2 ^ (n + 1) := Nat.one_le_pow _ _ (by norm_num)
+  have h2 := sqrt2_badly_approximable (2 * p + 1) (2 ^ (n + 1)) h1
+  have hcast : ((2 ^ (n + 1) : ℕ) : ℝ) = 2 ^ (n + 1) := by push_cast; ring
+  rw [hcast] at h2
+  have h4 : (2 : ℝ) ^ (n + 1) * Real.sqrt 2 - ((2 * p + 1 : ℤ) : ℝ)
+      = 2 * (Real.sqrt 2 * 2 ^ n - ((p : ℝ) + 1 / 2)) := by push_cast; ring
+  rw [h4, abs_mul, abs_of_pos (by norm_num : (0:ℝ) < 2)] at h2
+  have h5 : (1 : ℝ) / (3 * 2 ^ (n + 1)) = 1 / (3 * 2 ^ (n + 2)) * 2 := by ring
+  rw [h5] at h2
+  linarith
+
 end Erdos482
 
