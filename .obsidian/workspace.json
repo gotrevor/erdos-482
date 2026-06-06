@@ -183,6 +183,8 @@
   "active": "efd869cbcc11544b",
   "lastOpenFiles": [
     "src/Erdos482/CheckAx.lean",
+    "tools/aristotle/bandbranch/Problem.lean",
+    "tools/aristotle/bandbranch",
     "tools/aristotle/dblexplicit/Problem.lean",
     "tools/aristotle/dblexplicit",
     "tools/aristotle/bandmargin/Problem.lean",
@@ -192,8 +194,6 @@
     "tools/aristotle/nehalf",
     "tools/aristotle/fractdbl",
     "notes/ST05-GENERAL-PLAN.md",
-    "papers/SOURCES.md",
-    "notes",
-    "papers/St05-stoll-JIS2005.pdf"
+    "papers/SOURCES.md"
   ]
 }

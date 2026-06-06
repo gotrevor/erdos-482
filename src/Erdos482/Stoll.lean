@@ -1655,6 +1655,15 @@ theorem fract_two_mul (x : ℝ) :
   rw [eq_comm, Int.fract_eq_fract]
   exact ⟨-⌊x⌋ * 2, by push_cast; linarith [Int.fract_add_floor x]⟩
 
+/-- **The doubling map in explicit branch form.**  For `f ∈ [0,1)`, `fract (2f)` is `2f` when
+`f < ½` and `2f − 1` when `f ≥ ½` (the binary-digit branch).  Drives the concrete pair-5 band
+analysis.  (Aristotle-proved, kernel-verified.) -/
+theorem fract_two_mul_branch (f : ℝ) (h0 : 0 ≤ f) (h1 : f < 1) :
+    (f < 1 / 2 → Int.fract (2 * f) = 2 * f) ∧
+      (1 / 2 ≤ f → Int.fract (2 * f) = 2 * f - 1) := by
+  norm_num [Int.fract_eq_iff]
+  exact ⟨fun h => ⟨h0, by linarith⟩, fun h => ⟨by linarith, by linarith, 1, by norm_num⟩⟩
+
 /-- **The band center is never hit.**  `{√2·2^n} ≠ ½` for every `n`: if it were `½`, then
 `√2 = (2⌊√2·2^n⌋+1)/2^(n+1)` would be rational, contradicting `irrational_sqrt_two`.  The pair-5
 band brackets degenerate exactly when `{√2·2^m} → ½`; this says the orbit never lands *on* `½`.
@@ -1712,6 +1721,34 @@ theorem pair5_band_fails_below_half (j : ℕ) (hj : 1 ≤ j) {ε : ℝ}
   have hpos : (0:ℝ) < 2 - Real.sqrt 2 := by
     nlinarith [Real.sq_sqrt (show (0:ℝ) ≤ 2 by norm_num), Real.sqrt_nonneg 2]
   have hlin : f * (2 - Real.sqrt 2) < 1 - Real.sqrt 2 * ε := (lt_div_iff₀ hpos).mp hf_hi
+  intro hcontra
+  nlinarith [hlin, hcontra]
+
+/-- **The precise obstruction (symmetric): the ε-step fails above ½ when the orbit lands just
+below ½.**  For `j ≥ 1`, if `{√2·2^{j−1}} ∈ [(1−√2ε)/(2−√2), ½)` then the band bracket `B_j(ε)` is
+`≥ 1`, so by `pair5_estep_band` the ε-step overshoots.  For `ε > ½` the lower threshold
+`(1−√2ε)/(2−√2)` is below `½`, so this sub-band just below `½` is nonempty — whenever the orbit
+`{√2·2^m}` enters it the recurrence breaks.  This is why no `ε > ½` is uniformly admissible.  Pure
+doubling-map branch arithmetic via `fract_two_mul` — no normality assumption. -/
+theorem pair5_band_fails_above_half (j : ℕ) (hj : 1 ≤ j) {ε : ℝ}
+    (hf_lo : (1 - Real.sqrt 2 * ε) / (2 - Real.sqrt 2) ≤ Int.fract (Real.sqrt 2 * 2 ^ (j - 1)))
+    (hf_hi : Int.fract (Real.sqrt 2 * 2 ^ (j - 1)) < 1 / 2) :
+    ¬ (Int.fract (Real.sqrt 2 * 2 ^ j)
+            - Real.sqrt 2 * Int.fract (Real.sqrt 2 * 2 ^ (j - 1)) + Real.sqrt 2 * ε < 1) := by
+  obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
+  simp only [Nat.add_sub_cancel] at *
+  set f := Int.fract (Real.sqrt 2 * 2 ^ i) with hf
+  have hf0 : 0 ≤ f := Int.fract_nonneg _
+  -- doubling: {√2·2^(i+1)} = 2f (the orbit is in the lower half [0,½))
+  have hdouble : Int.fract (Real.sqrt 2 * 2 ^ (i + 1)) = 2 * f := by
+    have e : Real.sqrt 2 * 2 ^ (i + 1) = 2 * (Real.sqrt 2 * 2 ^ i) := by ring
+    have hfloor : ⌊2 * f⌋ = 0 := by
+      rw [Int.floor_eq_iff]; constructor <;> push_cast <;> linarith
+    rw [e, fract_two_mul, ← hf, Int.fract, hfloor]; push_cast; ring
+  rw [hdouble]
+  have hpos : (0:ℝ) < 2 - Real.sqrt 2 := by
+    nlinarith [Real.sq_sqrt (show (0:ℝ) ≤ 2 by norm_num), Real.sqrt_nonneg 2]
+  have hlin : 1 - Real.sqrt 2 * ε ≤ f * (2 - Real.sqrt 2) := (div_le_iff₀ hpos).mp hf_lo
   intro hcontra
   nlinarith [hlin, hcontra]
 
