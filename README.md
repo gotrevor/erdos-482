@@ -1,4 +1,31 @@
 # erdos-482 — Graham–Pollak binary-digits identity (Erdős #482), formalized in Lean 4 / mathlib
 
-`u 0 = 1`, `u(n+1) = ⌊√2(u n + ½)⌋` ⟹ `u(2n+1) − 2u(2n−1)` is the n-th binary digit of √2.
-Crux = one fractional-part inequality. See `HANDOFF.md` for the attack plan.
+A Lean 4 / mathlib formalization of [Erdős problem #482](https://www.erdosproblems.com/482).
+The problem is marked **SOLVED** on erdosproblems.com, which lists **no formalized statement** — so
+this is (as far as that database knows) the first Lean formalization of #482.
+
+## The problem
+
+> Define `a₁ = 1` and `a(n+1) = ⌊√2·(aₙ + ½)⌋`. Then `a(2n+1) − 2·a(2n−1)` is the n-th digit in the
+> binary expansion of √2. Find similar results for `θ = √m` and other algebraic numbers.
+
+Source: `[ErGr80, p.96]`. The √2 result is due to **Graham and Pollak [GrPo70]**; the wide-ranging
+generalizations are due to **Stoll [St05, St06]** ([arXiv:0902.4168](https://arxiv.org/abs/0902.4168)).
+The only genuinely new content is **one fractional-part inequality** (`0 ≤ {x} − √2{x/2} + √2/2 < 1`,
+Stoll eq (7)); mathlib supplies `Int.fract`, `irrational_sqrt_two`, `Real.digits`, and the rest.
+
+## What is proven
+
+`lake build` is green, with **zero `sorry` and zero custom axioms** (every theorem bottoms out at
+`[propext, Classical.choice, Quot.sound]`).
+
+- **Headline** — the Graham–Pollak √2 identity (`graham_pollak`), plus its restatement against
+  mathlib's `Real.digits` and a concrete first-six-digits certificate.
+- **Stoll's Theorem 3.2** — binary-digit identities for the GP-style `(α, l)` pairs (general core +
+  the individual pairs).
+- **Stoll's Corollary 3.3** — the unconditional title result, digits of `759250125·√2`
+  (`cor33_unconditional`).
+
+See [`STATUS.md`](STATUS.md) for the full theorem inventory + axiom ledger, and
+[`PENDING_WORK.md`](PENDING_WORK.md) for the remaining optional polish (notably pair 6 over its full
+ε-interval, and the cosmetic `t_i` restatement).
