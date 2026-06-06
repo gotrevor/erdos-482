@@ -26,6 +26,24 @@ private lemma eq8 {w : ℝ} (h0 : 0 ≤ w) (h1 : w < 1) :
   · nlinarith [mul_nonneg (by linarith : (0:ℝ) ≤ 1 - w) (by linarith : (0:ℝ) ≤ Real.sqrt 2 - 1)]
   · nlinarith [mul_nonneg h0 (by linarith : (0:ℝ) ≤ Real.sqrt 2 - 1)]
 
+/-- Stoll eq (8) in full generality: for `ε` in the interval `[1 − √2/2, √2/2)` and `w ∈ [0,1)`,
+`0 ≤ w·(1−√2) + √2·ε < 1`.  (The headline uses `ε = 1/2`, recovered as `eq8` above.)  This is the
+general odd→even step needed by Stoll's Theorem 3.2 (BONUS); `crux` already supplies the general
+even→odd step (eq (7)). -/
+private lemma eq8_general {ε w : ℝ} (hε0 : 1 - Real.sqrt 2 / 2 ≤ ε) (hε1 : ε < Real.sqrt 2 / 2)
+    (h0 : 0 ≤ w) (h1 : w < 1) :
+    0 ≤ w * (1 - Real.sqrt 2) + Real.sqrt 2 * ε ∧
+      w * (1 - Real.sqrt 2) + Real.sqrt 2 * ε < 1 := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hspos : (0:ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
+  have hmul : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hs1 : (1:ℝ) ≤ Real.sqrt 2 := by nlinarith [hmul, hsnn]
+  refine ⟨?_, ?_⟩
+  · nlinarith [mul_le_mul_of_nonneg_left hε0 hsnn, hmul,
+      mul_nonneg (by linarith : (0:ℝ) ≤ 1 - w) (by linarith : (0:ℝ) ≤ Real.sqrt 2 - 1)]
+  · nlinarith [mul_lt_mul_of_pos_left hε1 hspos, hmul,
+      mul_nonneg h0 (by linarith : (0:ℝ) ≤ Real.sqrt 2 - 1)]
+
 /-- even→odd floor step: from `u(2j+2) = ⌊√2·2^j⌋ + 2^(j+1)` derive `u(2j+3) = ⌊√2·2^(j+1)⌋ + 2^(j+1)`.
 Reduces to `crux (√2·2^(j+1))`. -/
 private lemma floorB (j : ℕ) :
