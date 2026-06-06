@@ -185,4 +185,20 @@ theorem thm13_digits (g : ℕ) [NeZero g] (hg : 2 ≤ g) (t : ℝ) (ht1 : 1 ≤ 
   simp only [e1, e2] at hmain
   exact hmain
 
+/-- **Capstone digit ↔ literal mantissa digit.**  The shifted digit `Real.digits (t·g^{n−1}/g) g 0`
+that `thm13_digits` outputs is exactly the `(n−2)`-th mathlib base-`g` digit of the mantissa `t`
+itself (for `n ≥ 2`).  So the recurrence output reads off `t`'s genuine base-`g` digits. -/
+theorem digit_recon (g : ℕ) [NeZero g] (t : ℝ) (ht : 0 ≤ t) (n : ℕ) (hn : 2 ≤ n) :
+    ((Real.digits (t * (g : ℝ) ^ (n - 1) / g) g 0 : ℕ) : ℤ)
+      = ((Real.digits t g (n - 2) : ℕ) : ℤ) := by
+  have hg1 : 1 ≤ g := Nat.one_le_iff_ne_zero.mpr (NeZero.ne g)
+  have hg0 : (g : ℝ) ≠ 0 := by positivity
+  have hpow : t * (g : ℝ) ^ (n - 1) / g = t * (g : ℝ) ^ (n - 2) := by
+    obtain ⟨k, rfl⟩ : ∃ k, n = k + 2 := ⟨n - 2, by omega⟩
+    rw [show k + 2 - 1 = k + 1 from rfl, show k + 2 - 2 = k from rfl, pow_succ]
+    field_simp
+  rw [realDigits_eq_digitStep g (t * (g : ℝ) ^ (n - 1) / g) (by positivity) 0,
+    realDigits_eq_digitStep g t ht (n - 2)]
+  simp only [digitStep, pow_zero, mul_one, hpow]
+
 end Erdos482.General

@@ -1,6 +1,17 @@
 # STATUS — erdos-482 📊
 
-**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8258 jobs) · **Updated**: 2026-06-06 (pair-5 resolution + St05 general track started)
+**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8265 jobs) · **Updated**: 2026-06-06 (**ENTIRE St05 paper formalized — #482 resolved for any w>0, any base g≥2**)
+
+## 🏆 St05 COMPLETE — Erdős #482 resolved in full generality (2026-06-06)
+The whole of Stoll [St05] is now machine-checked and **axiom-clean** (`src/Erdos482/General/`):
+**Thm 1.1** (Rabinowitz–Gilbert, `Thm11.lean`), **Thm 1.2 Case I** (ε-interval `[1/3,2/3)`, `Thm12CaseI.lean`)
++ **Case II** (ε=½, `Thm12.lean`), **Thm 1.3** (g-ary, any base — the headline, `Thm13Closed.lean`:
+`thm13_closed`+`thm13_digits`), **Cor 1.1** (both √2 binary families, `Cor11.lean`), **Cor 1.2** (ternary
+√2, `Cor12.lean`), **Prop 2** (`Digits.lean`). Top-level packaging: **`erdos482_resolution`**
+(`Erdos482General.lean`) — for any `w>0`, any `g≥2`, an explicit recurrence reads off `w`'s base-`g`
+digits. The joint-induction obligation the stalled Aristotle job `e0240fef` couldn't crack was proved
+locally. Every declaration `#print axioms` = `[propext, Classical.choice, Quot.sound]`.
+Next frontier: **St06** (Acta Arith. 2006, sharper) — needs online fetch (see `ON-LINE-REQUEST.md`).
 
 ## Where it stands
 The **headline** (Graham–Pollak: the GP sequence reads off the binary digits of √2) and the **bonus**
