@@ -2,6 +2,7 @@ import Erdos482.Basic
 import Erdos482.Crux
 import Erdos482.Induction
 import Erdos482.Digits
+import Erdos482.Main
 
 /-!
 # Stoll's Theorem 3.2 — the parametrized Graham–Pollak recurrence
@@ -1431,6 +1432,23 @@ theorem stoll_gp_isBit {ε : ℝ} {k : ℕ} (hk : 31 ≤ k)
   · have h := stoll_pair8 a b (k - 3)
     rw [show k - 3 + 3 = k from by omega] at h
     rw [h]; exact binDigit_mem_zero_one _ _ (by omega)
+
+/-- **The bonus sequence at `ε = ½` is the headline sequence.**  `vv (1/2) = u`: both the ε-steps
+(even indices) and the ½-steps (odd indices) use offset `½`, so the recurrence collapses to `u`'s.
+Hence pair 5's `ε = ½` instance *is* exactly Graham–Pollak (`graham_pollak`), with no extra work; the
+open part of pair 5 is only the OTHER `ε` in its interval (the Diophantine thread, see PENDING_WORK). -/
+theorem vv_half_eq_u (n : ℕ) : vv (1 / 2) n = u n := by
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+    show ⌊Real.sqrt 2 * ((vv (1/2) n : ℝ) + (if Even n then (1/2 : ℝ) else 1/2))⌋₊ = u (n + 1)
+    rw [ih, ite_self]; rfl
+
+/-- Pair 5 at `ε = ½` (Graham–Pollak, restated through `vv`): `vv (1/2) (2n+1) − 2 vv (1/2) (2n−1)`
+is the `n`-th binary digit of `√2`. Immediate from `vv_half_eq_u` + `graham_pollak`. -/
+theorem stoll_pair5_half (n : ℕ) (hn : 1 ≤ n) :
+    (vv (1 / 2) (2 * n + 1) : ℤ) - 2 * (vv (1 / 2) (2 * n - 1) : ℤ) = binDigit (Real.sqrt 2) n := by
+  rw [vv_half_eq_u, vv_half_eq_u]; exact graham_pollak n hn
 
 end Erdos482
 
