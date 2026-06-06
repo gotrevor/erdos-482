@@ -74,7 +74,10 @@ plus `1 < √2 < 3/2` facts. Needs a small **fract-of-x vs fract-of-x/2 parity h
 - **Base index is `k = l+2 = 3`** — the off-by-some on where induction starts is the #1 time-sink. Small-k
   cases are checked directly, not by the recurrence.
 - **Do the math over ℝ/ℤ, bridge to the ℕ sequence** with `Int.natCast_floor_eq_floor` — don't fight ℕ subtraction.
-- **`u` must be `noncomputable`** (`Real.sqrt`). `decide` on base cases works through the floor of explicit reals.
+- **Real-floor defs must be `noncomputable`** — `u` (via `Real.sqrt`) *and* `binDigit` (via `Int.floor`
+  on ℝ); the codegen check only fires under `lake build` (`lean -c`), not bare elaboration, so a "looks
+  fine" file can still fail the build. Already handled in the scaffold. `decide` on base cases works
+  through the floor of explicit reals.
 - **No `native_decide` needed and none wanted** (kernel-pure target, like #403). `#print axioms graham_pollak`
   should end at `[propext, Classical.choice, Quot.sound]`.
 - **Faithfulness first:** before pouring effort down, confirm the headline `binDigit`/index form matches Stoll
