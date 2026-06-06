@@ -57,6 +57,22 @@ private lemma vv_step_odd (ε : ℝ) (n : ℕ) (hn : ¬ Even n) :
   rw [h, Int.natCast_floor_eq_floor
     (mul_nonneg (Real.sqrt_nonneg 2) (by positivity))]
 
+/-- Base-case helper: an `ε`-step (even index) lands on the integer `W` when the floor bounds hold.
+Reduces a base-case recurrence step to two inequalities (typically `nlinarith` with `√2`/`ε` bounds). -/
+private lemma vv_even_to (ε : ℝ) (hε : 0 ≤ ε) (n : ℕ) (hn : Even n) {V W : ℤ}
+    (hV : (vv ε n : ℤ) = V) (hlo : (W : ℝ) ≤ Real.sqrt 2 * ((V : ℝ) + ε))
+    (hhi : Real.sqrt 2 * ((V : ℝ) + ε) < (W : ℝ) + 1) : (vv ε (n + 1) : ℤ) = W := by
+  rw [vv_step_even ε hε n hn, show ((vv ε n : ℕ) : ℝ) = (V : ℝ) by exact_mod_cast hV,
+    Int.floor_eq_iff]
+  exact ⟨hlo, hhi⟩
+
+/-- Base-case helper: a `½`-step (odd index) lands on the integer `W` when the floor bounds hold. -/
+private lemma vv_odd_to (ε : ℝ) (n : ℕ) (hn : ¬ Even n) {V W : ℤ}
+    (hV : (vv ε n : ℤ) = V) (hlo : (W : ℝ) ≤ Real.sqrt 2 * ((V : ℝ) + 1 / 2))
+    (hhi : Real.sqrt 2 * ((V : ℝ) + 1 / 2) < (W : ℝ) + 1) : (vv ε (n + 1) : ℤ) = W := by
+  rw [vv_step_odd ε n hn, show ((vv ε n : ℕ) : ℝ) = (V : ℝ) by exact_mod_cast hV, Int.floor_eq_iff]
+  exact ⟨hlo, hhi⟩
+
 /-- The `½`-step floor identity (generalizes `floorB`; reduces to `crux` at `α√2·2^(p+1)`):
 from `⌊α√2·2^p⌋ + α·2^(p+1)` adding `½` gives `⌊α√2·2^(p+1)⌋ + α·2^(p+1)`. -/
 private lemma stollB (a : ℤ) (p : ℕ) :
@@ -363,6 +379,75 @@ theorem stoll_pair8 {ε : ℝ} (hlo : 5 / 2 * Real.sqrt 2 - 3 ≤ ε) (hhi : ε 
   have key := stoll_digit 3 1 hε0 hhi baseP baseQ m
   have i1 : 2 * (1 + 2 + m) + 1 = 2 * (m + 3) + 1 := by ring
   have i2 : 2 * (1 + 2 + m) - 1 = 2 * (m + 3) - 1 := by omega
+  rw [i1, i2] at key
+  simpa using key
+
+/-! ## Concrete instantiation: Pair 2 (`α = 11`, `l = 3`, `t = (11√2 − 5)/8`)
+
+Stoll's pair `i = 2`: `ε ∈ [√2 − 1, (19/2)√2 − 13)`, `α = 11`, `l = 3`, so the difference reads off
+the binary digits of `11√2`.  Base case `vv ε 0..10 = 1,2,3,4,6,9,13,18,26,37,53` (the `vv_even_to`/
+`vv_odd_to` helpers reduce each step to two `nlinarith` bounds). -/
+
+/-- Base case for pair 2: `vv ε 9 = 37`, `vv ε 10 = 53` for `ε ∈ [√2 − 1, (19/2)√2 − 13)`. -/
+private lemma stoll_pair2_base {ε : ℝ} (hlo : Real.sqrt 2 - 1 ≤ ε)
+    (hhi : ε < 19 / 2 * Real.sqrt 2 - 13) :
+    (vv ε 9 : ℤ) = 37 ∧ (vv ε 10 : ℤ) = 53 := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hspos : (0:ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hs1 : (1:ℝ) ≤ Real.sqrt 2 := by nlinarith [hs2, hsnn]
+  have hε : 0 ≤ ε := by nlinarith [hlo, hs2, hsnn]
+  have v0 : (vv ε 0 : ℤ) = 1 := by simp [vv]
+  have v1 : (vv ε 1 : ℤ) = 2 := vv_even_to ε hε 0 (by decide) v0
+    (by push_cast; nlinarith [hlo, hs1, hs2, hspos]) (by push_cast; nlinarith [hhi, hs1, hs2, hspos])
+  have v2 : (vv ε 2 : ℤ) = 3 := vv_odd_to ε 1 (by decide) v1
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v3 : (vv ε 3 : ℤ) = 4 := vv_even_to ε hε 2 (by decide) v2
+    (by push_cast; nlinarith [hlo, hs1, hs2, hspos]) (by push_cast; nlinarith [hhi, hs1, hs2, hspos])
+  have v4 : (vv ε 4 : ℤ) = 6 := vv_odd_to ε 3 (by decide) v3
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v5 : (vv ε 5 : ℤ) = 9 := vv_even_to ε hε 4 (by decide) v4
+    (by push_cast; nlinarith [hlo, hs1, hs2, hspos]) (by push_cast; nlinarith [hhi, hs1, hs2, hspos])
+  have v6 : (vv ε 6 : ℤ) = 13 := vv_odd_to ε 5 (by decide) v5
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v7 : (vv ε 7 : ℤ) = 18 := vv_even_to ε hε 6 (by decide) v6
+    (by push_cast; nlinarith [hlo, hs1, hs2, hspos]) (by push_cast; nlinarith [hhi, hs1, hs2, hspos])
+  have v8 : (vv ε 8 : ℤ) = 26 := vv_odd_to ε 7 (by decide) v7
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  have v9 : (vv ε 9 : ℤ) = 37 := vv_even_to ε hε 8 (by decide) v8
+    (by push_cast; nlinarith [hlo, hs1, hs2, hspos]) (by push_cast; nlinarith [hhi, hs1, hs2, hspos])
+  have v10 : (vv ε 10 : ℤ) = 53 := vv_odd_to ε 9 (by decide) v9
+    (by push_cast; nlinarith [hs1, hs2, hspos]) (by push_cast; nlinarith [hs1, hs2, hspos])
+  exact ⟨v9, v10⟩
+
+/-- **Stoll Theorem 3.2, pair 2.**  For every offset `ε ∈ [√2 − 1, (19/2)√2 − 13)` and every `m`,
+`v_{2k+1} − 2 v_{2k−1}` (with `k = m + 5`) equals the `(m+1)`-th binary digit of `11√2`. -/
+theorem stoll_pair2 {ε : ℝ} (hlo : Real.sqrt 2 - 1 ≤ ε) (hhi : ε < 19 / 2 * Real.sqrt 2 - 13)
+    (m : ℕ) :
+    (vv ε (2 * (m + 5) + 1) : ℤ) - 2 * (vv ε (2 * (m + 5) - 1) : ℤ)
+      = binDigit (11 * Real.sqrt 2) (m + 1) := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hε0 : 1 - Real.sqrt 2 / 2 ≤ ε := by nlinarith [hlo, hs2, hsnn]
+  have hε1 : ε < Real.sqrt 2 / 2 := by nlinarith [hhi, hs2, hsnn]
+  obtain ⟨hb9, hb10⟩ := stoll_pair2_base hlo hhi
+  have baseP : (vv ε (2 * (3 + 2) - 1) : ℤ)
+      = ⌊((11 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0⌋ + (11 : ℤ) * 2 ^ 1 := by
+    have hf : ⌊((11 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0⌋ = 15 := by
+      have he : ((11 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 0 = 11 * Real.sqrt 2 := by push_cast; ring
+      rw [he, Int.floor_eq_iff]
+      constructor <;> push_cast <;> nlinarith [hs2, hsnn]
+    rw [show (2 * (3 + 2) - 1 : ℕ) = 9 from rfl, hf, hb9]; norm_num
+  have baseQ : (vv ε (2 * (3 + 2)) : ℤ)
+      = ⌊((11 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1⌋ + (11 : ℤ) * 2 ^ 1 := by
+    have hf : ⌊((11 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1⌋ = 31 := by
+      have he : ((11 : ℤ) : ℝ) * Real.sqrt 2 * 2 ^ 1 = 22 * Real.sqrt 2 := by push_cast; ring
+      rw [he, Int.floor_eq_iff]
+      constructor <;> push_cast <;> nlinarith [hs2, hsnn]
+    rw [show (2 * (3 + 2) : ℕ) = 10 from rfl, hf, hb10]; norm_num
+  have key := stoll_digit 11 3 hε0 hε1 baseP baseQ m
+  have i1 : 2 * (3 + 2 + m) + 1 = 2 * (m + 5) + 1 := by ring
+  have i2 : 2 * (3 + 2 + m) - 1 = 2 * (m + 5) - 1 := by omega
   rw [i1, i2] at key
   simpa using key
 
