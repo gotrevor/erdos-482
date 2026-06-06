@@ -43,7 +43,25 @@ general `stoll_pair` core also cannot represent pair 5 (digit-phase off by 1; no
 the base value 3). This is why Stoll treats pair 5 specially and why its interval is the specific
 `[0.49599…, 0.50124…)`.
 
+**🔑 CLEANEST REFORMULATION (found this lap, numerically verified to n=300):** for ε ∈ [ξ₁,ξ₂),
+`vv ε n = vv (1/2) n = u n` **for all n** (exact equality, including at ξ₁; diverges at ξ₂, n=59).
+So pair 5 ⟺ **`∀ ε ∈ [ξ₁,ξ₂), ∀ n, vv ε n = u n`**, after which the headline `graham_pollak` gives
+the digits for free. The induction's even-step (ε-step) needs `⌊√2(u_{2j}+ε)⌋ = ⌊√2(u_{2j}+½)⌋`, i.e.
+the ε-shift `√2(ε−½)` doesn't cross the floor boundary `{√2(u_{2j}+½)}`.
+
+**⚠️ This is genuinely Diophantine (NOT finite).** The per-step margin `min({√2(u_{2j}+½)}, 1−…)`
+**shrinks as n grows**: ≥0.0037 for n<400, but **1.4e-6 at step 1811** (verified, prec=2200 ≫ needed
+~905 digits). So `{√2·2^j}` gets arbitrarily close to the danger boundary; agreement holds for all n
+only because √2 is a quadratic irrational (badly approximable, c.f. `[1;2,2,2,…]`) — a quantitative
+Diophantine lower bound on `‖√2·2^j‖` is what keeps the margin positive forever. A finite base case
+will NOT suffice; this needs a real Diophantine input (likely the hardest single piece of the project,
+plausibly 🟠 generational). The headline already covers the key instance ε=½.
+
 **Attack paths (all require new ideas, likely multi-lap):**
+0. **(Primary) `vv ε = u` via Diophantine bound.** Prove `∀ ε∈[ξ₁,ξ₂), ∀ n, vv ε n = u n` by strong
+   induction; the even-step reduces to a quantitative lower bound on `‖√2·2^j‖` (distance to nearest
+   integer) for the quadratic irrational √2. Check mathlib for badly-approximable / quadratic-irrational
+   Diophantine lemmas (e.g. `Real.sqrt`-irrationality + a `Liouville`-style bound for degree-2).
 1. **Find/port Stoll's actual pair-5 argument.** The transcribed eqs (5)/(6) for pair 5 in
    `archive/findings/…` do NOT match the data (they predict `vv3=2`; actual `vv3=4`) — the
    transcription is suspect for pair 5. APPEND an `ON-LINE-REQUEST.md` item for Stoll's §4 pair-5
