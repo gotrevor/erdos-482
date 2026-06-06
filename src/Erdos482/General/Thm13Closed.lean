@@ -159,4 +159,30 @@ theorem thm13_closed (g : ℕ) (hg : 2 ≤ g) (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t
     | succ n ih => exact hAfromB n (hBfromA n ih)
   exact ⟨hA, fun k => hBfromA k (hA k)⟩
 
+/-- **St05 Theorem 1.3 — unconditional, end to end.**  For the recurrence `gu` with the St05
+parameters (`a = g/((g−1)(t+g))`, `b = (g−1)(t+g)`, mantissa `1 ≤ t < g`, base `g ≥ 2`, offset
+`−1/g ≤ ε < (g+1)(g−2)/g`), the Graham–Pollak difference `gu(2n) − g·gu(2n−2)` (which is
+`u_{2n+1} − g·u_{2n−1}` in St05's 1-indexing, since `gu m = u_{m+1}`) is exactly the leading
+base-`g` digit `Real.digits (t·g^{n−1}/g) g 0`.  No `sorry`, no custom axiom: this discharges
+Theorem 1.3 completely. -/
+theorem thm13_digits (g : ℕ) [NeZero g] (hg : 2 ≤ g) (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (ε a b : ℝ) (ha : a = (g : ℝ) / (((g : ℝ) - 1) * (t + g)))
+    (hb : b = ((g : ℝ) - 1) * (t + g))
+    (hε0 : -1 / (g : ℝ) ≤ ε) (hε1 : ε < ((g : ℝ) + 1) * ((g : ℝ) - 2) / g)
+    (n : ℕ) (hn : 1 ≤ n) :
+    gu g a b ε (2 * n) - g * gu g a b ε (2 * n - 2)
+      = ((Real.digits (t * (g : ℝ) ^ (n - 1) / g) g 0 : ℕ) : ℤ) := by
+  have hclosed := (thm13_closed g hg t ht1 ht2 ε a b ha hb hε0 hε1).1
+  have ht0 : (0 : ℝ) ≤ t := by linarith
+  -- view gu as the 1-indexed u via u j = gu (j-1); then u(2k+1) = gu(2k) is the odd closed form
+  have hodd : ∀ k, (fun j => gu g a b ε (j - 1)) (2 * k + 1)
+      = (g : ℤ) ^ k + ⌊t * (g : ℝ) ^ k / g⌋ := by
+    intro k; simpa using hclosed k
+  have hmain := thm13_digit_realDigits g hg t ht0 (fun j => gu g a b ε (j - 1)) hodd n hn
+  -- u(2n+1) = gu(2n),  u(2n-1) = gu(2n-2)
+  have e1 : 2 * n + 1 - 1 = 2 * n := by omega
+  have e2 : 2 * n - 1 - 1 = 2 * n - 2 := by omega
+  simp only [e1, e2] at hmain
+  exact hmain
+
 end Erdos482.General
