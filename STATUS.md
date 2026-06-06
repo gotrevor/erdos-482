@@ -1,19 +1,31 @@
 # STATUS — erdos-482 📊
 
-**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8255 jobs) · **Updated**: review lap · 2026-06-06 · `adbd69d`
+**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8258 jobs) · **Updated**: 2026-06-06 (pair-5 resolution + St05 general track started)
 
 ## Where it stands
 The **headline** (Graham–Pollak: the GP sequence reads off the binary digits of √2) and the **bonus**
-(Stoll's Theorem 3.2 + Corollary 3.3) are both complete and **axiom-clean** (every headline theorem's
-`#print axioms` = the trust base `[propext, Classical.choice, Quot.sound]`, zero custom axioms). This
-review lap closed the last open *math* thread: **pair 6 now holds for its full ε-interval** (not just
-the Cor-3.3 ε), so **Theorem 3.2 is complete for all 7 non-special pairs over their whole intervals**,
-each also stated in the paper's **verbatim `tᵢ` form**, plus a **completeness** theorem (the 8
-intervals are disjoint and exactly cover `[1−√2/2, √2/2)`). The one remaining gap is **pair 5** (the
-special β=0 / `t=√2` case): proved at ε=½ by the headline, but its full-interval *vv*-based version
-needs a non-uniform ε-step analysis (see Outstanding).
+(Stoll's Theorem 3.2 + Corollary 3.3) are complete and **axiom-clean** (every theorem's `#print axioms`
+= the trust base `[propext, Classical.choice, Quot.sound]`, zero custom axioms, zero `sorry`).
+**Pair 5 is now resolved**: the online findings established that Stoll's full-interval claim is *not a
+theorem* (false at the stated endpoint, fails at n=280); only ε=½ works for all n (= the headline).
+The honest content was formalized: the typo-corrected closed form, an exact **band characterization**
+of the ε-step, the **conditional** full-interval theorem, and the **precise obstruction** (both sides)
+showing why no ε≠½ is uniformly admissible (PENDING_WORK §1, all axiom-clean).
+A new **general track** (Stoll [St05], the real #482 resolution for any `w>0`, any base `g≥2`) is
+underway in `src/Erdos482/General/` (PENDING_WORK §1b): the g-ary digit bound, Prop-2 bridge to
+mathlib `Real.digits`, the mantissa lemma, and Thm 1.3's conclusion modulo the closed-form induction
+(the induction is grinding on Aristotle, job `e0240fef`).
 
 ## What's happened (newest first)
+- **2026-06-06 (autonomous lap — pair-5 resolution + St05 start)**:
+  • **Pair 5 RESOLVED** (full interval is not a theorem; honest content formalized): `stoll_pair5_closed_form`
+    (typo-corrected §4 formula), `pair5_estep_band` (exact band characterization), `stoll_pair5_conditional`
+    (conditional full-interval), `pair5_band_at_half` + `stoll_pair5_half_via_band` (band route to GP),
+    `pair5_band_branch` + `pair5_band_fails_below_half`/`above_half` (precise obstruction). Diophantine infra:
+    `fract_two_mul`, `fract_two_mul_branch`, `fract_sqrt2_pow_ne_half`, `sqrt2_pow_far_from_halfint`.
+  • **St05 general track started** (`General/`): `Digits` (`digitStep`/`gdigit` range bounds +
+    `realDigits_eq_digitStep` general Prop 2), `Thm13` (`thm13_digit_of_oddClosed`), `Mantissa`
+    (`mantissa_mem`: 1≤t<g). Thm 1.3 numerically verified (g∈{2,3,10}, w∈{√2,√3,π}). All axiom-clean.
 - **2026-06-06 (review lap, late)**: Pair-5 deep dive. Added `vv_eq_u_of_evenstep` /
   `stoll_pair5_of_evenstep` (pair 5 reduced to one hypothesis `Heven`; axiom-clean) and
   `sqrt2_badly_approximable` (`1/(3q)≤|q√2−p|`, Aristotle-proved, kernel-verified). **CORRECTION**:
