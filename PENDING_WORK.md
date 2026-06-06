@@ -4,6 +4,19 @@ Headline (Graham–Pollak / √2) and **Theorem 3.2 for the 7 non-special pairs 
 **Corollary 3.3** are COMPLETE and axiom-clean — see STATUS.md. Verbatim `tᵢ`-form restatements and
 the disjoint-and-cover completeness theorem are done. Remaining work below.
 
+## 0. 🆕 NEXT TRACK — formalize Stoll [St05]: the REAL #482 resolution (any `w>0`, any base `g`)
+
+**This is the highest-value open work** (added 2026-06-06). Erdős–Graham's "similar results for √m and
+other algebraic numbers" is resolved by Stoll [St05] for *every* positive real `w` in *every* integer
+base `g≥2` — and it's **elementary** (#403-tier), reusing this repo's `Crux`/`Induction`/`Digits`
+machinery with the coefficients parametrized. Everything below (§1 pair-5, §2 master) is `0902.4168`
+polish on the *α√2* sub-case; §0 is the actual generalization the problem is famous for.
+- **Plan + milestones:** [`notes/ST05-GENERAL-PLAN.md`](notes/ST05-GENERAL-PLAN.md)
+- **Verbatim targets + ⚠️ verify-don't-trust + ground-truth PDF:** [`papers/SOURCES.md`](papers/SOURCES.md)
+  (`papers/St05-stoll-JIS2005.pdf`, gitignored).
+- First milestone: Thm 1.2 **Case II** (binary, ε=½) as proof-of-concept the machinery parametrizes.
+- **Note:** St05 does NOT inherit pair-5's Diophantine wall — its proofs close uniformly (see the plan).
+
 ## 1. Pair 5 full-interval (the special `t₅ = √2`, β=0 case) — the real open thread
 
 Pair 5 is the only pair without a vv-based interval theorem. It's proved at ε=½ by the headline
@@ -93,8 +106,10 @@ proved by `rcases stoll_intervals_cover`, applying the matching `stoll_pair{i}` 
 (re-index via omega; all pairs stable for `k ≥ 31` since max `lᵢ+2 = 31`), then `binDigit_mem_zero_one`.
 The 7 non-pair-5 cases already work; only the pair-5 interval case needs item 1.
 
-## 3. Open research direction (out of scope per HANDOFF)
-"Generalize to other algebraic numbers" — needs new mathematics, not a formalization gap.
+## 3. ~~Open research direction (out of scope)~~ — SUPERSEDED 2026-06-06
+Previously: "'Generalize to other algebraic numbers' needs new mathematics, not a formalization gap."
+**This was wrong.** Stoll [St05] already resolves it elementarily for any real `w` / any base `g` — it's
+now the active **§0 NEXT TRACK** above, not out of scope.
 
 ## Notes for whoever continues
 - The general core `stoll_pair`/`stoll_digit` (carry `αᵢ·2^{m+1}`) does NOT fit pair 5 (carry `2^j`
