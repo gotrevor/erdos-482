@@ -1,6 +1,7 @@
 import Erdos482.Basic
 import Erdos482.Crux
 import Erdos482.Induction
+import Erdos482.Digits
 
 /-!
 # Stoll's Theorem 3.2 — the parametrized Graham–Pollak recurrence
@@ -1386,6 +1387,50 @@ theorem vv_one_le_and_mono (ε : ℝ) (hε : 0 ≤ ε) (n : ℕ) :
     exact one_le_mul_of_one_le_of_one_le ( Real.le_sqrt_of_sq_le ( by norm_num ) ) ( le_add_of_le_of_nonneg ( mod_cast ih ) ( by positivity ) )
   refine' ⟨ h_lower_bound _, Nat.le_floor _ ⟩
   split_ifs <;> nlinarith [ Real.sqrt_nonneg 2, Real.sq_sqrt zero_le_two, show ( vv ε n : ℝ ) ≥ 1 by exact_mod_cast h_lower_bound n ]
+
+/-- **Master theorem (7 of 8 pairs): the Graham–Pollak difference is a binary digit.**  For every
+offset `ε` in any of the seven explicitly-formalized pair intervals (i.e. `ε ∈ [1−√2/2, √2/2)`
+*except* pair 5's interval `[309/2√2−218, 1296121037/2√2−916495974)`), and every `k ≥ 31`, the
+difference `vv ε (2k+1) − 2 vv ε (2k−1)` is `0` or `1` — a genuine bit of the corresponding `tᵢ`.
+`k ≥ 31` is the uniform threshold (max `lᵢ+2 = 31`, pair 6).  Pair 5's interval is the one remaining
+case (the special `t=√2` / Diophantine thread — see `PENDING_WORK.md`). -/
+theorem stoll_gp_isBit {ε : ℝ} {k : ℕ} (hk : 31 ≤ k)
+    (hmem :
+      (1 - Real.sqrt 2 / 2 ≤ ε ∧ ε < Real.sqrt 2 - 1) ∨
+      (Real.sqrt 2 - 1 ≤ ε ∧ ε < 19 / 2 * Real.sqrt 2 - 13) ∨
+      ((19 : ℝ) / 2 * Real.sqrt 2 - 13 ≤ ε ∧ ε < 77 / 2 * Real.sqrt 2 - 54) ∨
+      ((77 : ℝ) / 2 * Real.sqrt 2 - 54 ≤ ε ∧ ε < 309 / 2 * Real.sqrt 2 - 218) ∨
+      ((1296121037 : ℝ) / 2 * Real.sqrt 2 - 916495974 ≤ ε ∧ ε < 79109 / 2 * Real.sqrt 2 - 55938) ∨
+      ((79109 : ℝ) / 2 * Real.sqrt 2 - 55938 ≤ ε ∧ ε < 5 / 2 * Real.sqrt 2 - 3) ∨
+      ((5 : ℝ) / 2 * Real.sqrt 2 - 3 ≤ ε ∧ ε < Real.sqrt 2 / 2)) :
+    (vv ε (2 * k + 1) : ℤ) - 2 * (vv ε (2 * k - 1) : ℤ) = 0 ∨
+    (vv ε (2 * k + 1) : ℤ) - 2 * (vv ε (2 * k - 1) : ℤ) = 1 := by
+  rcases hmem with ⟨a,b⟩|⟨a,b⟩|⟨a,b⟩|⟨a,b⟩|⟨a,b⟩|⟨a,b⟩|⟨a,b⟩
+  · have h := stoll_pair1 a b (k - 2)
+    rw [show k - 2 + 2 = k from by omega] at h
+    rw [h]; exact binDigit_mem_zero_one _ _ (by omega)
+  · have h := stoll_pair2 a b (k - 5)
+    rw [show k - 5 + 5 = k from by omega] at h
+    rw [h]; exact binDigit_mem_zero_one _ _ (by omega)
+  · have h := stoll_pair3 a b (k - 7)
+    rw [show k - 7 + 7 = k from by omega] at h
+    rw [h]; exact binDigit_mem_zero_one _ _ (by omega)
+  · have h := stoll_pair4 a b (k - 9)
+    rw [show k - 9 + 9 = k from by omega] at h
+    rw [h]; exact binDigit_mem_zero_one _ _ (by omega)
+  · have a' : (1296121037 : ℝ) * Real.sqrt 2 / 2 - 916495974 ≤ ε := by
+      rw [show (1296121037 : ℝ) * Real.sqrt 2 / 2 = 1296121037 / 2 * Real.sqrt 2 from by ring]; exact a
+    have b' : ε < (79109 : ℝ) * Real.sqrt 2 / 2 - 55938 := by
+      rw [show (79109 : ℝ) * Real.sqrt 2 / 2 = 79109 / 2 * Real.sqrt 2 from by ring]; exact b
+    have h := stoll_pair6 a' b' (k - 31)
+    rw [show k - 31 + 31 = k from by omega] at h
+    rw [h]; exact binDigit_mem_zero_one _ _ (by omega)
+  · have h := stoll_pair7 a b (k - 17)
+    rw [show k - 17 + 17 = k from by omega] at h
+    rw [h]; exact binDigit_mem_zero_one _ _ (by omega)
+  · have h := stoll_pair8 a b (k - 3)
+    rw [show k - 3 + 3 = k from by omega] at h
+    rw [h]; exact binDigit_mem_zero_one _ _ (by omega)
 
 end Erdos482
 
