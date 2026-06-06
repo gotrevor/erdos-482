@@ -1,6 +1,6 @@
 # STATUS — erdos-482 📊
 
-**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8255 jobs) · **Updated**: review lap · 2026-06-06 · `409c356`
+**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8255 jobs) · **Updated**: review lap · 2026-06-06 · `adbd69d`
 
 ## Where it stands
 The **headline** (Graham–Pollak: the GP sequence reads off the binary digits of √2) and the **bonus**
@@ -14,6 +14,10 @@ special β=0 / `t=√2` case): proved at ε=½ by the headline, but its full-int
 needs a non-uniform ε-step analysis (see Outstanding).
 
 ## What's happened (newest first)
+- **2026-06-06 (review lap, cont.)**: `stoll_gp_isBit` — **master theorem**: GP difference ∈ {0,1}
+  for ε in any of the 7 proven pair intervals (k≥31). `vv_one_le_and_mono` (Aristotle-proved,
+  kernel-verified). Pinned pair 5 as the lone gap: numerics show `vv ε = u` on `[ξ₁,ξ₂)` but the
+  step-margin shrinks (1.4e-6 at n=1811) → genuinely Diophantine, NOT finite (filed ON-LINE-REQUEST).
 - **2026-06-06 (review lap)**: Completed Theorem 3.2 for pairs 1–4,6,7,8 over full intervals.
   • `stoll_pair6` + `stoll_pair6_t`: pair 6 for the *whole* interval `[1296121037√2/2−916495974,
     79109√2/2−55938)` via `cor33_base_interval` (the two endpoint-defining steps 30/58 are exactly
@@ -50,6 +54,8 @@ All headline theorems verified `#print axioms` this lap = trust base only; **0 m
 | `stoll_pair1..4,6,7,8` (+ `_t`) | uncond (Thm 3.2, 7 pairs, full intervals) | trust base | 🟢 clean |
 | `cor33_unconditional` (+ `_t`) | uncond (digits of 759250125√2) | trust base | 🟢 clean |
 | `stoll_intervals_cover` | uncond (intervals partition range) | trust base | 🟢 clean |
+| `stoll_gp_isBit` | uncond (GP diff is a bit, 7 pairs) | trust base | 🟢 clean |
+| `vv_one_le_and_mono` | structural (vv ≥1, monotone) | trust base | 🟢 clean |
 
 No 🟡/🟠/🔴 axioms anywhere: the whole development is elementary (floors, √2, π/e bounds from mathlib).
 The remaining work (pair 5, master theorem) is *new proof*, not axiom discharge.
