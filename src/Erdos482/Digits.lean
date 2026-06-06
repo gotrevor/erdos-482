@@ -63,4 +63,18 @@ theorem binDigit_mem_zero_one (x : ℝ) (n : ℕ) (hn : 1 ≤ n) :
   rw [show x * 2 ^ n = 2 * (x * 2 ^ (n - 1)) by rw [← hpow]; ring]
   exact floor_two_mul_sub (x * 2 ^ (n - 1))
 
+/-- The fractional part `√2 − 1` whose binary digits we extract is irrational — so the digit
+sequence is the genuine expansion of an irrational number (it is not eventually constant; see
+`PENDING_WORK.md` for the non-termination refinement). -/
+theorem irrational_fract_sqrt2 : Irrational (Int.fract (Real.sqrt 2)) := by
+  have hs2 : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hfloor : ⌊Real.sqrt 2⌋ = 1 := by
+    rw [Int.floor_eq_iff]
+    refine ⟨by push_cast; nlinarith [hs2, hsnn], by push_cast; nlinarith [hs2, hsnn]⟩
+  have he : Int.fract (Real.sqrt 2) = Real.sqrt 2 - 1 := by
+    rw [← Int.self_sub_floor, hfloor]; push_cast; ring
+  rw [he]
+  simpa using (irrational_sqrt_two).sub_natCast 1
+
 end Erdos482

@@ -129,4 +129,33 @@ theorem gp_pair (j : ℕ) :
       have : 2 * (j + 1) + 2 = 2 * j + 2 + 1 + 1 := by ring
       rw [this]; exact step2
 
+/-! ## Basic structural properties of the sequence -/
+
+/-- The Graham–Pollak sequence is everywhere `≥ 1` (in particular `u` never hits `0`, so the
+recurrence stays well inside the positive reals). -/
+theorem u_pos (n : ℕ) : 1 ≤ u n := by
+  have hs1 : (1:ℝ) ≤ Real.sqrt 2 := by
+    nlinarith [Real.sq_sqrt (show (0:ℝ) ≤ 2 by norm_num), Real.sqrt_nonneg 2]
+  induction n with
+  | zero => exact le_refl 1
+  | succ n ih =>
+    show 1 ≤ ⌊Real.sqrt 2 * ((u n : ℝ) + 1 / 2)⌋₊
+    apply Nat.le_floor
+    have : (1:ℝ) ≤ (u n : ℝ) := by exact_mod_cast ih
+    push_cast; nlinarith [this, hs1]
+
+/-- The Graham–Pollak sequence is strictly increasing. -/
+theorem u_strictMono : StrictMono u := by
+  have hsnn : (0:ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hs2 : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
+  have hlo : (4:ℝ) / 3 ≤ Real.sqrt 2 := by nlinarith [hs2, hsnn]
+  apply strictMono_nat_of_lt_succ
+  intro n
+  have ih : (1:ℝ) ≤ (u n : ℝ) := by exact_mod_cast u_pos n
+  have : u n + 1 ≤ u (n + 1) := by
+    show u n + 1 ≤ ⌊Real.sqrt 2 * ((u n : ℝ) + 1 / 2)⌋₊
+    apply Nat.le_floor
+    push_cast; nlinarith [ih, hlo]
+  omega
+
 end Erdos482
