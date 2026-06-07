@@ -12,8 +12,10 @@ of `e` honestly, without citing any unverified St06 closed form.
 
 Stoll's coefficients for `g = 3`, `w = e` are `a = 3/((3−1)(e+3)) = 3/(2(e+3))` and
 `b = (3−1)(e+3) = 6 + 2e` (so `a·b = 3`).  Since `1 ≤ e < 3` the base-3 mantissa is `t = e` itself
-(`m = ⌊log₃ e⌋ = 0`), so the recurrence's Graham–Pollak difference reads off the **ternary** digits
-of `e = (2.0110221111002…)₃`.  Any offset `ε ∈ [−1/3, 4/3)` works; we take `ε = 0`.
+(`m = ⌊log₃ e⌋ = 0`), so the recurrence's Graham–Pollak difference reads off the **fractional ternary**
+digits of `e = (2.2011011212…)₃` — i.e. `Real.digits e 3 k` is the `(k+1)`-th base-3 digit after the
+point, `2, 0, 1, 1, 0, 1, 1, 2, …` (verified numerically against the high-precision expansion of `e`).
+Any offset `ε ∈ [−1/3, 4/3)` works; we take `ε = 0`.
 
 Axiom-clean (inherits `thm13_digits`'s `[propext, Classical.choice, Quot.sound]`).
 -/
