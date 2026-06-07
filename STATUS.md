@@ -1,6 +1,6 @@
 # STATUS — erdos-482 📊
 
-**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8267 jobs) · **Updated**: lap 2026-06-07 · `022dea2` (**#482 COMPLETE & axiom-clean; St06 unobtainable + off critical path; showcase polish only remains**)
+**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8268 jobs) · **Updated**: lap 2026-06-07 · `7cbcd8c` (**#482 COMPLETE & axiom-clean; headline now reads literal digits of any w≥1; St06 unobtainable + off critical path; only optional showcases remain**)
 
 ## 🏆 St05 COMPLETE — Erdős #482 resolved in full generality (2026-06-06)
 The whole of Stoll [St05] is now machine-checked and **axiom-clean** (`src/Erdos482/General/`):
@@ -32,13 +32,17 @@ mathlib `Real.digits`, the mantissa lemma, and Thm 1.3's conclusion modulo the c
 
 ## What's happened (newest first)
 - **2026-06-07 (review/showcase lap)**: St06 online-fetch returned — unobtainable but off the critical
-  path (harvested to `archive/findings/`; `ON-LINE-REQUEST.md` retired). Added two showcase/bridge
-  results, both axiom-clean: `cor13_ternary_exp_one[_literal]` (`Cor13e.lean`, **base-3 digits of e** —
-  the transcendental-in-odd-base object St06 is OEIS-tagged to; expansion `2.2011011212…₃` numerically
-  verified), and **`gv_sqrt2_eq_u`** + `gp_sqrt2_digits_via_general[_literal]` (`GrahamPollakBridge.lean`):
-  the general recurrence at Cor 1.1's `j=1` (`a=b=√2, ε=½`) is *literally* the original sequence `u`, so
-  the general digit theorem re-proves √2 with a **machinery-disjoint** tree — original reads odd-index
-  diffs (fractional digits `0,1,1,0,1,0,…`), general route reads even-index diffs (full `1.0110101…₂`).
+  path (harvested to `archive/findings/`; `ON-LINE-REQUEST.md` retired). Added (all axiom-clean):
+  • **`erdos482_resolution_general_literal`** + `realDigits_mantissa_shift` (`Erdos482GeneralLiteral.lean`):
+    closed the deliberately-left mantissa index-shift — the headline now reads off **any `w≥1`'s genuine
+    `Real.digits w g i`** (at `n=i+m+2`, `m=⌊log_g w⌋`), not just the mantissa's.
+  • `cor13_ternary_exp_one[_literal]` (`Cor13e.lean`, **base-3 digits of e** — the transcendental-in-odd-
+    base object St06 is OEIS-tagged to; expansion `2.2011011212…₃` numerically verified).
+  • **`gv_sqrt2_eq_u`** + `gp_sqrt2_digits_via_general[_literal]` (`GrahamPollakBridge.lean`): the general
+    recurrence at Cor 1.1's `j=1` (`a=b=√2, ε=½`) is *literally* the original sequence `u`, so the general
+    digit theorem re-proves √2 with a **machinery-disjoint** tree — original reads odd-index diffs
+    (fractional digits `0,1,1,0,1,0,…`), general route reads even-index diffs (full `1.0110101…₂`).
+  • `PROOF-JOURNEY.md` — process retrospective (the arc, methodology, instructive failures).
 - **2026-06-06 (autonomous lap — pair-5 resolution + St05 start)**:
   • **Pair 5 RESOLVED** (full interval is not a theorem; honest content formalized): `stoll_pair5_closed_form`
     (typo-corrected §4 formula), `pair5_estep_band` (exact band characterization), `stoll_pair5_conditional`
