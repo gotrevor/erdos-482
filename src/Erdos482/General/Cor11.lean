@@ -54,4 +54,16 @@ theorem cor11_binary_sqrt2_caseI (j : ℕ) (hj : 1 ≤ j) (n : ℕ) (hn : 1 ≤ 
   exact thm12_caseI_digits (Real.sqrt 2) hs1 hs2 j hj (1 / 2) _ _ (by norm_num) (by norm_num)
     ha rfl n hn
 
+/-- **Cor 1.1 (Case II slice), literal-digit form.**  For `n ≥ 2`, the `j ≥ 1` binary recurrence
+output is exactly the `(n−2)`-th mathlib base-2 digit of `√2`:
+`gv(2n) − 2·gv(2n−2) = Real.digits √2 2 (n−2)`. -/
+theorem cor11_binary_sqrt2_literal (j : ℕ) (hj : 1 ≤ j) (n : ℕ) (hn : 2 ≤ n) :
+    gv (2 * (j : ℝ) + 1 - Real.sqrt 2) (2 / (2 * (j : ℝ) + 1 - Real.sqrt 2)) (1 / 2) (2 * n)
+        - 2 * gv (2 * (j : ℝ) + 1 - Real.sqrt 2)
+            (2 / (2 * (j : ℝ) + 1 - Real.sqrt 2)) (1 / 2) (2 * n - 2)
+      = ((Real.digits (Real.sqrt 2) 2 (n - 2) : ℕ) : ℤ) := by
+  haveI : NeZero (2 : ℕ) := ⟨by norm_num⟩
+  rw [cor11_binary_sqrt2 j hj n (by omega)]
+  exact digit_recon 2 (Real.sqrt 2) (Real.sqrt_nonneg 2) n hn
+
 end Erdos482.General

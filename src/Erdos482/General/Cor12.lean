@@ -43,4 +43,14 @@ theorem cor12_ternary_sqrt2 (n : ℕ) (hn : 1 ≤ n) :
     0 ((9 - 3 * Real.sqrt 2) / 14) (6 + 2 * Real.sqrt 2) ha hb
     (by norm_num) (by norm_num) n hn
 
+/-- **Cor 1.2, literal-digit form.**  For `n ≥ 2`, the ternary recurrence output is exactly the
+`(n−2)`-th mathlib base-3 digit of `√2` itself: `gu(2n) − 3·gu(2n−2) = Real.digits √2 3 (n−2)`. -/
+theorem cor12_ternary_sqrt2_literal (n : ℕ) (hn : 2 ≤ n) :
+    gu 3 ((9 - 3 * Real.sqrt 2) / 14) (6 + 2 * Real.sqrt 2) 0 (2 * n)
+        - 3 * gu 3 ((9 - 3 * Real.sqrt 2) / 14) (6 + 2 * Real.sqrt 2) 0 (2 * n - 2)
+      = ((Real.digits (Real.sqrt 2) 3 (n - 2) : ℕ) : ℤ) := by
+  haveI : NeZero (3 : ℕ) := ⟨by norm_num⟩
+  rw [cor12_ternary_sqrt2 n (by omega)]
+  exact digit_recon 3 (Real.sqrt 2) (Real.sqrt_nonneg 2) n hn
+
 end Erdos482.General
