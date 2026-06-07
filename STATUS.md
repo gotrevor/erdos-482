@@ -1,6 +1,6 @@
 # STATUS — erdos-482 📊
 
-**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8265 jobs) · **Updated**: 2026-06-06 (**ENTIRE St05 paper formalized — #482 resolved for any w>0, any base g≥2**)
+**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8267 jobs) · **Updated**: lap 2026-06-07 · `022dea2` (**#482 COMPLETE & axiom-clean; St06 unobtainable + off critical path; showcase polish only remains**)
 
 ## 🏆 St05 COMPLETE — Erdős #482 resolved in full generality (2026-06-06)
 The whole of Stoll [St05] is now machine-checked and **axiom-clean** (`src/Erdos482/General/`):
@@ -11,7 +11,10 @@ The whole of Stoll [St05] is now machine-checked and **axiom-clean** (`src/Erdos
 (`Erdos482General.lean`) — for any `w>0`, any `g≥2`, an explicit recurrence reads off `w`'s base-`g`
 digits. The joint-induction obligation the stalled Aristotle job `e0240fef` couldn't crack was proved
 locally. Every declaration `#print axioms` = `[propext, Classical.choice, Quot.sound]`.
-Next frontier: **St06** (Acta Arith. 2006, sharper) — needs online fetch (see `ON-LINE-REQUEST.md`).
+**St06 resolved as a non-blocker** (2026-06-07): online-fetch came back (`archive/findings/…-st06.md`) —
+its text is genuinely unobtainable (broken IMPAN SPA; not on arXiv/shadow libs) **and not on the
+critical path** (St05 *is* the resolution; St06 only adds sharper restatements + showcase constants).
+Nothing core remains open; what's left is optional showcase/polish.
 
 ## Where it stands
 The **headline** (Graham–Pollak: the GP sequence reads off the binary digits of √2) and the **bonus**
@@ -28,6 +31,14 @@ mathlib `Real.digits`, the mantissa lemma, and Thm 1.3's conclusion modulo the c
 (the induction is grinding on Aristotle, job `e0240fef`).
 
 ## What's happened (newest first)
+- **2026-06-07 (review/showcase lap)**: St06 online-fetch returned — unobtainable but off the critical
+  path (harvested to `archive/findings/`; `ON-LINE-REQUEST.md` retired). Added two showcase/bridge
+  results, both axiom-clean: `cor13_ternary_exp_one[_literal]` (`Cor13e.lean`, **base-3 digits of e** —
+  the transcendental-in-odd-base object St06 is OEIS-tagged to; expansion `2.2011011212…₃` numerically
+  verified), and **`gv_sqrt2_eq_u`** + `gp_sqrt2_digits_via_general[_literal]` (`GrahamPollakBridge.lean`):
+  the general recurrence at Cor 1.1's `j=1` (`a=b=√2, ε=½`) is *literally* the original sequence `u`, so
+  the general digit theorem re-proves √2 with a **machinery-disjoint** tree — original reads odd-index
+  diffs (fractional digits `0,1,1,0,1,0,…`), general route reads even-index diffs (full `1.0110101…₂`).
 - **2026-06-06 (autonomous lap — pair-5 resolution + St05 start)**:
   • **Pair 5 RESOLVED** (full interval is not a theorem; honest content formalized): `stoll_pair5_closed_form`
     (typo-corrected §4 formula), `pair5_estep_band` (exact band characterization), `stoll_pair5_conditional`
