@@ -49,4 +49,26 @@ theorem erdos482_resolution (g : ℕ) [NeZero g] (hg : 2 ≤ g) (w : ℝ) (hw : 
     exact thm13_digits g hg t ht1 ht2 (-1 / (g : ℝ))
       ((g : ℝ) / (((g : ℝ) - 1) * (t + g))) (((g : ℝ) - 1) * (t + g)) rfl rfl hε0 hε1 n hn
 
+/-- **Erdős–Graham #482 — literal-digit form for `w ∈ [1, g)`.**  When `w` is already its own base-`g`
+mantissa (`1 ≤ w < g`), the recurrence reads off `w`'s genuine mathlib base-`g` digits:
+`gu(2n) − g·gu(2n−2) = Real.digits w g (n−2)` for every `n ≥ 2`. -/
+theorem erdos482_resolution_literal (g : ℕ) [NeZero g] (hg : 2 ≤ g) (w : ℝ)
+    (hw1 : 1 ≤ w) (hw2 : w < (g : ℝ)) :
+    ∃ a b ε : ℝ, a * b = (g : ℝ) ∧
+      ∀ n, 2 ≤ n →
+        gu g a b ε (2 * n) - g * gu g a b ε (2 * n - 2)
+          = ((Real.digits w g (n - 2) : ℕ) : ℤ) := by
+  have hgpos : (0 : ℝ) < (g : ℝ) := by positivity
+  have hg2 : (2 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+  have hg1 : (g : ℝ) - 1 ≠ 0 := by linarith
+  have htg : w + (g : ℝ) ≠ 0 := by positivity
+  refine ⟨(g : ℝ) / (((g : ℝ) - 1) * (w + g)), ((g : ℝ) - 1) * (w + g), -1 / (g : ℝ), by field_simp, ?_⟩
+  intro n hn
+  have hε1 : -1 / (g : ℝ) < ((g : ℝ) + 1) * ((g : ℝ) - 2) / g := by
+    rw [div_lt_div_iff_of_pos_right hgpos]
+    nlinarith [hg2, mul_nonneg (show (0 : ℝ) ≤ (g : ℝ) - 2 by linarith)
+      (show (0 : ℝ) ≤ (g : ℝ) + 1 by linarith)]
+  rw [thm13_digits g hg w hw1 hw2 (-1 / (g : ℝ)) _ _ rfl rfl (le_refl _) hε1 n (by omega)]
+  exact digit_recon g w (by linarith) n hn
+
 end Erdos482.General
