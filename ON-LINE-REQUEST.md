@@ -1,5 +1,11 @@
 # On-line requests (need open web / the St06 PDF)
 
+> **NOTE (2026-06-13): Cor 3.5 is now CLOSED without the PDF** — the "exact index convention" worry was
+> illusory. The recurrence reads off the digits of `r·√2` (the Beatty real `r·α`), and Stoll's printed
+> `w`-table is just a mantissa renormalization of the same digit string. See `St06Cor35.lean`
+> (`st06_cor35`). Only the Thm 3.4 request below remains genuinely useful (and even it has an honest
+> ε=½ ceiling already formalized).
+
 ## 2026-06-13 — Stoll [St06] Theorem 3.4 exact statement + ε-interval
 
 **Source.** T. Stoll, *On a problem of Erdős and Graham concerning digits*, Acta Arith. 125 (2006),

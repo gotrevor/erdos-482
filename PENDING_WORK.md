@@ -16,15 +16,20 @@ sub-subcones `𝒟₁..₆ × {+,−}` via the cone-agnostic master `st06_thm31_
 `d{1..6}{m,p}_core` interval lemmas, and the twelve `st06_thm31_d{1..6}{m,p}_digits`.  Corrected
 ε-intervals `1+γᵢ^s ≤ ε < δᵢ^s` (erratum), verified ~250k pts.
 
-**TIER 3 UPDATE (2026-06-13): Thm 3.3 (full), Thm 3.4 (ε=½), Cor 3.5 (Beatty foundation) DONE.**
+**TIER 3 UPDATE (2026-06-13): Thm 3.3 (full), Thm 3.4 (ε=½), Cor 3.5 (FULL CAPSTONE) DONE.**
 - ✅ **Thm 3.3** — `St06Thm33.lean`, both conclusions + full ε-interval + GP cross-check. Axiom-clean.
-- ✅ **Thm 3.4** — `St06Thm34.lean`, **ε=½** case (both conclusions). The full k-dependent interval is
-  **Diophantine / not t-universal** (pair-5 phenomenon; `notes/ST06-THM34-FINDINGS.md`) — PDF asked in
-  `ON-LINE-REQUEST.md`. So the ε=½ formalization is likely the honest ceiling absent a per-w argument.
-- 🟡 **Cor 3.5** — `St06Cor35.lean`: Beatty foundation done (Hölder conjugacy, Rayleigh partition,
-  exactly-one-Beatty-seq). **Remaining**: package, per representable `m`, the `w=w(r)` construction
-  (`w=r√2−2⌊r/√2⌋` or `2r√2−2⌊r√2⌋`) + `M=⌊log₂w⌋` index shift onto `st06_thm33`'s GP instance
-  (`m=1,l=k=0`). Needs the PDF's exact index convention (ON-LINE-REQUEST) to avoid an off-by-M error.
+- 🟡 **Thm 3.4** — `St06Thm34.lean`, **ε=½** case (both conclusions). The full k-dependent interval is
+  **Diophantine / not t-universal** (pair-5 phenomenon; `notes/ST06-THM34-FINDINGS.md`). Numerics: Stoll's
+  printed interval is ~28× wider than the actual √2 band ⇒ the pair-5 trap. ε=½ is the honest ceiling.
+  **Only open St06 item.** Next: formalize the honest conditional full-interval (band ⇒ digits, à la
+  `stoll_pair5_conditional`), OR await the PDF's per-w argument (`ON-LINE-REQUEST.md`).
+- ✅ **Cor 3.5 — COMPLETE (2026-06-13), no PDF needed.** `St06Cor35.lean`: the GP recurrence
+  `su √2 √2 ½ ½ n` from any `n>0` reads off the binary digits of `r·√2`, `r` fixed by which Beatty seq
+  contains `n`. Engine = `gp_pair` generalized by a free factor `r` (`cor35_pair`/`_case2`,
+  `cor35_floorA/B`, `cor35_base`); capstone `st06_cor35` (via `beatty_unique_sqrt2`); literal
+  `st06_cor35_realDigits` (= `Real.digits (r√2) 2 j`) + `st06_cor35_isBit`. The off-by-M PDF concern
+  was illusory — the tracked number is `r·α` (Beatty real); digits are those of `r√2`; Stoll's printed
+  `w`-table is just a mantissa renormalization of the same digit string. All axiom-clean.
 
 **Original Tier 3 transcription (kept for reference):**
 - **Thm 3.3** (binary `g=2`): `u₁=m`, `a=2k+1+(t+2l)/(t+2m)`, `b=2/a`, `½−(2l+1)/(2(2m+1)) ≤ ε <

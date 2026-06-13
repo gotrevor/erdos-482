@@ -1,8 +1,8 @@
 # STATUS — erdos-482 📊
 
-**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8273 jobs) · **Updated**: lap 2026-06-13 (`st06` branch) (**#482 COMPLETE & axiom-clean on `main`; St06 fun-extension on `st06`: Tiers 1+2 done, Tier 3 = Thm 3.3 full + Thm 3.4 (ε=½) + Cor 3.5 Beatty foundation now done**)
+**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8273 jobs) · **Updated**: lap 2026-06-13 (`st06` branch, HEAD `1f844c2`) (**#482 COMPLETE & axiom-clean on `main`; St06 fun-extension on `st06`: Tiers 1+2 done, Tier 3 = Thm 3.3 full + Thm 3.4 (ε=½) + Cor 3.5 CAPSTONE now done — ALL St06 main theorems formalized**)
 
-## 🎁 St06 fun-extension (branch `st06`) — Tier 3 mostly DONE (2026-06-13)
+## 🎁 St06 fun-extension (branch `st06`) — Tier 3 COMPLETE (2026-06-13)
 All axiom-clean (`[propext, Classical.choice, Quot.sound]`), build green (8273 jobs):
 - **Thm 3.3** (binary family 1, `St06Thm33.lean`) — BOTH conclusions, full ε-interval `½±(2l+1)/(2(2m+1))`:
   `st06_thm33_{acrux,bcrux,closed,digits,even_digits,grahampollak}`. Even closed form
@@ -10,10 +10,20 @@ All axiom-clean (`[propext, Classical.choice, Quot.sound]`), build green (8273 j
 - **Thm 3.4** (binary family 2, `St06Thm34.lean`) — at **ε=½** (t-universal): `a=2k+1+2l/(t+2m)`,
   even form `(2k+1)A+k+l·2ʲ`; `st06_thm34_{acrux,bcrux,closed,digits,even_digits}` (concl. 2 = `(2k+1)dₙ−k`).
   ⚠️ The full k-dependent interval is **Diophantine, not t-universal** (the two digit-branches meet at ½,
-  the pair-5 phenomenon) — see `notes/ST06-THM34-FINDINGS.md`; exact PDF statement requested in `ON-LINE-REQUEST.md`.
-- **Cor 3.5** (Beatty capstone, `St06Cor35.lean`) — verified **Beatty foundation**:
-  `holderConjugate_one_add_sqrt2` ((1+√2,1+1/√2) Hölder conjugate), `beatty_partition_sqrt2` (Rayleigh),
-  `beatty_unique_sqrt2` (every n>0 in exactly one Beatty seq). Remaining: per-`m` `w(r)`+M-shift packaging.
+  the pair-5 phenomenon) — see `notes/ST06-THM34-FINDINGS.md`. Numerics show Stoll's PRINTED interval
+  (e.g. width 0.2 for (1,1,0)) is ~28× wider than what actually works for √2 (width 0.0073), so it's
+  the pair-5 trap; ε=½ is the honest t-universal ceiling. Only genuinely-open St06 item.
+- **Cor 3.5** (Beatty capstone, `St06Cor35.lean`) — **COMPLETE this lap, no PDF needed**. The GP
+  recurrence `su √2 √2 ½ ½ n` started at any `n>0` reads off the binary digits of `r·√2` for the unique
+  `r≥1` fixed by which Beatty sequence (`1+√2` / `1+1/√2`) contains `n`:
+  - engine `cor35_pair`/`cor35_pair_case2` (gp_pair generalized by a free factor `r`; `cor35_floorA/B`
+    + `cor35_base` from `crux`/`eq8_general`), digit forms `cor35_digits_case1/case2`;
+  - `beatty_start_case1/case2` identify the starts with `beattySeq`; capstone **`st06_cor35`** via
+    `beatty_unique_sqrt2`; literal **`st06_cor35_realDigits`** (= `Real.digits (r√2) 2 j`) + **`st06_cor35_isBit`**.
+  - KEY INSIGHT: the tracked number is `w(m)=r·α` (Beatty real), digits are those of `r√2`; Stoll's
+    printed `w`-table is just a mantissa renormalization of the same digit string (so the off-by-M PDF
+    concern was illusory). Foundation lemmas (`holderConjugate_one_add_sqrt2`, `beatty_partition_sqrt2`,
+    `beatty_unique_sqrt2`) unchanged.
 
 ## 🏆 St05 COMPLETE — Erdős #482 resolved in full generality (2026-06-06)
 The whole of Stoll [St05] is now machine-checked and **axiom-clean** (`src/Erdos482/General/`):
@@ -68,20 +78,25 @@ Aristotle independently confirmed the `𝒟₂⁻` and `𝒟₁⁻` cores (`tool
 Cor 3.5 (Beatty unification of the Borwein–Bailey examples). See `PENDING_WORK.md`.
 
 ## Where it stands
-The **headline** (Graham–Pollak: the GP sequence reads off the binary digits of √2) and the **bonus**
-(Stoll's Theorem 3.2 + Corollary 3.3) are complete and **axiom-clean** (every theorem's `#print axioms`
-= the trust base `[propext, Classical.choice, Quot.sound]`, zero custom axioms, zero `sorry`).
-**Pair 5 is now resolved**: the online findings established that Stoll's full-interval claim is *not a
-theorem* (false at the stated endpoint, fails at n=280); only ε=½ works for all n (= the headline).
-The honest content was formalized: the typo-corrected closed form, an exact **band characterization**
-of the ε-step, the **conditional** full-interval theorem, and the **precise obstruction** (both sides)
-showing why no ε≠½ is uniformly admissible (PENDING_WORK §1, all axiom-clean).
-A new **general track** (Stoll [St05], the real #482 resolution for any `w>0`, any base `g≥2`) is
-underway in `src/Erdos482/General/` (PENDING_WORK §1b): the g-ary digit bound, Prop-2 bridge to
-mathlib `Real.digits`, the mantissa lemma, and Thm 1.3's conclusion modulo the closed-form induction
-(the induction is grinding on Aristotle, job `e0240fef`).
+**Three complete, axiom-clean layers** (every `#print axioms` = trust base `[propext, Classical.choice,
+Quot.sound]`, zero custom axioms, zero `sorry`): (1) the **headline** (Graham–Pollak / √2) + the
+**bonus** (Stoll [0902.4168] Thm 3.2's 7 pairs + Cor 3.3, with pair 5 resolved to its honest ε=½
+content); (2) the **general #482 resolution** (Stoll [St05]: `erdos482_resolution`, any `w>0` any base
+`g≥2`); (3) the **St06 fun-extension** (Acta Arith. 125): Example 1.1, Thm 3.1 (all 12 cones), Thm 3.3
+(full), Thm 3.4 (ε=½), and **Cor 3.5 (the Beatty-unification capstone, closed this lap)**. The single
+genuinely-open mathematical item is Thm 3.4's full k-dependent ε-interval, which is Diophantine / not
+t-universal (the pair-5 phenomenon) — needs the PDF's per-w argument, NOT an axiom; ε=½ is the honest
+ceiling. Everything else is optional polish (faithfulness certificates, top-level showcase wiring).
 
 ## What's happened (newest first)
+- **2026-06-13 (review lap — Cor 3.5 capstone)**: Closed **St06 Corollary 3.5** entirely, **without the
+  PDF**. Reverse-engineered the exact statement numerically (`tools/sandbox/st06_cor35_*.py`): the GP
+  recurrence from start `m` tracks `w(m)=r·α` (the Beatty real, `α∈{1+√2,1+1/√2}`, `m=⌊rα⌋`), reading
+  off the binary digits of `r√2`. Built the digit engine = `gp_pair` generalized by a free factor `r`
+  (`cor35_pair`, `cor35_pair_case2`, `cor35_floorA/B`, `cor35_base`), the capstone **`st06_cor35`** (via
+  `beatty_unique_sqrt2`), and literal/bit forms (`st06_cor35_realDigits`, `st06_cor35_isBit`). All
+  axiom-clean. **All St06 main theorems are now formalized**; the off-by-M PDF concern was illusory
+  (Stoll's `w`-table = mantissa renormalization of the `r√2` digit string).
 - **2026-06-07 (review/showcase lap)**: St06 online-fetch returned — unobtainable but off the critical
   path (harvested to `archive/findings/`; `ON-LINE-REQUEST.md` retired). Added (all axiom-clean):
   • **`erdos482_resolution_general_literal`** + `realDigits_mantissa_shift` (`Erdos482GeneralLiteral.lean`):
@@ -128,32 +143,39 @@ mathlib `Real.digits`, the mantissa lemma, and Thm 1.3's conclusion modulo the c
 
 ## Outstanding
 ### Short-term (mirror PENDING_WORK top)
-- **Pair 5 full-interval** (`t₅=√2`, special β=0): the only pair without a vv-based interval theorem.
-  Invariant (verified): `vv(2j+1)=⌊√2·2^j⌋+2^j`, `vv(2j+2)=⌊√2·2^j⌋+2^{j+1}`; digit
-  `vv(2k+1)−2vv(2k−1)=binDigit √2 k`. The ½-step is `eq8_general(ε=½)`; the ε-step bracket
-  `{x}−√2{x/2}+√2ε` is **non-uniform in x** (uniform only at ε=½) — needs a dedicated bound.
-- **Master theorem**: once pair 5 lands, a single `∀ ε admissible, ∀ k≥31, vv ε (2k+1)−2vv ε (2k−1) ∈
-  {0,1}` via `stoll_intervals_cover` + the 8 pairs.
+- **St06 Thm 3.4 full k-dependent interval** (the only open St06 item): Diophantine / not t-universal
+  (the two b-step digit-branches meet at ε=½ → forces ε=½ for arbitrary `w`; the √2-specific band is
+  ~28× narrower than Stoll's printed interval — the pair-5 trap). Options: (a) formalize the honest
+  **conditional** full-interval (band condition ⇒ digits, mirroring `stoll_pair5_conditional`); (b)
+  await the PDF's per-w argument (`ON-LINE-REQUEST.md`). ε=½ (`st06_thm34_digits`) is the honest ceiling.
+- **Optional polish**: Cor 3.5 faithfulness certificate (concrete `r=2`→digits of `2√2`); wire
+  `st06_cor35`/`erdos482_resolution` into a single top-level St06 showcase; unified Thm 3.3/3.4/Cor 3.5
+  `isBit` master.
 ### Long-term
-- "Generalize to other algebraic numbers" — open research direction, needs new math.
+- "Generalize to other algebraic numbers" — Stoll [St05] already resolves it elementarily (DONE as
+  `erdos482_resolution`); deeper generalizations (cubic irrationals, etc.) would need new math.
 ### To completion
-- The headline + Theorem 3.2 (7 pairs) + Cor 3.3 are done & axiom-clean. "Done" for the full bonus =
-  add pair 5's interval + the master theorem; then every result's base is trust-base only.
+- The headline + Thm 3.2 (7 pairs) + Cor 3.3 + St05 general (`erdos482_resolution`) + St06 (Ex 1.1,
+  Thm 3.1/3.3/3.4@½, Cor 3.5) are all done & **axiom-clean**. "Done" for St06 = add Thm 3.4's honest
+  conditional interval (the full interval is not a t-universal theorem). Nothing on the critical path open.
 
 ## Axiom ledger
 All headline theorems verified `#print axioms` this lap = trust base only; **0 math axioms** (🟢).
 | headline theorem | paper claim | `#print axioms` shows | status |
 |---|---|---|---|
 | `graham_pollak` | uncond (digits of √2) | `[propext, Classical.choice, Quot.sound]` | 🟢 clean — no machinery |
-| `stoll_digit`, `stoll_pair` | uncond (Thm 3.2 core) | trust base | 🟢 clean |
-| `stoll_pair1..4,6,7,8` (+ `_t`) | uncond (Thm 3.2, 7 pairs, full intervals) | trust base | 🟢 clean |
 | `cor33_unconditional` (+ `_t`) | uncond (digits of 759250125√2) | trust base | 🟢 clean |
-| `stoll_intervals_cover` | uncond (intervals partition range) | trust base | 🟢 clean |
-| `stoll_gp_isBit` | uncond (GP diff is a bit, 7 pairs) | trust base | 🟢 clean |
-| `vv_one_le_and_mono` | structural (vv ≥1, monotone) | trust base | 🟢 clean |
+| `erdos482_resolution` | uncond (St05: any `w>0`, any base `g≥2`) | trust base | 🟢 clean |
+| `st06_example11_ternary_e` | uncond (St06 Ex 1.1, base-3 digits of e) | trust base | 🟢 clean |
+| `st06_thm31_d{1..6}{m,p}_digits` | uncond (St06 Thm 3.1, all 12 cones) | trust base | 🟢 clean |
+| `st06_thm33_digits` (+ `_grahampollak`) | uncond (St06 Thm 3.3, full ε-interval) | trust base | 🟢 clean |
+| `st06_thm34_digits` | St06 Thm 3.4 **at ε=½** (honest ceiling) | trust base | 🟢 clean |
+| `st06_cor35` (+ `_realDigits`, `_isBit`) | uncond (St06 Cor 3.5, Beatty unification) | trust base | 🟢 clean |
 
-No 🟡/🟠/🔴 axioms anywhere: the whole development is elementary (floors, √2, π/e bounds from mathlib).
-The remaining work (pair 5, master theorem) is *new proof*, not axiom discharge.
+No 🟡/🟠/🔴 axioms anywhere: the whole development is elementary (floors, √2, π/e bounds, Rayleigh from
+mathlib). The ONLY genuinely-open item is Thm 3.4's full k-dependent interval — Diophantine / not
+t-universal (the pair-5 phenomenon; ε=½ is the honest ceiling), needing the PDF's per-w argument, NOT
+an axiom to discharge.
 
 ## Pointers
 `HANDOFF.md` (completion pointer) · session batons archived in `archive/handoff/` ·
