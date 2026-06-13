@@ -248,4 +248,53 @@ theorem cor35_digits_case2 (r j : ℕ) :
       = binDigit ((r : ℝ) * Real.sqrt 2) (j + 1) := by
   rw [(cor35_pair_case2 r (j + 1)).2, (cor35_pair_case2 r j).2, ← cor35_floorDiff]; ring
 
+/-! ## Beatty connection and the capstone -/
+
+/-- The case-1 Beatty value `beattySeq (1+1/√2) r = ⌊r(1+1/√2)⌋` equals the case-1 start
+`r + ⌊√2 r/2⌋`. -/
+private lemma beatty_start_case1 (r : ℕ) :
+    beattySeq (1 + 1 / Real.sqrt 2) (r : ℤ) = (r : ℤ) + ⌊Real.sqrt 2 * (r : ℝ) / 2⌋ := by
+  have h2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hpos : (0 : ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
+  have hhalf : (1 : ℝ) / Real.sqrt 2 = Real.sqrt 2 / 2 := by
+    have hne : Real.sqrt 2 ≠ 0 := ne_of_gt hpos
+    field_simp
+    linarith [h2]
+  have key : ((r : ℤ) : ℝ) * (1 + 1 / Real.sqrt 2) = ((r : ℤ) : ℝ) + Real.sqrt 2 * (r : ℝ) / 2 := by
+    rw [hhalf]; push_cast; ring
+  simp only [beattySeq]
+  rw [key, Int.floor_intCast_add]
+
+/-- The case-2 Beatty value `beattySeq (1+√2) r = ⌊r(1+√2)⌋` equals the case-2 start `⌊√2 r⌋ + r`. -/
+private lemma beatty_start_case2 (r : ℕ) :
+    beattySeq (1 + Real.sqrt 2) (r : ℤ) = ⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ) := by
+  have key : ((r : ℤ) : ℝ) * (1 + Real.sqrt 2) = ((r : ℤ) : ℝ) + Real.sqrt 2 * (r : ℝ) := by
+    push_cast; ring
+  simp only [beattySeq]
+  rw [key, Int.floor_intCast_add, add_comm]
+
+/-- **Stoll [St06] Corollary 3.5 — the Beatty unification (capstone).**  For every positive integer
+`n`, the Graham–Pollak recurrence `su √2 √2 ½ ½ n` (start `n`) reads off the binary digits of `r·√2`
+for a unique `r ≥ 1` determined by which Beatty sequence (`1+√2` or `1+1/√2`) contains `n`
+(`beatty_unique_sqrt2`).  This unifies the Borwein–Bailey digit-extraction examples: every admissible
+start corresponds, via Rayleigh's partition, to exactly one multiple `r√2`. -/
+theorem st06_cor35 (n : ℤ) (hn : 0 < n) :
+    ∃ r : ℕ, 0 < r ∧ ∀ j : ℕ,
+      su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2) n (2 * (j + 1) + 1)
+        - 2 * su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2) n (2 * j + 1)
+      = binDigit ((r : ℝ) * Real.sqrt 2) (j + 1) := by
+  rcases beatty_unique_sqrt2 n hn with ⟨⟨k, hk, hkn⟩, _⟩ | ⟨_, ⟨k, hk, hkn⟩⟩
+  · -- `n ∈ B(1+√2)` (case 2)
+    refine ⟨k.toNat, by omega, fun j => ?_⟩
+    have hkr : ((k.toNat : ℕ) : ℤ) = k := Int.toNat_of_nonneg (by omega)
+    have hn' : n = ⌊Real.sqrt 2 * (k.toNat : ℝ)⌋ + (k.toNat : ℤ) := by
+      rw [← beatty_start_case2 k.toNat, hkr, hkn]
+    rw [hn']; exact cor35_digits_case2 k.toNat j
+  · -- `n ∈ B(1+1/√2)` (case 1)
+    refine ⟨k.toNat, by omega, fun j => ?_⟩
+    have hkr : ((k.toNat : ℕ) : ℤ) = k := Int.toNat_of_nonneg (by omega)
+    have hn' : n = (k.toNat : ℤ) + ⌊Real.sqrt 2 * (k.toNat : ℝ) / 2⌋ := by
+      rw [← beatty_start_case1 k.toNat, hkr, hkn]
+    rw [hn']; exact cor35_digits_case1 k.toNat j
+
 end Erdos482.General
