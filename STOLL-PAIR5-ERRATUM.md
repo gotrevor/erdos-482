@@ -1,8 +1,12 @@
 # Erratum / caveat: Stoll arXiv:0902.4168, Theorem 3.2, pair i=5 (t₅=√2)
 
-**DURABLE NOTE — keep, do not archive.** This records two problems in Stoll's paper that directly
-shape how pair 5 should (and should not) be formalized here. Full evidence + scripts:
-`ON-LINE-FINDINGS-2026-06-06-pair5.md` (root, or `archive/findings/` after harvest).
+Two issues in Stoll's Theorem 3.2 (pair `i=5`, `t₅=√2`), found while formalizing the result in Lean 4,
+both verified by **exact integer arithmetic** (`math.isqrt`, no floating point). Reproduction scripts:
+[`tools/sandbox/`](tools/sandbox/) (`stoll_pair5_verify.py`, `stoll_pair5_digits.py`,
+`stoll_pair5_shrink.py`). A fuller write-up — the mechanism (tie to Stoll's remark (d) / normality of √2),
+the horizon-contraction table, and a map of the Lean formalization — is in
+[`NOTES-FOR-STOLL.md`](NOTES-FOR-STOLL.md). Detailed derivation:
+[`archive/findings/ON-LINE-FINDINGS-2026-06-06-pair5.md`](archive/findings/ON-LINE-FINDINGS-2026-06-06-pair5.md).
 
 ## 1. Typo in the pair-5 closed form (certain)
 The paper prints, for i=5:  `v_{2k} = ⌊t₅·2^{k−2}⌋ + 2^{k−2}`.
@@ -22,9 +26,10 @@ connection Stoll flags in remark (d) but never applies to pair 5). Stoll's endpo
 assumed the whole leftover gap is pair-5 territory. Cross-check: pairs 1,2,4,6,8 (eq-8 uniform) DO
 hold over their full intervals to n=1500 with the same machinery — only pair 5 fails.
 
-## Consequence for this repo
-Pair 5 (digits of √2) is a genuine theorem **only at ε=½** (original Graham–Pollak), where the
-ε-step is exactly the universal `crux` `0≤{x}−√2{x/2}+√2/2<1`. That is the case to formalize.
-**Do not state/prove pair 5 over the open interval** — it is not an elementary theorem (it is
-open-Diophantine / normality-flavored) and the stated interval is demonstrably wrong. A full
-Theorem-3.2 formalization should scope pair 5 to ε=½ and cite this note.
+## Consequence for the formalization
+Pair 5 (digits of √2) is a genuine theorem **only at ε=½** (the original Graham–Pollak), where the
+ε-step is exactly the universal `crux` `0≤{x}−√2{x/2}+√2/2<1`. That is the case formalized here. The
+open interval is **not** claimed: it is not an elementary theorem (it is open-Diophantine /
+normality-flavored) and the stated endpoints provably fail (n=280, above). So this repo scopes pair 5 to
+ε=½ and records the honest content instead — the typo-corrected closed form, the exact ε-step band
+characterization, and a conditional full-interval theorem.

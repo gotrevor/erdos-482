@@ -3,7 +3,8 @@
 Two items in **Theorem 3.2**, pair `i = 5` (`t₅ = √2`, `β = 0`), found while formalizing the result in
 Lean 4, plus a summary of the formalization itself. Everything numerical below is **exact integer
 arithmetic** (`math.isqrt`; no floating point) and is reproducible from the scripts in
-[`tools/sandbox/`](tools/sandbox/).
+[`tools/sandbox/`](tools/sandbox/). The two issues are also recorded as a standalone erratum,
+[`STOLL-PAIR5-ERRATUM.md`](STOLL-PAIR5-ERRATUM.md).
 
 Notation follows the paper: `vₙ` is the recurrence of Def. 3.1,
 `v₁ = 1`, `v_{n+1} = ⌊√2·(vₙ + ε)⌋` for `n` odd, `v_{n+1} = ⌊√2·(vₙ + ½)⌋` for `n` even, and the
