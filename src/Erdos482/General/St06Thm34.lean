@@ -533,4 +533,23 @@ theorem st06_thm34_isBit_eps (t : ℝ) (ht0 : 0 ≤ t) (ht1 : 1 ≤ t) (ht2 : t 
   obtain ⟨h0, h2⟩ := digitStep_mem 2 (by norm_num) (t * (2 : ℝ) ^ (n - 1) / 2)
   omega
 
+/-- **St06 Theorem 3.4, conclusion (2) — full interval.**  For every `ε` in Stoll's symmetric
+interval, the even-index Graham–Pollak difference of `su a b ε (1/2) m` is `(2k+1)·dₙ − k` with
+`dₙ = ⌊t·2^{n−1}⌋ − 2⌊t·2^{n−1}/2⌋` the `n`-th binary digit (same closed form as the `ε = ½` case,
+since the a-step lands on the same integer for every admissible `ε`). -/
+theorem st06_thm34_even_digits_eps (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < 2)
+    (m l k : ℤ) (hm : 1 ≤ m) (hl1 : 1 ≤ l) (hlm : l ≤ m) (hk : 0 ≤ k)
+    (a b : ℝ) (ha : a = (2 * k + 1) + 2 * l / (t + 2 * m)) (hb : b = 2 / a) (ε : ℝ)
+    (hεlo : (1 : ℝ) / 2 - ((m : ℝ) - l + 1 / 2) / ((2 * m + 1) * (2 * k + 1) + 2 * l) ≤ ε)
+    (hεhi : ε < (1 : ℝ) / 2 + ((m : ℝ) - l + 1 / 2) / ((2 * m + 1) * (2 * k + 1) + 2 * l))
+    (n : ℕ) (hn : 1 ≤ n) :
+    su a b ε (1 / 2) m (2 * n + 1) - 2 * su a b ε (1 / 2) m (2 * n - 1)
+      = (2 * k + 1) * (⌊t * (2 : ℝ) ^ (n - 1)⌋ - 2 * ⌊t * (2 : ℝ) ^ (n - 1) / 2⌋) - k := by
+  have hE := (st06_thm34_closed_eps t ht1 ht2 m l k hm hl1 hlm hk a b ha hb ε hεlo hεhi).2
+  obtain ⟨n', rfl⟩ : ∃ n', n = n' + 1 := ⟨n - 1, by omega⟩
+  have hfl : ⌊t * (2 : ℝ) ^ (n' + 1) / 2⌋ = ⌊t * (2 : ℝ) ^ n'⌋ := by congr 1; rw [pow_succ]; ring
+  rw [hE (n' + 1), show 2 * (n' + 1) - 1 = 2 * n' + 1 from by omega, hE n',
+    show n' + 1 - 1 = n' from by omega, hfl, pow_succ]
+  ring
+
 end Erdos482.General
