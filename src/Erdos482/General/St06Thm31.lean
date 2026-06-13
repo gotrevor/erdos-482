@@ -79,33 +79,35 @@ theorem d2m_core (g : ℕ) (hg : 3 ≤ g) (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < (
   rw [hfrac]
   exact ⟨div_nonneg hlowpoly (le_of_lt hden), (div_lt_one hden).mpr hhighpoly⟩
 
-/-- **St06 Theorem 3.1 — joint closed-form induction, subcone `𝒟₂⁻`.**  For the recurrence
-`su a b ε (l/(g−1)) m` with the `𝒟₂⁻` parameters, both closed forms hold:
-`su(2j) = m·gʲ + ⌊t·gʲ/g⌋` (odd form) and `(g−1)·su(2j+1) = l(k·gʲ − 1)` (even form). -/
-theorem st06_thm31_d2m_closed (g : ℕ) (hg : 3 ≤ g) (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
-    (m l k : ℤ) (hm : 1 ≤ m) (hl0 : 0 < l) (hlg : l ≤ (g : ℤ) - 1) (hk : k < 0)
+/-- **St06 Theorem 3.1 — joint closed-form induction, cone-agnostic master.**  The induction skeleton
+shared by all six subcones: it takes the even→odd inequality core as an abstract hypothesis `hcore`
+(`0 ≤ l/(g−1)+a(ε−f) < 1` for every fractional part `f ∈ [0,1)`), so each subcone reduces to supplying
+its own verified ε-interval core.  Requires only `l ≠ 0`, `k ≠ 0`, `t+mg ≠ 0`, the divisibility
+`(g−1)∣(k−1)l`, and `a,b` of the St06 form.  Both closed forms follow:
+`su(2j) = m·gʲ + ⌊t·gʲ/g⌋` and `(g−1)·su(2j+1) = l(k·gʲ − 1)`. -/
+theorem st06_thm31_closed_core (g : ℕ) (hg : 2 ≤ g) (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (m l k : ℤ) (hlne0 : l ≠ 0) (hkne0 : k ≠ 0) (hPne0 : t + (m : ℝ) * (g : ℝ) ≠ 0)
     (hdvd : ((g : ℤ) - 1) ∣ (k - 1) * l)
     (a b ε : ℝ)
     (ha : a = ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))))
     (hb : b = (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))) / ((k : ℝ) * (l : ℝ)))
-    (hε_lo : 1 + ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (l : ℝ) * (g : ℝ)) ≤ ε)
-    (hε_hi : ε < -((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (g : ℝ))) :
+    (hcore : ∀ f : ℝ, 0 ≤ f → f < 1 →
+      0 ≤ (l : ℝ) / ((g : ℝ) - 1) + a * (ε - f) ∧
+        (l : ℝ) / ((g : ℝ) - 1) + a * (ε - f) < 1) :
     (∀ j, su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * j)
         = m * (g : ℤ) ^ j + ⌊t * (g : ℝ) ^ j / g⌋) ∧
       (∀ j, ((g : ℤ) - 1) * su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * j + 1)
         = l * (k * (g : ℤ) ^ j - 1)) := by
-  have hgR : (3 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+  have hgR : (2 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
   have hg1R : (0 : ℝ) < (g : ℝ) - 1 := by linarith
   have hg1ne : (g : ℝ) - 1 ≠ 0 := ne_of_gt hg1R
-  have hmR : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
-  have hlR : (0 : ℝ) < (l : ℝ) := by exact_mod_cast hl0
-  have hkR : (k : ℝ) < 0 := by exact_mod_cast hk
-  have hkne : (k : ℝ) ≠ 0 := ne_of_lt hkR
-  have hlne : (l : ℝ) ≠ 0 := ne_of_gt hlR
+  have hlne : (l : ℝ) ≠ 0 := by exact_mod_cast hlne0
+  have hkne : (k : ℝ) ≠ 0 := by exact_mod_cast hkne0
   have hgpos : (0 : ℝ) < (g : ℝ) := by linarith
   have hgne : (g : ℝ) ≠ 0 := ne_of_gt hgpos
-  have hP : (0 : ℝ) < t + (m : ℝ) * (g : ℝ) := by nlinarith
-  have hPne : t + (m : ℝ) * (g : ℝ) ≠ 0 := ne_of_gt hP
+  have hPne : t + (m : ℝ) * (g : ℝ) ≠ 0 := hPne0
+  have hPne2 : (g : ℝ) * (m : ℝ) + t ≠ 0 := by
+    rw [show (g : ℝ) * (m : ℝ) + t = t + (m : ℝ) * (g : ℝ) by ring]; exact hPne
   -- divisibility at each j:  (g−1) ∣ l·(k·gʲ − 1)
   have hdvdj : ∀ j : ℕ, ((g : ℤ) - 1) ∣ l * (k * (g : ℤ) ^ j - 1) := by
     intro j
@@ -133,21 +135,24 @@ theorem st06_thm31_d2m_closed (g : ℕ) (hg : 3 ≤ g) (t : ℝ) (ht1 : 1 ≤ t)
     set f : ℝ := t * (g : ℝ) ^ j / g - (⌊t * (g : ℝ) ^ j / g⌋ : ℝ) with hf
     have hf0 : 0 ≤ f := by rw [hf]; linarith [Int.floor_le (t * (g : ℝ) ^ j / g)]
     have hf1 : f < 1 := by rw [hf]; linarith [Int.lt_floor_add_one (t * (g : ℝ) ^ j / g)]
-    have hcore := d2m_core g hg t ht1 ht2 m l k hm hl0 hlg hk a ε ha hε_lo hε_hi f hf0 hf1
+    have hcoref := hcore f hf0 hf1
     -- identity:  a·(Aⱼ + ε) − (l/(g−1) + a(ε−f)) = Q.  Prove the (g−1)-scaled version (no Q,
     -- the ε/f terms cancel), then cancel (g−1) against hQr.
     have hfe : ((⌊t * (g : ℝ) ^ j / g⌋ : ℤ) : ℝ) = t * (g : ℝ) ^ j / g - f := by rw [hf]; ring
     have hR : ((g : ℝ) - 1) * (a * (((m * (g : ℤ) ^ j + ⌊t * (g : ℝ) ^ j / g⌋ : ℤ) : ℝ) + ε)
         - ((l : ℝ) / ((g : ℝ) - 1) + a * (ε - f)))
         = (l : ℝ) * ((k : ℝ) * (g : ℝ) ^ j - 1) := by
-      rw [ha]; push_cast; rw [hfe]; field_simp; ring
+      rw [ha]; push_cast; rw [hfe]
+      rw [show t + (m : ℝ) * (g : ℝ) = (g : ℝ) * (m : ℝ) + t from by ring]
+      field_simp
+      ring
     have hXminus : a * (((m * (g : ℤ) ^ j + ⌊t * (g : ℝ) ^ j / g⌋ : ℤ) : ℝ) + ε)
         - ((l : ℝ) / ((g : ℝ) - 1) + a * (ε - f)) = (Q : ℝ) := by
       have hRQ := hR.trans hQr.symm
       exact mul_left_cancel₀ hg1ne hRQ
     have hfloorQ : ⌊a * (((m * (g : ℤ) ^ j + ⌊t * (g : ℝ) ^ j / g⌋ : ℤ) : ℝ) + ε)⌋ = Q := by
       rw [Int.floor_eq_iff]
-      exact ⟨by linarith [hXminus, hcore.1], by linarith [hXminus, hcore.2]⟩
+      exact ⟨by linarith [hXminus, hcoref.1], by linarith [hXminus, hcoref.2]⟩
     rw [hfloorQ, hQ]
   -- ODD→EVEN: from the even closed form B_j, the (b, l/(g−1)) floor gives A_{j+1} (exact).
   have hAfromB : ∀ j, ((g : ℤ) - 1) * su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * j + 1)
@@ -193,6 +198,111 @@ theorem st06_thm31_d2m_closed (g : ℕ) (hg : 3 ≤ g) (t : ℝ) (ht1 : 1 ≤ t)
       rw [hfl]; omega
     | succ n ih => exact hAfromB n (hBfromA n ih)
   exact ⟨hA, fun j => hBfromA j (hA j)⟩
+
+/-- **St06 Theorem 3.1 — joint closed-form induction, subcone `𝒟₂⁻`** (`k < 0`).  Master + `d2m_core`. -/
+theorem st06_thm31_d2m_closed (g : ℕ) (hg : 3 ≤ g) (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (m l k : ℤ) (hm : 1 ≤ m) (hl0 : 0 < l) (hlg : l ≤ (g : ℤ) - 1) (hk : k < 0)
+    (hdvd : ((g : ℤ) - 1) ∣ (k - 1) * l)
+    (a b ε : ℝ)
+    (ha : a = ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))))
+    (hb : b = (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))) / ((k : ℝ) * (l : ℝ)))
+    (hε_lo : 1 + ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (l : ℝ) * (g : ℝ)) ≤ ε)
+    (hε_hi : ε < -((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (g : ℝ))) :
+    (∀ j, su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * j)
+        = m * (g : ℤ) ^ j + ⌊t * (g : ℝ) ^ j / g⌋) ∧
+      (∀ j, ((g : ℤ) - 1) * su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * j + 1)
+        = l * (k * (g : ℤ) ^ j - 1)) := by
+  have hPne : t + (m : ℝ) * (g : ℝ) ≠ 0 := by
+    have : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+    have : (3 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+    positivity
+  exact st06_thm31_closed_core g (by omega) t ht1 ht2 m l k (ne_of_gt hl0) (ne_of_lt hk) hPne
+    hdvd a b ε ha hb (fun f hf0 hf1 => d2m_core g hg t ht1 ht2 m l k hm hl0 hlg hk a ε ha hε_lo hε_hi f hf0 hf1)
+
+/-- **Even→odd inequality core (`𝒟₂⁺`, `k > 0`).**  Mirror of `d2m_core`: now `a > 0` so the core
+is decreasing in `f`; the corrected `𝒟₂⁺` ε-interval is `1 − (mg+1)/(kg) ≤ ε < (g−l−1)(mg+1)/(klg)`
+(again no spurious `+1` on the open endpoint — `notes/ST06-THM31-ERRATUM.md`).  Verified over ~390k
+points. -/
+theorem d2p_core (g : ℕ) (hg : 3 ≤ g) (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (m l k : ℤ) (hm : 1 ≤ m) (hl0 : 0 < l) (hlg : l ≤ (g : ℤ) - 1) (hk : 0 < k)
+    (a ε : ℝ)
+    (ha : a = ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))))
+    (hε_lo : 1 - ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (g : ℝ)) ≤ ε)
+    (hε_hi : ε < ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (l : ℝ) * (g : ℝ)))
+    (f : ℝ) (hf0 : 0 ≤ f) (hf1 : f < 1) :
+    0 ≤ (l : ℝ) / ((g : ℝ) - 1) + a * (ε - f) ∧
+      (l : ℝ) / ((g : ℝ) - 1) + a * (ε - f) < 1 := by
+  have hgR : (3 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+  have hg1 : (0 : ℝ) < (g : ℝ) - 1 := by linarith
+  have hmR : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+  have hlR : (0 : ℝ) < (l : ℝ) := by exact_mod_cast hl0
+  have hlgR : (l : ℝ) ≤ (g : ℝ) - 1 := by
+    have : ((l : ℤ) : ℝ) ≤ (((g : ℤ) - 1 : ℤ) : ℝ) := by exact_mod_cast hlg
+    push_cast at this; linarith
+  have hkR : (0 : ℝ) < (k : ℝ) := by exact_mod_cast hk
+  have hgpos : (0 : ℝ) < (g : ℝ) := by linarith
+  have hP : (0 : ℝ) < t + (m : ℝ) * (g : ℝ) := by nlinarith
+  have hkg : (0 : ℝ) < (k : ℝ) * (g : ℝ) := by positivity
+  have hklg : (0 : ℝ) < (k : ℝ) * (l : ℝ) * (g : ℝ) := by positivity
+  -- clear the divisions in the ε-bounds
+  have hLo : -((m : ℝ) * (g : ℝ) + 1) ≤ (ε - 1) * ((k : ℝ) * (g : ℝ)) := by
+    have hX : -((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (g : ℝ)) ≤ ε - 1 := by
+      rw [neg_div]; linarith
+    rwa [div_le_iff₀ hkg] at hX
+  have hHi : ε * ((k : ℝ) * (l : ℝ) * (g : ℝ)) < ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) * (g : ℝ) + 1) := by
+    rw [lt_div_iff₀ hklg] at hε_hi; exact hε_hi
+  subst ha
+  set P : ℝ := t + (m : ℝ) * (g : ℝ) with hPdef
+  have hden : (0 : ℝ) < ((g : ℝ) - 1) * P := mul_pos hg1 hP
+  have hlowpoly : 0 ≤ (l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f) := by
+    nlinarith [mul_le_mul_of_nonneg_left hLo (le_of_lt hlR), mul_pos hklg (show (0 : ℝ) < 1 - f by linarith),
+      mul_pos hlR hP, ht1, hlR]
+  have hhighpoly : (l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f) < ((g : ℝ) - 1) * P := by
+    nlinarith [hHi, mul_nonneg (le_of_lt hklg) hf0,
+      mul_nonneg (show (0 : ℝ) ≤ (g : ℝ) - (l : ℝ) - 1 by linarith) (show (0 : ℝ) ≤ t - 1 by linarith), hP]
+  have hfrac : (l : ℝ) / ((g : ℝ) - 1)
+      + ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * P) * (ε - f)
+      = ((l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f)) / (((g : ℝ) - 1) * P) := by
+    field_simp
+  rw [hfrac]
+  exact ⟨div_nonneg hlowpoly (le_of_lt hden), (div_lt_one hden).mpr hhighpoly⟩
+
+/-- **St06 Theorem 3.1 — joint closed-form induction, subcone `𝒟₂⁺`** (`k > 0`).  Master + `d2p_core`. -/
+theorem st06_thm31_d2p_closed (g : ℕ) (hg : 3 ≤ g) (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (m l k : ℤ) (hm : 1 ≤ m) (hl0 : 0 < l) (hlg : l ≤ (g : ℤ) - 1) (hk : 0 < k)
+    (hdvd : ((g : ℤ) - 1) ∣ (k - 1) * l)
+    (a b ε : ℝ)
+    (ha : a = ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))))
+    (hb : b = (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))) / ((k : ℝ) * (l : ℝ)))
+    (hε_lo : 1 - ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (g : ℝ)) ≤ ε)
+    (hε_hi : ε < ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (l : ℝ) * (g : ℝ))) :
+    (∀ j, su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * j)
+        = m * (g : ℤ) ^ j + ⌊t * (g : ℝ) ^ j / g⌋) ∧
+      (∀ j, ((g : ℤ) - 1) * su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * j + 1)
+        = l * (k * (g : ℤ) ^ j - 1)) := by
+  have hPne : t + (m : ℝ) * (g : ℝ) ≠ 0 := by
+    have : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+    have : (3 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+    positivity
+  exact st06_thm31_closed_core g (by omega) t ht1 ht2 m l k (ne_of_gt hl0) (ne_of_gt hk) hPne
+    hdvd a b ε ha hb (fun f hf0 hf1 => d2p_core g hg t ht1 ht2 m l k hm hl0 hlg hk a ε ha hε_lo hε_hi f hf0 hf1)
+
+/-- **St06 Theorem 3.1 — digit extraction, subcone `𝒟₂⁺`.** -/
+theorem st06_thm31_d2p_digits (g : ℕ) [NeZero g] (hg : 3 ≤ g) (t : ℝ) (ht0 : 0 ≤ t)
+    (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (m l k : ℤ) (hm : 1 ≤ m) (hl0 : 0 < l) (hlg : l ≤ (g : ℤ) - 1) (hk : 0 < k)
+    (hdvd : ((g : ℤ) - 1) ∣ (k - 1) * l)
+    (a b ε : ℝ)
+    (ha : a = ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))))
+    (hb : b = (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))) / ((k : ℝ) * (l : ℝ)))
+    (hε_lo : 1 - ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (g : ℝ)) ≤ ε)
+    (hε_hi : ε < ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (l : ℝ) * (g : ℝ)))
+    (n : ℕ) (hn : 1 ≤ n) :
+    su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * n)
+        - g * su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * n - 2)
+      = ((Real.digits (t * (g : ℝ) ^ (n - 1) / g) g 0 : ℕ) : ℤ) := by
+  have hclosed := (st06_thm31_d2p_closed g hg t ht1 ht2 m l k hm hl0 hlg hk hdvd a b ε ha hb hε_lo hε_hi).1
+  exact digit_of_evenClosed_coeff g (by omega) t ht0 m _ hclosed n hn
 
 /-- **St06 Theorem 3.1 — digit extraction, subcone `𝒟₂⁻`.**  The Graham–Pollak difference of the
 `𝒟₂⁻` recurrence reads off `w`'s base-`g` digit (mathlib form): for `n ≥ 1`,

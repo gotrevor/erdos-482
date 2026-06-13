@@ -32,20 +32,25 @@ formalized and **axiom-clean** (`src/Erdos482/General/St06Example.lean`):
 St06 Thm 3.1's ε-interval for subcone 𝒟₂⁻ has a spurious "+1" on the upper endpoint — the correct
 (numerically verified, ~1M points) interval is `1+γ₂⁻ ≤ ε < δ₂⁻` (not `< 1+δ₂⁻`).
 
-### Tier 2 — St06 Theorem 3.1, subcone 𝒟₂⁻ DONE (2026-06-13)
-The **full negative-`k` subcone** of St06 Thm 3.1 is formalized and **axiom-clean**
+### Tier 2 — St06 Theorem 3.1, subcones 𝒟₂⁻ AND 𝒟₂⁺ DONE (2026-06-13)
+The **full `𝒜₂` cone (both signs of `k`)** of St06 Thm 3.1 is formalized and **axiom-clean**
 (`src/Erdos482/General/St06Thm31.lean`):
-- `d2m_core` — the even→odd inequality core `0 ≤ l/(g−1)+a(ε−f) < 1` (hand-proved; Aristotle
-  independently confirmed it, `tools/aristotle/st06_d2m_eo`).
-- `st06_thm31_d2m_closed` — the joint closed-form induction for ALL `(g≥3, m≥1, 0<l≤g−1, k<0)` with
-  `(g−1)∣(k−1)l`: `su(2j)=m·gʲ+⌊t·gʲ/g⌋`, `(g−1)·su(2j+1)=l(k·gʲ−1)`.
-- `st06_thm31_d2m_digits` — the digit-extraction conclusion (GP difference = base-`g` digit of `w`).
-- `st06_example11_from_thm31` — Example 1.1 recovered as the `(g,m,l,k)=(3,3,2,−1)`, `t=e`, `ε=π`
-  instance, cross-validating the generalization and the corrected ε-interval (`π ∈ [1, 10/3)`).
+- `st06_thm31_closed_core` — a **cone-agnostic master** joint-induction: it takes the even→odd
+  inequality core as an abstract hypothesis, so each subcone reduces to supplying its verified
+  ε-interval core. The odd→even step and the closed-form induction are shared across all six cones.
+- `d2m_core` / `d2p_core` — the even→odd inequality cores for `k<0` / `k>0` (hand-proved; the `k<0`
+  one independently confirmed by Aristotle, `tools/aristotle/st06_d2m_eo`).
+- `st06_thm31_d2m_closed` / `_d2p_closed` (+ `_d2m_digits` / `_d2p_digits`) — the joint closed forms
+  `su(2j)=m·gʲ+⌊t·gʲ/g⌋`, `(g−1)·su(2j+1)=l(k·gʲ−1)`, and the GP-difference digit extraction, for
+  ALL `(g≥3, m≥1, 0<l≤g−1, k≷0)` with `(g−1)∣(k−1)l`.
+- `st06_example11_from_thm31` — Example 1.1 recovered as the `𝒟₂⁻` instance `(3,3,2,−1)`, `t=e`, `ε=π`.
 
-**Remaining St06:** the other 5 subcones of Thm 3.1 (𝒟₁,𝒟₃₋₆; each needs its ε-interval re-derived +
-numerically verified, watching for the same "+1" transcription bug), then Thms 3.3/3.4 (binary), Cor 3.5
-(Beatty). See `PENDING_WORK.md`.
+Both subcones' corrected ε-intervals (no spurious "+1" on the open endpoint) are numerically verified
+(~1.4M points total) and recorded in `notes/ST06-THM31-ERRATUM.md`.
+
+**Remaining St06:** the other 4 subcones of Thm 3.1 (𝒟₁, 𝒟₃ in `Ω₁`; 𝒟₄₋₆ in `Ω₂`, `m≤−2` — note the
+odd→even/master skeleton already covers them, only each `*_core` interval lemma is needed), then Thms
+3.3/3.4 (binary `g=2`), Cor 3.5 (Beatty). See `PENDING_WORK.md`.
 
 ## Where it stands
 The **headline** (Graham–Pollak: the GP sequence reads off the binary digits of √2) and the **bonus**
