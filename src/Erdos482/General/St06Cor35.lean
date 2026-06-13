@@ -54,4 +54,19 @@ theorem beatty_partition_sqrt2 :
       ∆ {beattySeq (1 + 1 / Real.sqrt 2) k | k > 0} = {n | 0 < n} :=
   irrational_one_add_sqrt2.beattySeq_symmDiff_beattySeq_pos holderConjugate_one_add_sqrt2
 
+/-- **The explicit Cor 3.5 partition.**  Every positive integer is a value of *exactly one* of the
+two Beatty sequences `B⁺(1+√2)`, `B⁺(1+1/√2)` — the form Stoll uses to characterise the representable
+`m`.  (Extracted from `beatty_partition_sqrt2` via `Set.mem_symmDiff`.) -/
+theorem beatty_unique_sqrt2 (n : ℤ) (hn : 0 < n) :
+    ((∃ k > 0, beattySeq (1 + Real.sqrt 2) k = n)
+        ∧ ¬ ∃ k > 0, beattySeq (1 + 1 / Real.sqrt 2) k = n)
+      ∨ (¬ (∃ k > 0, beattySeq (1 + Real.sqrt 2) k = n)
+        ∧ ∃ k > 0, beattySeq (1 + 1 / Real.sqrt 2) k = n) := by
+  have hmem : n ∈ {beattySeq (1 + Real.sqrt 2) k | k > 0}
+      ∆ {beattySeq (1 + 1 / Real.sqrt 2) k | k > 0} := by
+    rw [beatty_partition_sqrt2]; exact hn
+  rcases Set.mem_symmDiff.mp hmem with ⟨h1, h2⟩ | ⟨h1, h2⟩
+  · exact Or.inl ⟨h1, h2⟩
+  · exact Or.inr ⟨h2, h1⟩
+
 end Erdos482.General
