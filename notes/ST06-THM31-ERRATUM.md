@@ -53,5 +53,30 @@ numerically-correct interval is the boxed one above. Confirm against the PDF whe
 **formalize against the corrected (verified) interval**, per the repo's "verify, don't trust" rule
 (cf. `STOLL-PAIR5-ERRATUM.md`).
 
-The other five subcones are **not** yet re-derived here; expect the analogous "+1" to need checking on
-each `δᵢ±` before formalizing them.
+## General rule — verified for ALL 12 sub-subcones (2026-06-13)
+
+Re-deriving the core for every cone (the reduction `0 ≤ l/(g−1)+a(ε−f) < 1` is cone-independent; only
+the ε-endpoints differ) and matching the endpoints against St06's Def 2.4 `γᵢ±, δᵢ±` gives a **single
+uniform correction**:
+
+> **The St06 Thm 3.1 offset condition is `1 + γᵢ^s ≤ ε < δᵢ^s`** (for cone `i`, sign `s∈{+,−}`).
+> The lower endpoint keeps the `+1`; the **upper endpoint has NO `+1`**.  The plan's transcription
+> `… < 1 + δᵢ^s` over-shoots the upper endpoint on every cone.
+
+With `γ, δ` read off Def 2.4's four lines:
+
+| line | value | appears as |
+|---|---|---|
+| L1 | `−(mg+1)/(kg)`        | `γ₂⁺ δ₂⁻ γ₃⁺ δ₃⁻ γ₄⁺ δ₄⁻` |
+| L2 | `(g−l−1)(mg+1)/(klg)` | `δ₂⁺ γ₂⁻ γ₁⁺ δ₁⁻ γ₆⁺ δ₆⁻` |
+| L3 | `−(m+1)/k`            | `δ₅⁺ γ₅⁻ δ₁⁺ γ₁⁻ δ₆⁺ γ₆⁻` |
+| L4 | `(g−l−1)(m+1)/(kl)`   | `γ₅⁺ δ₅⁻ δ₃⁺ γ₃⁻ δ₄⁺ γ₄⁻` |
+
+**Evidence:** `1 + γᵢ^s ≤ ε < δᵢ^s` gives **0 failures over ~250 000** `(g,m,l,k,t,ε,f)` points across
+**all 12** sub-subcones (𝒟₁..𝒟₆, both signs), `g∈[3,8]`, `m∈[1,7]∪[−7,−2]`, `t∈[1,g)`, `f∈{0,½,1⁻}`,
+including the `Ω₂` cones (`m ≤ −2`, where `t+mg < 0`).  The plan's `< 1+δ` fails on every cone.
+
+So **formalize each cone against `1 + γᵢ^s ≤ ε < δᵢ^s`** (lower keeps the +1, upper drops it).  The
+`src/Erdos482/General/St06Thm31.lean` `d2m_core`/`d2p_core` lemmas already do this for 𝒜₂; the other
+cones are the same proof shape with the line-`Lk` endpoints substituted (watch the sign of `t+mg`:
+positive on `Ω₁`/𝒟₁₋₃, negative on `Ω₂`/𝒟₄₋₆, which flips the `÷(g−1)(t+mg)` step).

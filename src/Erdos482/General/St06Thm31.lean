@@ -350,4 +350,74 @@ theorem st06_example11_from_thm31 (n : ℕ) (hn : 1 ≤ n) :
   rw [show ((2 : ℤ) : ℝ) / (((3 : ℕ) : ℝ) - 1) = 1 by norm_num] at key
   convert key using 2
 
+/-! ## Subcone `𝒟₁` (cone `𝒜₁`: `l < 0`) — shows the master handles negative `l` -/
+
+/-- **Even→odd inequality core (`𝒟₁⁻`, `k < 0`, `l < 0`).**  Here `kl > 0` so `a > 0`.  Corrected
+`𝒟₁⁻` ε-interval `1 − (m+1)/k ≤ ε < (g−l−1)(mg+1)/(klg)` (verified ~160k points). -/
+theorem d1m_core (g : ℕ) (hg : 3 ≤ g) (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (m l k : ℤ) (hm : 1 ≤ m) (hl : l < 0) (hk : k < 0)
+    (a ε : ℝ)
+    (ha : a = ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))))
+    (hε_lo : 1 - ((m : ℝ) + 1) / (k : ℝ) ≤ ε)
+    (hε_hi : ε < ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (l : ℝ) * (g : ℝ)))
+    (f : ℝ) (hf0 : 0 ≤ f) (hf1 : f < 1) :
+    0 ≤ (l : ℝ) / ((g : ℝ) - 1) + a * (ε - f) ∧
+      (l : ℝ) / ((g : ℝ) - 1) + a * (ε - f) < 1 := by
+  have hgR : (3 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+  have hg1 : (0 : ℝ) < (g : ℝ) - 1 := by linarith
+  have hmR : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+  have hlR : (l : ℝ) < 0 := by exact_mod_cast hl
+  have hkR : (k : ℝ) < 0 := by exact_mod_cast hk
+  have hgpos : (0 : ℝ) < (g : ℝ) := by linarith
+  have hP : (0 : ℝ) < t + (m : ℝ) * (g : ℝ) := by nlinarith
+  have hlg_neg : (l : ℝ) * (g : ℝ) < 0 := mul_neg_of_neg_of_pos hlR hgpos
+  have hklg : (0 : ℝ) < (k : ℝ) * (l : ℝ) * (g : ℝ) := by
+    have : (0 : ℝ) < (k : ℝ) * (l : ℝ) := mul_pos_of_neg_of_neg hkR hlR
+    positivity
+  -- clear the divisions in the ε-bounds
+  have hLo : (ε - 1) * (k : ℝ) ≤ -((m : ℝ) + 1) := by
+    have h1 : -((m : ℝ) + 1) / (k : ℝ) ≤ ε - 1 := by rw [neg_div]; linarith
+    rwa [div_le_iff_of_neg hkR] at h1
+  have hHi : ε * ((k : ℝ) * (l : ℝ) * (g : ℝ)) < ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) * (g : ℝ) + 1) := by
+    rw [lt_div_iff₀ hklg] at hε_hi; exact hε_hi
+  subst ha
+  set P : ℝ := t + (m : ℝ) * (g : ℝ) with hPdef
+  have hden : (0 : ℝ) < ((g : ℝ) - 1) * P := mul_pos hg1 hP
+  have hlowpoly : 0 ≤ (l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f) := by
+    -- klg(ε−f) ≥ klg(ε−1) ≥ −(m+1)·l·g ;  l·P − (m+1)·l·g = l·(t−g) ≥ 0
+    nlinarith [mul_pos hklg (show (0 : ℝ) < 1 - f by linarith),
+      mul_le_mul_of_nonpos_right hLo (le_of_lt hlg_neg),
+      mul_nonneg (le_of_lt (neg_pos.mpr hlR)) (le_of_lt (show (0 : ℝ) < (g : ℝ) - t by linarith))]
+  have hhighpoly : (l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f) < ((g : ℝ) - 1) * P := by
+    nlinarith [hHi, mul_nonneg (le_of_lt hklg) hf0,
+      mul_nonneg (show (0 : ℝ) ≤ (g : ℝ) - (l : ℝ) - 1 by linarith) (show (0 : ℝ) ≤ t - 1 by linarith), hP]
+  have hfrac : (l : ℝ) / ((g : ℝ) - 1)
+      + ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * P) * (ε - f)
+      = ((l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f)) / (((g : ℝ) - 1) * P) := by
+    field_simp
+  rw [hfrac]
+  exact ⟨div_nonneg hlowpoly (le_of_lt hden), (div_lt_one hden).mpr hhighpoly⟩
+
+/-- **St06 Theorem 3.1 — digit extraction, subcone `𝒟₁⁻`** (`k<0`, `l<0`).  Master + `d1m_core`. -/
+theorem st06_thm31_d1m_digits (g : ℕ) [NeZero g] (hg : 3 ≤ g) (t : ℝ) (ht0 : 0 ≤ t)
+    (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (m l k : ℤ) (hm : 1 ≤ m) (hl : l < 0) (hk : k < 0)
+    (hdvd : ((g : ℤ) - 1) ∣ (k - 1) * l)
+    (a b ε : ℝ)
+    (ha : a = ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))))
+    (hb : b = (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))) / ((k : ℝ) * (l : ℝ)))
+    (hε_lo : 1 - ((m : ℝ) + 1) / (k : ℝ) ≤ ε)
+    (hε_hi : ε < ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (l : ℝ) * (g : ℝ)))
+    (n : ℕ) (hn : 1 ≤ n) :
+    su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * n)
+        - g * su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * n - 2)
+      = ((Real.digits (t * (g : ℝ) ^ (n - 1) / g) g 0 : ℕ) : ℤ) := by
+  have hPne : t + (m : ℝ) * (g : ℝ) ≠ 0 := by
+    have hm1 : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+    have hg3 : (3 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+    positivity
+  have hclosed := (st06_thm31_closed_core g (by omega) t ht1 ht2 m l k (ne_of_lt hl) (ne_of_lt hk) hPne
+    hdvd a b ε ha hb (fun f hf0 hf1 => d1m_core g hg t ht1 ht2 m l k hm hl hk a ε ha hε_lo hε_hi f hf0 hf1)).1
+  exact digit_of_evenClosed_coeff g (by omega) t ht0 m _ hclosed n hn
+
 end Erdos482.General
