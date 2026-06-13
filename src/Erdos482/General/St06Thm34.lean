@@ -552,4 +552,24 @@ theorem st06_thm34_even_digits_eps (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < 2)
     show n' + 1 - 1 = n' from by omega, hfl, pow_succ]
   ring
 
+/-- **Witness that the corrected Theorem 3.4 interval has teeth.**  The prior lap reported "only
+`ε = ½` works"; that was the swapped recurrence.  Here is a concrete **`ε ≠ ½`** that reads off the
+binary digits of `√2`: take `w = √2` (so `t = √2`), `(m,l,k) = (1,1,0)` — the symmetric interval is
+`[2/5, 3/5)` — and `ε = 9/20`.  The a-step recurrence `su a b (9/20) (1/2) 1` still extracts `√2`'s
+`n`-th binary digit, by `st06_thm34_digits_eps`.  Proof that the genuine interval is an interval. -/
+theorem st06_thm34_sqrt2_eps_nonhalf (n : ℕ) (hn : 1 ≤ n) :
+    su (1 + 2 / (Real.sqrt 2 + 2)) (2 / (1 + 2 / (Real.sqrt 2 + 2))) (9 / 20) (1 / 2) 1 (2 * n)
+        - 2 * su (1 + 2 / (Real.sqrt 2 + 2)) (2 / (1 + 2 / (Real.sqrt 2 + 2))) (9 / 20) (1 / 2) 1
+              (2 * n - 2)
+      = ((Real.digits (Real.sqrt 2 * (2 : ℝ) ^ (n - 1) / 2) 2 0 : ℕ) : ℤ) := by
+  have hs2 : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
+  have hsnn : (0 : ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have h1 : (1 : ℝ) ≤ Real.sqrt 2 := by nlinarith [hs2, hsnn]
+  have h2 : Real.sqrt 2 < 2 := by nlinarith [hs2, hsnn]
+  have ha : (1 + 2 / (Real.sqrt 2 + 2) : ℝ)
+      = (2 * ((0 : ℤ) : ℝ) + 1) + 2 * ((1 : ℤ) : ℝ) / (Real.sqrt 2 + 2 * ((1 : ℤ) : ℝ)) := by
+    push_cast; ring
+  exact st06_thm34_digits_eps (Real.sqrt 2) hsnn h1 h2 1 1 0 (by norm_num) (by norm_num) (by norm_num)
+    (by norm_num) _ _ ha rfl (9 / 20) (by push_cast; norm_num) (by push_cast; norm_num) n hn
+
 end Erdos482.General
