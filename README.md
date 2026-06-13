@@ -9,10 +9,21 @@ this is (as far as that database knows) the first Lean formalization of #482.
 > Define `a₁ = 1` and `a(n+1) = ⌊√2·(aₙ + ½)⌋`. Then `a(2n+1) − 2·a(2n−1)` is the n-th digit in the
 > binary expansion of √2. Find similar results for `θ = √m` and other algebraic numbers.
 
-Source: `[ErGr80, p.96]`. The √2 result is due to **Graham and Pollak [GrPo70]**; the wide-ranging
-generalizations are due to **Stoll [St05, St06]** ([arXiv:0902.4168](https://arxiv.org/abs/0902.4168)).
-The only genuinely new content is **one fractional-part inequality** (`0 ≤ {x} − √2{x/2} + √2/2 < 1`,
-Stoll eq (7)); mathlib supplies `Int.fract`, `irrational_sqrt_two`, `Real.digits`, and the rest.
+Source: `[ErGr80, p.96]`. The √2 result is due to **Graham and Pollak** (*Math. Mag.* **43** (1970),
+143–145). The generalizations formalized here come from two **Thomas Stoll** papers, which should be
+kept distinct (see [`papers/SOURCES.md`](papers/SOURCES.md)):
+
+- the **(α, l)-pair family** (Theorem 3.2, Corollary 3.3) — *A fancy way to obtain the binary digits of
+  759250125√2*, **Amer. Math. Monthly 117** (2010), no. 7, 611–617
+  ([arXiv:0902.4168](https://arxiv.org/abs/0902.4168));
+- the **general base-`g` resolution** (any real `w > 0`, any base `g ≥ 2`) — **[St05]**, *J. Integer Seq.*
+  **8** (2005), Art. 05.3.2.
+
+(A third Stoll paper, **[St06]** — *On a problem of Erdős and Graham concerning digits*, *Acta Arith.*
+**125** (2006), 89–100 — gives further/sharper results; it is not formalized here, and is not on the
+critical path for #482.) The only genuinely new content in the formalization is **one fractional-part
+inequality** (`0 ≤ {x} − √2{x/2} + √2/2 < 1`, eq (7) of arXiv:0902.4168); mathlib supplies `Int.fract`,
+`irrational_sqrt_two`, `Real.digits`, and the rest.
 
 ## What is proven
 

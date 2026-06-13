@@ -1,7 +1,10 @@
-# Notes on *A fancy way to obtain the binary digits of 759250125√2* (arXiv:0902.4168)
+# Notes on T. Stoll, *A fancy way to obtain the binary digits of 759250125√2*
 
-Two items in **Theorem 3.2**, pair `i = 5` (`t₅ = √2`, `β = 0`), found while formalizing the result in
-Lean 4, plus a summary of the formalization itself. Everything numerical below is **exact integer
+*Amer. Math. Monthly* **117** (2010), no. 7, 611–617 ([arXiv:0902.4168](https://arxiv.org/abs/0902.4168)).
+Page/section references below are to the arXiv version (v2, 7 pp.), which anyone can open freely.
+
+Two items in **Theorem 3.2** (p. 2), pair `i = 5` (`t₅ = √2`, `β = 0`), found while formalizing the
+result in Lean 4, plus a summary of the formalization itself. Everything numerical below is **exact integer
 arithmetic** (`math.isqrt`; no floating point) and is reproducible from the scripts in
 [`tools/sandbox/`](tools/sandbox/). The two issues are also recorded as a standalone erratum,
 [`STOLL-PAIR5-ERRATUM.md`](STOLL-PAIR5-ERRATUM.md).
@@ -16,9 +19,10 @@ the assistant's, not claimed as his own hand-derivations.*
 
 ---
 
-## 1. Typo in the i=5 closed form (§4)
+## 1. Typo in the i=5 closed form (§4, p. 5)
 
-The paper prints, for `i = 5`:
+In the proof of Theorem 3.2 (§4), the paragraph treating the case `i = 5` ("Finally, we have to treat
+the case `i = 5` … Here we directly show that …", p. 5) prints:
 
 > `v_{2k} = ⌊t₅·2^{k−2}⌋ + 2^{k−2}`,  `v_{2k+1} = ⌊t₅·2^{k−1}⌋ + 2^k`  (k ≥ 1).
 
@@ -41,7 +45,8 @@ share the same floor `⌊√2·2^{k−1}⌋`. The corrected form matches the rec
 
 ## 2. The pair-5 interval claim is too wide (substantive)
 
-Theorem 3.2 / remark (b) states the digits of √2 are obtained for **any** `ε` in
+Theorem 3.2 (the `i = 5` row, p. 2) and its restatement in remark (b) (p. 3) state the digits of √2 are
+obtained for **any** `ε` in
 
 > `ε₅ ∈ [309/2·√2 − 218,  1296121037/2·√2 − 916495974) ≈ [0.495995, 0.501240)`.
 
@@ -89,7 +94,7 @@ to eq (8), `0 ≤ (1−√2){α√2·2^{k−l−1}} + √2ε < 1`, which is **un
 Now `{x} − √2{x/2} ∈ [−√2/2, 1−√2/2)`, with the extremes approached exactly when `{√2·2^m} → ½`. So a
 fixed `ε ≠ ½` eventually hits a wall: the step requires `{√2·2^m}` to avoid a band around ½ for **all**
 `m`, an infinitary property of √2's binary digits. This is exactly the normality connection of your
-remark (d) — there you use it to *enlarge* `ε₁`/`ε₈` under non-normality; the same mechanism *shrinks*
+remark (d) (p. 3) — there you use it to *enlarge* `ε₁`/`ε₈` under non-normality; the same mechanism *shrinks*
 pair 5's interval to `{½}` if √2 is normal in base 2 (believed, unproven). So the full-interval pair-5
 claim is, as an all-n theorem, false at the stated endpoints, and the sharp positive version is at best
 conditional on an explicit Diophantine hypothesis `{√2·2^m} ∉ (½−δ, ½+δ) ∀m`.

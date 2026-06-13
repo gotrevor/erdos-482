@@ -3,7 +3,7 @@
 **Request:** 2026-06-06 item in `ON-LINE-REQUEST.md` — the exact (5)/(6) analogue for pair 5,
 and how Stoll makes the ε-step land for *all* ε in pair 5's interval.
 
-**Sources read:** M. Stoll, *A fancy way to obtain the binary digits of 759250125√2*,
+**Sources read:** T. Stoll, *A fancy way to obtain the binary digits of 759250125√2*,
 arXiv:0902.4168 — full HTML via `ar5iv.labs.arxiv.org/html/0902.4168` (the `<math alttext>` =
 author's own LaTeX, so the quotes below are verbatim, not OCR). I re-read §3 (Thm 3.2 statement +
 remarks a–d), and §4 lines covering eqs (5)–(9) and the `i=5` paragraph. Every claim below is

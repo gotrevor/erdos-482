@@ -101,7 +101,8 @@ restatements + showcase constants. The remaining work was then honest polish:
 
 ## The instructive failures
 
-- **A published closed form was wrong** (St05 pair 5). Caught by numerics; never formalized.
+- **A published closed form was wrong** (the "fancy way" note, arXiv:0902.4168, pair 5). Caught by
+  numerics; never formalized.
 - **A promising reformulation was a dead end** (`vv ε = u` for interior ε). Caught by numerics at
   n=452; recorded, not buried.
 - **The auto-formalizer stalled on a monolithic goal** (9% on the joint induction). Fixed by

@@ -4,7 +4,7 @@
 (8-pair table + parametrized recurrence + digit-index eqs) and Corollary 3.3 (the `759250125√2`
 example), for replaying the `gp_pair` induction per pair.
 
-**Source read:** M. Stoll, *A fancy way to obtain the binary digits of 759250125√2*,
+**Source read:** T. Stoll, *A fancy way to obtain the binary digits of 759250125√2*,
 arXiv:0902.4168 — full HTML via `ar5iv.labs.arxiv.org/html/0902.4168` (the `alttext` LaTeX, so the
 formulas below are the author's own LaTeX, transcribed verbatim, not OCR). Section 2 (eqs 1–2),
 Section 3 (Def 3.1, Thm 3.2, Cor 3.3), Section 4 (proof: eqs 5–9). Cross-checked every row of the
@@ -167,8 +167,8 @@ separate `0.50124` and `0.51035` from `0.50862`, so coarse interval bounds suffi
 
 ## Reference summary (for `papers/SOURCES.md` if you keep one)
 
-- **Stoll, M.** "A fancy way to obtain the binary digits of 759250125√2." arXiv:0902.4168 (2009).
-  Also appeared in *Amer. Math. Monthly*. Self-contained; the headline (§4, `√2`, pair 5) you've
+- **Stoll, T.** "A fancy way to obtain the binary digits of 759250125√2." *Amer. Math. Monthly* **117**
+  (2010), no. 7, 611–617; arXiv:0902.4168 (2009). Self-contained; the headline (§4, `√2`, pair 5) you've
   already formalized. Key reusable lemmas: eq (7) = `crux` (universal), eq (8) = `eq8_general`.
 - Primary refs inside: Graham–Pollak, *Math. Mag.* 43 (1970) 143–145 [orig. result];
   Hwang–Lin [8]; Knuth TAOCP vol. 3 §5.3.1; Allouche–Shallit Ex.45 p.116.
