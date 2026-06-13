@@ -190,6 +190,7 @@ All headline theorems verified `#print axioms` this lap = trust base only; **0 m
 | `st06_thm34_digits_eps` (+ `_astep_eps`, `_closed_eps`, `_isBit_eps`) | St06 Thm 3.4, GENUINE full symmetric ε-interval (t-universal) | trust base | 🟢 clean |
 | `st06_thm34_bstep_band` / `_band_fails_below/above_half` | ⚠️ SWAPPED-VARIANT (ε on b-step = Thm 3.3 placement), NOT Thm 3.4 | trust base | 🟢 clean Lean, unfaithful statement |
 | `st06_cor35` (+ `_realDigits`, `_isBit`) | uncond (St06 Cor 3.5, Beatty unification) | trust base | 🟢 clean |
+| `selfref_crux_solvable_iff` (+ `_fails_of_three_le`) | NEW: self-referential digit crux solvable iff base g=2 | trust base | 🟢 clean |
 
 No 🟡/🟠/🔴 axioms anywhere: the whole development is elementary (floors, √2, π/e bounds, Rayleigh from
 mathlib). Thm 3.4's full k-dependent interval — once mis-formalized as a Diophantine "obstruction" — is
