@@ -105,5 +105,6 @@ No 🟡/🟠/🔴 axioms anywhere: the whole development is elementary (floors, 
 The remaining work (pair 5, master theorem) is *new proof*, not axiom discharge.
 
 ## Pointers
-ROADMAP: (none — see this file) · newest HANDOFF: `HANDOFF-2026-06-06-1946.md` (+ this lap's) ·
-`PENDING_WORK.md` (attack paths) · paper transcription: `archive/findings/ON-LINE-FINDINGS-2026-06-06-stoll-thm32-cor33.md`
+`HANDOFF.md` (completion pointer) · session batons archived in `archive/handoff/` ·
+`NOTES-FOR-STOLL.md` (pair-5 errata + computations) · `PENDING_WORK.md` (historical) ·
+paper transcription: `archive/findings/ON-LINE-FINDINGS-2026-06-06-stoll-thm32-cor33.md`

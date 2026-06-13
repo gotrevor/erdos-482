@@ -126,17 +126,17 @@ already covers its most important instance (ε=½).
 
 </details>
 
-## 1b. St05 Theorem 1.3 (g-ary general) — 🚧 IN PROGRESS (started 2026-06-06)
-The §0 NEXT TRACK is now underway. Verified numerically (`tools/sandbox/st05_thm13_verify.py`: w∈{√2,√3,π},
+## 1b. St05 Theorem 1.3 (g-ary general) — ✅ DONE (2026-06-07)
+Completed; see STATUS.md and `src/Erdos482/General/`. Verified numerically (`tools/sandbox/st05_thm13_verify.py`: w∈{√2,√3,π},
 g∈{2,3,10}, ε-endpoints, many n — all OK). Done & axiom-clean:
 - `General/Digits.lean` — `digitStep g x = ⌊gx⌋−g⌊x⌋`, range bound `0≤digitStep<g`; `gdigit` (Prop 2) + `gdigit_mem`.
 - `General/Thm13.lean` — `thm13_digit_of_oddClosed`: given the odd closed form `u(2k+1)=g^k+⌊t·g^k/g⌋`,
   the difference `u(2n+1)−g·u(2n−1) = digitStep g (t·g^{n−1}/g) ∈ [0,g)`. This is Thm 1.3's conclusion
   **modulo the closed-form induction**.
-- **Remaining:** the closed-form induction `thm13_closed` (recurrence ⟹ both closed forms) — submitted to
-  Aristotle (job `e0240fef`). When it returns: verify in-kernel, port onto a repo `gu` def, and chain
-  `thm13_closed → thm13_digit_of_oddClosed` for an UNCONDITIONAL Thm 1.3. Then Mantissa (1≤t<g), Prop 2
-  proper (identify `digitStep` with the actual base-g digit of `w`), Thm 1.2 Cases I/II, Cor 1.1/1.2.
+- **Completed (2026-06-07):** the closed-form induction `thm13_closed` was proved locally (after the
+  Aristotle job `e0240fef` stalled), ported onto the repo `gu` def, and chained to
+  `thm13_digit_of_oddClosed` for an unconditional Thm 1.3 — plus Mantissa (1≤t<g), Prop 2, Thm 1.2
+  Cases I/II, Cor 1.1/1.2, and the top-level `erdos482_resolution`. All axiom-clean (see STATUS.md).
 
 ## 2. Master theorem (Theorem 3.2, full ε-range)
 For the 7 non-special pairs this is done. Pair 5 only holds at ε=½ (§1: the full interval is not a
