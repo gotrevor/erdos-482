@@ -324,4 +324,21 @@ theorem st06_cor35_isBit (n : ℤ) (hn : 0 < n) :
   obtain ⟨r, hr, hdig⟩ := st06_cor35 n hn
   exact ⟨r, hr, fun j => by rw [hdig j]; exact binDigit_mem_zero_one _ (j + 1) (by omega)⟩
 
+/-- **Faithfulness: Cor 3.5 recovers Graham–Pollak.**  At `r = 1` (Beatty case 1, start `n = 1`) the
+capstone reads off the binary digits of `√2` — exactly the original Graham–Pollak digit theorem.  This
+anchors the abstract `r√2`-family to the concrete headline. -/
+theorem st06_cor35_recovers_gp (j : ℕ) :
+    su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2) 1 (2 * (j + 1) + 1)
+      - 2 * su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2) 1 (2 * j + 1)
+      = binDigit (Real.sqrt 2) (j + 1) := by
+  have h2 : Real.sqrt 2 < 2 := by
+    nlinarith [Real.sq_sqrt (show (0 : ℝ) ≤ 2 by norm_num), Real.sqrt_nonneg 2]
+  have hfl : ⌊Real.sqrt 2 * ((1 : ℕ) : ℝ) / 2⌋ = 0 := by
+    rw [Int.floor_eq_zero_iff]
+    refine ⟨by positivity, ?_⟩
+    simp only [Nat.cast_one, mul_one]; linarith
+  have := cor35_digits_case1 1 j
+  rw [hfl] at this
+  simpa using this
+
 end Erdos482.General
