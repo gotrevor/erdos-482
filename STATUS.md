@@ -52,10 +52,13 @@ The **full `𝒜₂` cone (both signs of `k`)** of St06 Thm 3.1 is formalized an
 `1 + γᵢ^s ≤ ε < δᵢ^s` — the "+1" the plan added belongs ONLY on the lower endpoint — **verified for all
 12 sub-subcones** (0 failures / ~250k points, incl. the `Ω₂`, `m≤−2` cones).
 
-**Remaining St06:** the `Ω₂` half — subcones `𝒟₄₋₆±` (`m≤−2`, where `t+mg < 0`, so the `÷(g−1)(t+mg)`
-step flips; needs a P<0 polynomial variant of the `*_core` shape) — each one `*_core` lemma over the
-shared master (`PENDING_WORK.md §0′` + erratum `γ,δ` table give verified endpoints). Then Thms 3.3/3.4
-(binary `g=2`), Cor 3.5 (Beatty).
+**`Ω₂` started** (`m≤−2`, `t+mg < 0`): subcone **`𝒟₅⁻`** done (`d5m_core` / `st06_thm31_d5m_digits`) —
+the P<0 template that flips the `÷(g−1)P` step (uses `div_lt_one_of_neg` + `neg_div_neg_eq`). The master
+needed NO change. **7 of 12 sub-subcones done.**
+
+**Remaining St06:** the other 5 `Ω₂` sub-subcones `𝒟₄±, 𝒟₅⁺, 𝒟₆±` (each = one P<0 `*_core` lemma on the
+`d5m_core` template, endpoints from the erratum `γ,δ` table). Then Thms 3.3/3.4 (binary `g=2`), Cor 3.5
+(Beatty).
 
 ## Where it stands
 The **headline** (Graham–Pollak: the GP sequence reads off the binary digits of √2) and the **bonus**
