@@ -1,10 +1,14 @@
 # On-line requests (need open web / the St06 PDF)
 
-> **NOTE (2026-06-13): Cor 3.5 is now CLOSED without the PDF** — the "exact index convention" worry was
-> illusory. The recurrence reads off the digits of `r·√2` (the Beatty real `r·α`), and Stoll's printed
-> `w`-table is just a mantissa renormalization of the same digit string. See `St06Cor35.lean`
-> (`st06_cor35`). Only the Thm 3.4 request below remains genuinely useful (and even it has an honest
-> ε=½ ceiling already formalized).
+> **NOTE (2026-06-13): both St06 PDF worries are now NON-BLOCKING.**
+> • **Cor 3.5 CLOSED without the PDF** — the "exact index convention" worry was illusory. The recurrence
+>   reads off the digits of `r·√2` (the Beatty real `r·α`); Stoll's printed `w`-table is just a mantissa
+>   renormalization of the same digit string. See `St06Cor35.lean` (`st06_cor35`).
+> • **Thm 3.4 RESOLVED honestly** — we machine-checked the full interval is NOT t-universal
+>   (`st06_thm34_band_fails_below_half`/`_above_half`: the d=0/d=1 boundary branches force ε=½). ε=½ is
+>   the proven ceiling. The request below is now only a *curiosity* (does Stoll claim a per-`w`
+>   Diophantine interval, or is the printed interval a transcription artifact?) — answer either way does
+>   not change our formalization. Fulfil only if convenient.
 
 ## 2026-06-13 — Stoll [St06] Theorem 3.4 exact statement + ε-interval
 

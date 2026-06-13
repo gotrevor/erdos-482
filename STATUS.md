@@ -9,10 +9,11 @@ All axiom-clean (`[propext, Classical.choice, Quot.sound]`), build green (8273 j
   `su(2j+1)=2k·A+(m+l)2ʲ+⌊t·2ʲ⌋+k`; the hard nonlinear b-crux proved locally (the `s` cancels → `y∈[0,1)`).
 - **Thm 3.4** (binary family 2, `St06Thm34.lean`) — at **ε=½** (t-universal): `a=2k+1+2l/(t+2m)`,
   even form `(2k+1)A+k+l·2ʲ`; `st06_thm34_{acrux,bcrux,closed,digits,even_digits}` (concl. 2 = `(2k+1)dₙ−k`).
-  ⚠️ The full k-dependent interval is **Diophantine, not t-universal** (the two digit-branches meet at ½,
-  the pair-5 phenomenon) — see `notes/ST06-THM34-FINDINGS.md`. Numerics show Stoll's PRINTED interval
-  (e.g. width 0.2 for (1,1,0)) is ~28× wider than what actually works for √2 (width 0.0073), so it's
-  the pair-5 trap; ε=½ is the honest t-universal ceiling. Only genuinely-open St06 item.
+  **Full interval RESOLVED this lap** (like pair 5): `st06_thm34_bstep_value` (exact general-ε b-step
+  value), `st06_thm34_bstep_band` (lands iff `frac∈(−d,1−d]`, cf. `pair5_estep_band`), and
+  `st06_thm34_band_fails_below_half`/`_above_half` — a **machine-checked Diophantine obstruction**: no
+  single `ε≠½` extracts digits for every `w` (d=0/d=1 boundary branches pull opposite ways). So Stoll's
+  printed k-dependent interval is NOT a t-universal theorem; ε=½ is the proven ceiling.
 - **Cor 3.5** (Beatty capstone, `St06Cor35.lean`) — **COMPLETE this lap, no PDF needed**. The GP
   recurrence `su √2 √2 ½ ½ n` started at any `n>0` reads off the binary digits of `r·√2` for the unique
   `r≥1` fixed by which Beatty sequence (`1+√2` / `1+1/√2`) contains `n`:
@@ -83,12 +84,18 @@ Quot.sound]`, zero custom axioms, zero `sorry`): (1) the **headline** (Graham–
 **bonus** (Stoll [0902.4168] Thm 3.2's 7 pairs + Cor 3.3, with pair 5 resolved to its honest ε=½
 content); (2) the **general #482 resolution** (Stoll [St05]: `erdos482_resolution`, any `w>0` any base
 `g≥2`); (3) the **St06 fun-extension** (Acta Arith. 125): Example 1.1, Thm 3.1 (all 12 cones), Thm 3.3
-(full), Thm 3.4 (ε=½), and **Cor 3.5 (the Beatty-unification capstone, closed this lap)**. The single
-genuinely-open mathematical item is Thm 3.4's full k-dependent ε-interval, which is Diophantine / not
-t-universal (the pair-5 phenomenon) — needs the PDF's per-w argument, NOT an axiom; ε=½ is the honest
-ceiling. Everything else is optional polish (faithfulness certificates, top-level showcase wiring).
+(full), Thm 3.4 (ε=½ + the full-interval Diophantine obstruction), and **Cor 3.5 (the Beatty-unification
+capstone)** — both closed this lap. **No open mathematical item remains**: Thm 3.4's full interval is now
+machine-checked as *not a t-universal theorem* (the pair-5 phenomenon, both obstruction directions
+proven), exactly as pair 5 was resolved. What's left is optional polish (top-level showcase wiring; the
+curiosity of whether Stoll's printed Thm 3.4 interval is a per-w claim — see `ON-LINE-REQUEST.md`).
 
 ## What's happened (newest first)
+- **2026-06-13 (review lap — Cor 3.5 capstone + Thm 3.4 obstruction)**: Two St06 closures. (1) **Thm 3.4
+  full interval RESOLVED** (like pair 5): `st06_thm34_bstep_value` + `_bstep_band` (exact general-ε
+  b-step + lands-iff-band) + `_band_fails_below/above_half` (machine-checked Diophantine obstruction —
+  no ε≠½ is t-universal). (2) Engine cross-validated on Aristotle (`cor35engine`: independently proved
+  `cor35_pair` from `crux` alone). All axiom-clean.
 - **2026-06-13 (review lap — Cor 3.5 capstone)**: Closed **St06 Corollary 3.5** entirely, **without the
   PDF**. Reverse-engineered the exact statement numerically (`tools/sandbox/st06_cor35_*.py`): the GP
   recurrence from start `m` tracks `w(m)=r·α` (the Beatty real, `α∈{1+√2,1+1/√2}`, `m=⌊rα⌋`), reading
@@ -143,14 +150,13 @@ ceiling. Everything else is optional polish (faithfulness certificates, top-leve
 
 ## Outstanding
 ### Short-term (mirror PENDING_WORK top)
-- **St06 Thm 3.4 full k-dependent interval** (the only open St06 item): Diophantine / not t-universal
-  (the two b-step digit-branches meet at ε=½ → forces ε=½ for arbitrary `w`; the √2-specific band is
-  ~28× narrower than Stoll's printed interval — the pair-5 trap). Options: (a) formalize the honest
-  **conditional** full-interval (band condition ⇒ digits, mirroring `stoll_pair5_conditional`); (b)
-  await the PDF's per-w argument (`ON-LINE-REQUEST.md`). ε=½ (`st06_thm34_digits`) is the honest ceiling.
-- **Optional polish**: Cor 3.5 faithfulness certificate (concrete `r=2`→digits of `2√2`); wire
-  `st06_cor35`/`erdos482_resolution` into a single top-level St06 showcase; unified Thm 3.3/3.4/Cor 3.5
-  `isBit` master.
+- **No open mathematical items.** All St06 main theorems formalized & axiom-clean; Thm 3.4's full
+  interval resolved via the machine-checked obstruction (not a t-universal theorem).
+- **Optional polish**: wire `st06_cor35`/`erdos482_resolution` into a single top-level St06 showcase;
+  unified Thm 3.3/3.4/Cor 3.5 `isBit` master; concrete `r=2`→digits-of-`2√2` certificate for Cor 3.5.
+- **Curiosity (non-blocking)**: whether Stoll's *printed* Thm 3.4 interval is a genuine per-`w`
+  (Diophantine) claim or a transcription artifact — needs the PDF (`ON-LINE-REQUEST.md`). Either way our
+  honest content (ε=½ + obstruction) stands.
 ### Long-term
 - "Generalize to other algebraic numbers" — Stoll [St05] already resolves it elementarily (DONE as
   `erdos482_resolution`); deeper generalizations (cubic irrationals, etc.) would need new math.
@@ -169,7 +175,7 @@ All headline theorems verified `#print axioms` this lap = trust base only; **0 m
 | `st06_example11_ternary_e` | uncond (St06 Ex 1.1, base-3 digits of e) | trust base | 🟢 clean |
 | `st06_thm31_d{1..6}{m,p}_digits` | uncond (St06 Thm 3.1, all 12 cones) | trust base | 🟢 clean |
 | `st06_thm33_digits` (+ `_grahampollak`) | uncond (St06 Thm 3.3, full ε-interval) | trust base | 🟢 clean |
-| `st06_thm34_digits` | St06 Thm 3.4 **at ε=½** (honest ceiling) | trust base | 🟢 clean |
+| `st06_thm34_digits` (+ `_bstep_band`, `_band_fails_below/above_half`) | St06 Thm 3.4 at ε=½ + full-interval Diophantine obstruction | trust base | 🟢 clean |
 | `st06_cor35` (+ `_realDigits`, `_isBit`) | uncond (St06 Cor 3.5, Beatty unification) | trust base | 🟢 clean |
 
 No 🟡/🟠/🔴 axioms anywhere: the whole development is elementary (floors, √2, π/e bounds, Rayleigh from

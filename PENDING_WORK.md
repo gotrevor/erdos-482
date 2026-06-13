@@ -18,11 +18,13 @@ sub-subcones `𝒟₁..₆ × {+,−}` via the cone-agnostic master `st06_thm31_
 
 **TIER 3 UPDATE (2026-06-13): Thm 3.3 (full), Thm 3.4 (ε=½), Cor 3.5 (FULL CAPSTONE) DONE.**
 - ✅ **Thm 3.3** — `St06Thm33.lean`, both conclusions + full ε-interval + GP cross-check. Axiom-clean.
-- 🟡 **Thm 3.4** — `St06Thm34.lean`, **ε=½** case (both conclusions). The full k-dependent interval is
-  **Diophantine / not t-universal** (pair-5 phenomenon; `notes/ST06-THM34-FINDINGS.md`). Numerics: Stoll's
-  printed interval is ~28× wider than the actual √2 band ⇒ the pair-5 trap. ε=½ is the honest ceiling.
-  **Only open St06 item.** Next: formalize the honest conditional full-interval (band ⇒ digits, à la
-  `stoll_pair5_conditional`), OR await the PDF's per-w argument (`ON-LINE-REQUEST.md`).
+- ✅ **Thm 3.4 — RESOLVED (2026-06-13), like pair 5.** `St06Thm34.lean`: **ε=½** case (both conclusions,
+  `st06_thm34_digits`/`_even_digits`) PLUS the full-interval **Diophantine obstruction**:
+  `st06_thm34_bstep_value` (exact general-ε b-step value), `st06_thm34_bstep_band` (lands iff
+  `frac∈(−d,1−d]`, cf. `pair5_estep_band`), `st06_thm34_band_fails_below_half`/`_above_half` (for ε<½ a
+  d=1 boundary step breaks the upper band; for ε>½ a d=0 step breaks the lower — so no ε≠½ is
+  t-universal). Stoll's printed interval is NOT a t-universal theorem; ε=½ is the proven ceiling. All
+  axiom-clean. (PDF curiosity in `ON-LINE-REQUEST.md` is now non-blocking.)
 - ✅ **Cor 3.5 — COMPLETE (2026-06-13), no PDF needed.** `St06Cor35.lean`: the GP recurrence
   `su √2 √2 ½ ½ n` from any `n>0` reads off the binary digits of `r·√2`, `r` fixed by which Beatty seq
   contains `n`. Engine = `gp_pair` generalized by a free factor `r` (`cor35_pair`/`_case2`,

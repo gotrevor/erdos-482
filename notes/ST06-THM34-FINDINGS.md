@@ -33,3 +33,17 @@ interval is per-w or a transcription artifact, mirroring the pair-5 erratum).
 
 (Conclusion (2) of the 3.3-style `d_{n+1}+k(2dₙ−1)` does NOT hold for 3.4 — the even form differs;
 `su(2j+1)−2·su(2j−1) = (2k+1)·dₙ + (l−... )`-type, not pursued.)
+
+## FORMALIZED RESOLUTION (2026-06-13) — the full interval is NOT a t-universal theorem ✅
+The Diophantine obstruction above is now **machine-checked** in `St06Thm34.lean` (all axiom-clean):
+* `st06_thm34_bstep_value` — exact general-ε b-step value: `b(E'+ε) = 2(ms+B)+1 − frac`,
+  `frac = (2·Nq − 2(t+2m)ε)/Da`, `Nq=(t+2m)/2 + l(1−t·s+2B)`, `Da=(2k+1)(t+2m)+2l`.
+* `st06_thm34_bstep_band` — the b-step lands on the digit value `2ms+C` **iff** `frac ∈ (−d, 1−d]`,
+  `d=C−2B∈{0,1}` (the exact admissible band; analogue of `pair5_estep_band`).
+* `st06_thm34_band_fails_below_half` — ε<½, a `d=1` boundary step (`C=2B+1`, `t·s` near `C`) has
+  `frac>0=1−d` ⇒ band's upper bound fails ⇒ b-step misses `2ms+C`.
+* `st06_thm34_band_fails_above_half` — ε>½, a `d=0` boundary step (`C=2B`, `t·s` near `C+1`) has
+  `frac<0=−d` ⇒ band's lower bound fails.
+Together: no single `ε≠½` keeps `frac` in the band for *all* fractional parts, so Stoll's printed
+k-dependent interval cannot be a `t`-universal digit theorem (the conclusion "digits of `w`" holds for
+all `w` only at ε=½). This mirrors exactly how pair 5 was resolved. **Open St06 items: none.**
