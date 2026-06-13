@@ -1,5 +1,6 @@
 import Erdos482.General.St06Thm34
 import Erdos482.Induction
+import Erdos482.Digits
 import Mathlib.NumberTheory.Rayleigh
 
 /-!
@@ -296,5 +297,31 @@ theorem st06_cor35 (n : ℤ) (hn : 0 < n) :
     have hn' : n = (k.toNat : ℤ) + ⌊Real.sqrt 2 * (k.toNat : ℝ) / 2⌋ := by
       rw [← beatty_start_case1 k.toNat, hkr, hkn]
     rw [hn']; exact cor35_digits_case1 k.toNat j
+
+/-- `binDigit x (j+1) = Real.digits x 2 j` — the Graham–Pollak difference convention coincides with
+mathlib's `Real.digits` (a pure floor identity for `x ≥ 0`). -/
+private lemma binDigit_succ_eq_realDigits (x : ℝ) (hx : 0 ≤ x) (j : ℕ) :
+    binDigit x (j + 1) = ((Real.digits x 2 j : ℕ) : ℤ) := by
+  rw [binDigit, Nat.add_sub_cancel, digits_eq_floor_sub x hx]
+
+/-- **Cor 3.5, literal form.**  The Graham–Pollak difference of the recurrence started at `n` is the
+genuine mathlib binary digit `Real.digits (r√2) 2 j` of `r·√2`, for the Beatty-determined `r`. -/
+theorem st06_cor35_realDigits (n : ℤ) (hn : 0 < n) :
+    ∃ r : ℕ, 0 < r ∧ ∀ j : ℕ,
+      su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2) n (2 * (j + 1) + 1)
+        - 2 * su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2) n (2 * j + 1)
+      = ((Real.digits ((r : ℝ) * Real.sqrt 2) 2 j : ℕ) : ℤ) := by
+  obtain ⟨r, hr, hdig⟩ := st06_cor35 n hn
+  exact ⟨r, hr, fun j => by rw [hdig j, binDigit_succ_eq_realDigits _ (by positivity)]⟩
+
+/-- **Cor 3.5, bit form.**  The Graham–Pollak difference is a genuine binary digit (`0` or `1`). -/
+theorem st06_cor35_isBit (n : ℤ) (hn : 0 < n) :
+    ∃ r : ℕ, 0 < r ∧ ∀ j : ℕ,
+      su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2) n (2 * (j + 1) + 1)
+          - 2 * su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2) n (2 * j + 1) = 0 ∨
+      su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2) n (2 * (j + 1) + 1)
+          - 2 * su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2) n (2 * j + 1) = 1 := by
+  obtain ⟨r, hr, hdig⟩ := st06_cor35 n hn
+  exact ⟨r, hr, fun j => by rw [hdig j]; exact binDigit_mem_zero_one _ (j + 1) (by omega)⟩
 
 end Erdos482.General
