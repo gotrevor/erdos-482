@@ -282,6 +282,24 @@ theorem st06_thm33_digits (t : ℝ) (ht0 : 0 ≤ t) (ht1 : 1 ≤ t) (ht2 : t < 2
   have := digit_of_evenClosed_coeff 2 (le_refl 2) t ht0 m _ hclosed n hn
   simpa using this
 
+/-- **St06 Theorem 3.3 — the Graham–Pollak difference is a genuine bit** (`0` or `1`): the conclusion-(1)
+digit is a base-2 `Real.digits` value, hence `< 2`. -/
+theorem st06_thm33_isBit (t : ℝ) (ht0 : 0 ≤ t) (ht1 : 1 ≤ t) (ht2 : t < 2)
+    (m l k : ℤ) (hm : 1 ≤ m) (hl0 : 0 ≤ l) (hlm : l ≤ m - 1) (hk : 0 ≤ k)
+    (ε : ℝ)
+    (hεlo : (1 : ℝ) / 2 - (2 * l + 1) / (2 * (2 * m + 1)) ≤ ε)
+    (hεhi : ε < (1 : ℝ) / 2 + (2 * l + 1) / (2 * (2 * m + 1)))
+    (a b : ℝ) (ha : a = (2 * k + 1) + (t + 2 * l) / (t + 2 * m)) (hb : b = 2 / a)
+    (n : ℕ) (hn : 1 ≤ n) :
+    su a b (1 / 2) ε m (2 * n) - 2 * su a b (1 / 2) ε m (2 * n - 2) = 0 ∨
+      su a b (1 / 2) ε m (2 * n) - 2 * su a b (1 / 2) ε m (2 * n - 2) = 1 := by
+  haveI : NeZero (2 : ℕ) := ⟨by norm_num⟩
+  rw [st06_thm33_digits t ht0 ht1 ht2 m l k hm hl0 hlm hk ε hεlo hεhi a b ha hb n hn,
+    realDigits_eq_digitStep 2 (t * (2 : ℝ) ^ (n - 1) / 2) (by positivity) 0]
+  simp only [pow_zero, mul_one]
+  obtain ⟨h0, h2⟩ := digitStep_mem 2 (by norm_num) (t * (2 : ℝ) ^ (n - 1) / 2)
+  omega
+
 /-- **St06 Theorem 3.3, conclusion (2)** — the Graham–Pollak difference of the *even*-index
 subsequence carries the extra `k`-term:  `su(2n+1) − 2·su(2n−1) = d_{n+1} + k·(2·dₙ − 1)`, where
 `dⱼ = ⌊t·2ʲ⌋ − 2⌊t·2ʲ/2⌋` is the `j`-th binary digit.  (Pure algebra from the even closed form.) -/
