@@ -21,17 +21,27 @@ Stoll eq (7)); mathlib supplies `Int.fract`, `irrational_sqrt_two`, `Real.digits
 
 - **Headline** — the Graham–Pollak √2 identity (`graham_pollak`), plus its restatement against
   mathlib's `Real.digits` and a concrete first-six-digits certificate.
-- **Stoll's Theorem 3.2** — binary-digit identities for the GP-style `(α, l)` pairs (general core +
-  the individual pairs). ⚠️ **Pair 5 (`t₅ = √2` itself) is proven only at `ε = ½`** — see
-  [`STOLL-PAIR5-ERRATUM.md`](STOLL-PAIR5-ERRATUM.md): the paper's full-interval claim for pair 5 is
-  *incorrect* (the digit identity fails at `n = 280` at the stated lower endpoint; validity collapses
-  to `ε = ½`), and its printed closed form has a typo. So pair 5's interval is deliberately **not**
-  claimed here.
+- **Stoll's Theorem 3.2** — binary-digit identities for the GP-style `(α, l)` pairs: the general core
+  plus all seven non-special pairs over their full ε-intervals. Pair 5 (`t₅ = √2` itself) is the special
+  case and is formalized at `ε = ½` (the Graham–Pollak case); the detailed analysis of pair 5 is in
+  [`NOTES-FOR-STOLL.md`](NOTES-FOR-STOLL.md).
 - **Stoll's Corollary 3.3** — the unconditional title result, digits of `759250125·√2`
   (`cor33_unconditional`).
 
-See [`STATUS.md`](STATUS.md) for the full theorem inventory + axiom ledger,
-[`PENDING_WORK.md`](PENDING_WORK.md) for the remaining optional polish (notably pair 6 over its full
-ε-interval, and the cosmetic `t_i` restatement), and
-[`STOLL-PAIR5-ERRATUM.md`](STOLL-PAIR5-ERRATUM.md) for two errors in the source paper's pair-5
-treatment (a typo + the over-wide interval claim) and why pair 5 is scoped to `ε = ½`.
+See [`STATUS.md`](STATUS.md) for the full theorem inventory + axiom ledger, and
+[`NOTES-FOR-STOLL.md`](NOTES-FOR-STOLL.md) for the detailed pair-5 analysis, with exact-arithmetic
+computations and reproduction scripts in [`tools/sandbox/`](tools/sandbox/).
+
+## Acknowledgments
+
+This formalization was carried out by Trevor Morris together with an AI assistant (Claude), which
+composed the Lean proofs and the accompanying analysis.
+
+Several supporting lemmas were proved with **Harmonic's Aristotle** auto-formalization system and then
+re-checked by the Lean kernel — no result is trusted on Aristotle's (or any tool's) say-so; the
+development is axiom-clean. The submitted problems are in [`tools/aristotle/`](tools/aristotle/) (see its
+README). Aristotle closed the pair-5 Diophantine lemmas (e.g. `sqrt2_badly_approximable`,
+`fract_two_mul`, `fract_sqrt2_pow_ne_half`, `pair5_band_branch`); the St05 Theorem 1.3 closed-form
+induction (`thm13_closed`) it could not close, and that was proved by hand.
+
+Built on [mathlib](https://github.com/leanprover-community/mathlib4).

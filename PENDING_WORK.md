@@ -1,8 +1,13 @@
 # PENDING_WORK — Erdős #482 / Stoll
 
-Headline (Graham–Pollak / √2) and **Theorem 3.2 for the 7 non-special pairs (full ε-intervals)** +
-**Corollary 3.3** are COMPLETE and axiom-clean — see STATUS.md. Verbatim `tᵢ`-form restatements and
-the disjoint-and-cover completeness theorem are done. Remaining work below.
+**⚠️ This file is now largely historical — see [`STATUS.md`](STATUS.md) for the authoritative state.**
+The project is **COMPLETE and axiom-clean** (zero `sorry`, zero custom axioms): the headline
+(Graham–Pollak / √2), **Theorem 3.2 for all 7 non-special pairs (full ε-intervals)** + **Corollary 3.3**,
+**and Stoll [St05] in full generality** (any `w>0`, any base `g≥2`: Thms 1.1, 1.2 I/II, 1.3, Cors
+1.1/1.2, Prop 2) are all done. The §0 / §1b tracks below were written **while St05 was in progress
+(2026-06-06)** and have **since been completed (2026-06-07)** — they're kept for the record. What
+genuinely remains is **not actionable as theorems** (the pair-5 full interval and an all-8-pairs master
+theorem are *not* theorems — §1, §2) plus optional cosmetic polish.
 
 ## 0. 🆕 NEXT TRACK — formalize Stoll [St05]: the REAL #482 resolution (any `w>0`, any base `g`)
 

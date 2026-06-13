@@ -1,7 +1,8 @@
 # Sources — Erdős #482
 
 Provenance + verbatim formalization targets for the papers behind this repo. **PDFs are gitignored**
-(`papers/**/*.pdf`) per the eventually-public-repo rule; only citations + math facts live here.
+(`papers/**/*.pdf`): this is a public repo and the source papers are copyrighted (not redistributable
+here), so only citations + math facts live in this file.
 
 ## The three Stoll papers (don't conflate them)
 
