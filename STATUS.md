@@ -16,6 +16,23 @@ its text is genuinely unobtainable (broken IMPAN SPA; not on arXiv/shadow libs) 
 critical path** (St05 *is* the resolution; St06 only adds sharper restatements + showcase constants).
 Nothing core remains open; what's left is optional showcase/polish.
 
+## 🎁 St06 fun-extension (branch `st06`) — Tier 1 DONE (2026-06-13)
+**Example 1.1 — the ternary digits of `e` via a negative-coefficient `π`/`e` recurrence** — is
+formalized and **axiom-clean** (`src/Erdos482/General/St06Example.lean`):
+- `su` — the St06 recurrence with general odd-offset `ε`, even-step shift `s`, start `m`
+  (St05's `gu` = the `s=1/(g−1)`, `m=1` case).
+- `st06_example11_ternary_e` / `_literal` — for `su (−3/(e+9)) (−(e+9)) π 1 3`, the Graham–Pollak
+  difference `su(2n)−3·su(2n−2)` is exactly the `n`-th base-3 digit of `e` (`Real.digits e 3 (n−2)`).
+  Proved via the joint closed-form induction `ex11_closed` (`su(2k)=3·3ᵏ+⌊e·3ᵏ/3⌋`,
+  `su(2k+1)=−(3ᵏ+1)`) — the negative-`a`,`b` analogue of `thm13_closed`.
+- `digit_of_evenClosed_coeff` — generalized digit extraction allowing ANY leading coefficient `c·gᵏ`
+  in the even closed form (St06's `m·gᵏ` vs St05's `gᵏ`); reusable for Tier 2.
+
+**Erratum found & recorded** (`notes/ST06-THM31-ERRATUM.md`): the `notes/ST06-PLAN.md` transcription of
+St06 Thm 3.1's ε-interval for subcone 𝒟₂⁻ has a spurious "+1" on the upper endpoint — the correct
+(numerically verified, ~1M points) interval is `1+γ₂⁻ ≤ ε < δ₂⁻` (not `< 1+δ₂⁻`). The general 𝒟₂⁻
+even→odd inequality core is verified and out to Aristotle (`tools/aristotle/st06_d2m_eo`, the Tier-2 crux).
+
 ## Where it stands
 The **headline** (Graham–Pollak: the GP sequence reads off the binary digits of √2) and the **bonus**
 (Stoll's Theorem 3.2 + Corollary 3.3) are complete and **axiom-clean** (every theorem's `#print axioms`
