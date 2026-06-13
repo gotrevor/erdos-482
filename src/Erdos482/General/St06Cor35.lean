@@ -1,4 +1,5 @@
 import Erdos482.General.St06Thm34
+import Erdos482.Induction
 import Mathlib.NumberTheory.Rayleigh
 
 /-!
@@ -68,5 +69,183 @@ theorem beatty_unique_sqrt2 (n : ℤ) (hn : 0 < n) :
   rcases Set.mem_symmDiff.mp hmem with ⟨h1, h2⟩ | ⟨h1, h2⟩
   · exact Or.inl ⟨h1, h2⟩
   · exact Or.inr ⟨h2, h1⟩
+
+/-! ## The Cor 3.5 digit engine — generalized Graham–Pollak (factor `r`)
+
+The Graham–Pollak recurrence `su √2 √2 ½ ½ m` (both steps `⌊√2·(·+½)⌋`) started at the Beatty value
+`m = ⌊r·(1+1/√2)⌋ = r + ⌊r√2/2⌋` (case 1) or `m = ⌊r·(1+√2)⌋ = r + ⌊r√2⌋` (case 2) reads off the
+binary digits of `r·√2`.  This is the classical `gp_pair` (the `r=1` case) generalized by a free
+factor `r ∈ ℕ`; the `s`-cancellation crux (`Erdos482.crux`) and the odd-step bound
+(`Erdos482.eq8_general`, at `ε=½`) are both universal, so inserting `r` is mechanical. -/
+
+/-- The Cor 3.5 recurrence step is the uniform Graham–Pollak step (both parities apply `⌊√2(·+½)⌋`). -/
+theorem su_gp_succ (m : ℤ) (n : ℕ) :
+    su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2) m (n + 1)
+      = ⌊Real.sqrt 2 * ((su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2) m n : ℝ) + 1 / 2)⌋ := by
+  rw [su_succ]; split <;> rfl
+
+/-- Base step (`su 0 → su 1`): from the Beatty start `m = r + ⌊√2 r/2⌋` the first step lands on
+`⌊√2·r⌋ + r`.  Reduces to `crux (√2·r)`. -/
+private lemma cor35_base (r : ℕ) :
+    ⌊Real.sqrt 2 * ((((r : ℤ) + ⌊Real.sqrt 2 * (r : ℝ) / 2⌋ : ℤ) : ℝ) + 1 / 2)⌋
+      = ⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ) := by
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  obtain ⟨cl, cu⟩ := crux (Real.sqrt 2 * (r : ℝ))
+  have key : Real.sqrt 2 * ((((r : ℤ) + ⌊Real.sqrt 2 * (r : ℝ) / 2⌋ : ℤ) : ℝ) + 1 / 2)
+      = (((⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ) : ℤ)) : ℝ)
+        + (Int.fract (Real.sqrt 2 * (r : ℝ))
+            - Real.sqrt 2 * Int.fract (Real.sqrt 2 * (r : ℝ) / 2) + Real.sqrt 2 / 2) := by
+    rw [← Int.self_sub_floor (Real.sqrt 2 * (r : ℝ)),
+        ← Int.self_sub_floor (Real.sqrt 2 * (r : ℝ) / 2)]
+    push_cast
+    linear_combination ((r : ℝ) / 2) * hs2
+  rw [key, Int.floor_intCast_add, Int.floor_eq_zero_iff.mpr ⟨cl, cu⟩, add_zero]
+
+/-- odd→even floor step (factor `r`): from `⌊√2·r·2^p⌋ + r·2^p` to `⌊√2·r·2^p⌋ + r·2^(p+1)`. -/
+private lemma cor35_floorA (r p : ℕ) :
+    ⌊Real.sqrt 2 * (((⌊Real.sqrt 2 * (r : ℝ) * 2 ^ p⌋ + (r : ℤ) * 2 ^ p : ℤ) : ℝ) + 1 / 2)⌋
+      = ⌊Real.sqrt 2 * (r : ℝ) * 2 ^ p⌋ + (r : ℤ) * 2 ^ (p + 1) := by
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  have hsnn : (0 : ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have hs1 : (1 : ℝ) ≤ Real.sqrt 2 := by nlinarith [hs2, hsnn]
+  have hs1' : (1 : ℝ) < Real.sqrt 2 := by nlinarith [hs2, hsnn]
+  obtain ⟨el, eu⟩ := eq8_general (ε := 1 / 2) (by linarith) (by linarith)
+    (Int.fract_nonneg (Real.sqrt 2 * (r : ℝ) * 2 ^ p))
+    (Int.fract_lt_one (Real.sqrt 2 * (r : ℝ) * 2 ^ p))
+  have key : Real.sqrt 2 * (((⌊Real.sqrt 2 * (r : ℝ) * 2 ^ p⌋ + (r : ℤ) * 2 ^ p : ℤ) : ℝ) + 1 / 2)
+      = ((⌊Real.sqrt 2 * (r : ℝ) * 2 ^ p⌋ + (r : ℤ) * 2 ^ (p + 1) : ℤ) : ℝ)
+        + (Int.fract (Real.sqrt 2 * (r : ℝ) * 2 ^ p) * (1 - Real.sqrt 2) + Real.sqrt 2 * (1 / 2)) := by
+    rw [← Int.self_sub_floor (Real.sqrt 2 * (r : ℝ) * 2 ^ p)]
+    push_cast
+    linear_combination ((r : ℝ) * 2 ^ p) * hs2
+  rw [key, Int.floor_intCast_add, Int.floor_eq_zero_iff.mpr ⟨el, eu⟩, add_zero]
+
+/-- even→odd floor step (factor `r`): from `⌊√2·r·2^p⌋ + r·2^(p+1)` to `⌊√2·r·2^(p+1)⌋ + r·2^(p+1)`. -/
+private lemma cor35_floorB (r p : ℕ) :
+    ⌊Real.sqrt 2 * (((⌊Real.sqrt 2 * (r : ℝ) * 2 ^ p⌋ + (r : ℤ) * 2 ^ (p + 1) : ℤ) : ℝ) + 1 / 2)⌋
+      = ⌊Real.sqrt 2 * (r : ℝ) * 2 ^ (p + 1)⌋ + (r : ℤ) * 2 ^ (p + 1) := by
+  have hs2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  obtain ⟨cl, cu⟩ := crux (Real.sqrt 2 * (r : ℝ) * 2 ^ (p + 1))
+  have hhalf : Real.sqrt 2 * (r : ℝ) * 2 ^ (p + 1) / 2 = Real.sqrt 2 * (r : ℝ) * 2 ^ p := by ring
+  rw [hhalf] at cl cu
+  have key : Real.sqrt 2 * (((⌊Real.sqrt 2 * (r : ℝ) * 2 ^ p⌋ + (r : ℤ) * 2 ^ (p + 1) : ℤ) : ℝ) + 1 / 2)
+      = ((⌊Real.sqrt 2 * (r : ℝ) * 2 ^ (p + 1)⌋ + (r : ℤ) * 2 ^ (p + 1) : ℤ) : ℝ)
+        + (Int.fract (Real.sqrt 2 * (r : ℝ) * 2 ^ (p + 1))
+            - Real.sqrt 2 * Int.fract (Real.sqrt 2 * (r : ℝ) * 2 ^ p) + Real.sqrt 2 / 2) := by
+    rw [← Int.self_sub_floor (Real.sqrt 2 * (r : ℝ) * 2 ^ (p + 1)),
+        ← Int.self_sub_floor (Real.sqrt 2 * (r : ℝ) * 2 ^ p)]
+    push_cast
+    linear_combination ((r : ℝ) * 2 ^ p) * hs2
+  rw [key, Int.floor_intCast_add, Int.floor_eq_zero_iff.mpr ⟨cl, cu⟩, add_zero]
+
+/-- **The Cor 3.5 engine, case 1** (`1+1/√2` Beatty branch).  Joint closed forms of the GP recurrence
+started at `m = r + ⌊√2 r/2⌋ = ⌊r(1+1/√2)⌋`, by induction. -/
+theorem cor35_pair (r j : ℕ) :
+    su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+        ((r : ℤ) + ⌊Real.sqrt 2 * (r : ℝ) / 2⌋) (2 * j + 1)
+        = ⌊Real.sqrt 2 * (r : ℝ) * 2 ^ j⌋ + (r : ℤ) * 2 ^ j ∧
+      su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+        ((r : ℤ) + ⌊Real.sqrt 2 * (r : ℝ) / 2⌋) (2 * j + 2)
+        = ⌊Real.sqrt 2 * (r : ℝ) * 2 ^ j⌋ + (r : ℤ) * 2 ^ (j + 1) := by
+  induction j with
+  | zero =>
+    have h1 : su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+        ((r : ℤ) + ⌊Real.sqrt 2 * (r : ℝ) / 2⌋) (0 + 1) = ⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ) := by
+      rw [su_gp_succ, su_zero]; exact cor35_base r
+    refine ⟨?_, ?_⟩
+    · simpa [pow_zero, mul_one] using h1
+    · have h2 : su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+          ((r : ℤ) + ⌊Real.sqrt 2 * (r : ℝ) / 2⌋) (0 + 1 + 1)
+          = ⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ) * 2 := by
+        rw [su_gp_succ, h1]
+        have := cor35_floorA r 0
+        simpa [pow_zero, mul_one, pow_one] using this
+      simpa [pow_zero, mul_one, pow_one] using h2
+  | succ j IH =>
+    obtain ⟨IH1, IH2⟩ := IH
+    have step1 : su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+        ((r : ℤ) + ⌊Real.sqrt 2 * (r : ℝ) / 2⌋) (2 * j + 2 + 1)
+        = ⌊Real.sqrt 2 * (r : ℝ) * 2 ^ (j + 1)⌋ + (r : ℤ) * 2 ^ (j + 1) := by
+      rw [su_gp_succ, IH2]; exact_mod_cast cor35_floorB r j
+    have step2 : su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+        ((r : ℤ) + ⌊Real.sqrt 2 * (r : ℝ) / 2⌋) (2 * j + 2 + 1 + 1)
+        = ⌊Real.sqrt 2 * (r : ℝ) * 2 ^ (j + 1)⌋ + (r : ℤ) * 2 ^ (j + 2) := by
+      rw [su_gp_succ, step1]; exact_mod_cast cor35_floorA r (j + 1)
+    refine ⟨?_, ?_⟩
+    · show su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+          ((r : ℤ) + ⌊Real.sqrt 2 * (r : ℝ) / 2⌋) (2 * (j + 1) + 1) = _
+      rw [show 2 * (j + 1) + 1 = 2 * j + 2 + 1 by ring]; exact step1
+    · show su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+          ((r : ℤ) + ⌊Real.sqrt 2 * (r : ℝ) / 2⌋) (2 * (j + 1) + 2) = _
+      rw [show 2 * (j + 1) + 2 = 2 * j + 2 + 1 + 1 by ring]; exact step2
+
+/-- **The Cor 3.5 engine, case 2** (`1+√2` Beatty branch).  Joint closed forms of the GP recurrence
+started at `m = r + ⌊√2 r⌋ = ⌊r(1+√2)⌋`.  (Base case is `cor35_floorA` at `p=0` — no separate crux
+base, since the start is already in `A`-form.) -/
+theorem cor35_pair_case2 (r j : ℕ) :
+    su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+        (⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ)) (2 * j)
+        = ⌊Real.sqrt 2 * (r : ℝ) * 2 ^ j⌋ + (r : ℤ) * 2 ^ j ∧
+      su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+        (⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ)) (2 * j + 1)
+        = ⌊Real.sqrt 2 * (r : ℝ) * 2 ^ j⌋ + (r : ℤ) * 2 ^ (j + 1) := by
+  induction j with
+  | zero =>
+    refine ⟨?_, ?_⟩
+    · show su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+          (⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ)) 0 = _
+      rw [su_zero]; simp [pow_zero, mul_one]
+    · show su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+          (⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ)) (0 + 1) = _
+      rw [su_gp_succ, su_zero]
+      have := cor35_floorA r 0
+      simpa [pow_zero, mul_one, pow_one] using this
+  | succ j IH =>
+    obtain ⟨IH1, IH2⟩ := IH
+    have step1 : su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+        (⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ)) (2 * j + 1 + 1)
+        = ⌊Real.sqrt 2 * (r : ℝ) * 2 ^ (j + 1)⌋ + (r : ℤ) * 2 ^ (j + 1) := by
+      rw [su_gp_succ, IH2]; exact_mod_cast cor35_floorB r j
+    have step2 : su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+        (⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ)) (2 * j + 1 + 1 + 1)
+        = ⌊Real.sqrt 2 * (r : ℝ) * 2 ^ (j + 1)⌋ + (r : ℤ) * 2 ^ (j + 2) := by
+      rw [su_gp_succ, step1]; exact_mod_cast cor35_floorA r (j + 1)
+    refine ⟨?_, ?_⟩
+    · show su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+          (⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ)) (2 * (j + 1)) = _
+      rw [show 2 * (j + 1) = 2 * j + 1 + 1 by ring]; exact step1
+    · show su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+          (⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ)) (2 * (j + 1) + 1) = _
+      rw [show 2 * (j + 1) + 1 = 2 * j + 1 + 1 + 1 by ring]; exact step2
+
+/-- Helper: `⌊√2·r·2^(j+1)⌋ − 2⌊√2·r·2^j⌋ = binDigit (r√2) (j+1)`, aligning the floor arguments. -/
+private lemma cor35_floorDiff (r j : ℕ) :
+    (⌊Real.sqrt 2 * (r : ℝ) * 2 ^ (j + 1)⌋ - 2 * ⌊Real.sqrt 2 * (r : ℝ) * 2 ^ j⌋ : ℤ)
+      = binDigit ((r : ℝ) * Real.sqrt 2) (j + 1) := by
+  have e1 : (⌊Real.sqrt 2 * (r : ℝ) * 2 ^ (j + 1)⌋ : ℤ) = ⌊(r : ℝ) * Real.sqrt 2 * 2 ^ (j + 1)⌋ := by
+    congr 1; ring
+  have e2 : (⌊Real.sqrt 2 * (r : ℝ) * 2 ^ j⌋ : ℤ) = ⌊(r : ℝ) * Real.sqrt 2 * 2 ^ ((j + 1) - 1)⌋ := by
+    rw [Nat.add_sub_cancel]; congr 1; ring
+  rw [binDigit, e1, e2]
+
+/-- **Cor 3.5 digit extraction, case 1.**  Started at the Beatty value `m = ⌊r(1+1/√2)⌋ = r+⌊√2 r/2⌋`,
+the Graham–Pollak recurrence reads off the binary digits of `r√2`. -/
+theorem cor35_digits_case1 (r j : ℕ) :
+    su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+        ((r : ℤ) + ⌊Real.sqrt 2 * (r : ℝ) / 2⌋) (2 * (j + 1) + 1)
+      - 2 * su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+        ((r : ℤ) + ⌊Real.sqrt 2 * (r : ℝ) / 2⌋) (2 * j + 1)
+      = binDigit ((r : ℝ) * Real.sqrt 2) (j + 1) := by
+  rw [(cor35_pair r (j + 1)).1, (cor35_pair r j).1, ← cor35_floorDiff]; ring
+
+/-- **Cor 3.5 digit extraction, case 2.**  Started at the Beatty value `m = ⌊r(1+√2)⌋ = r+⌊√2 r⌋`,
+the Graham–Pollak recurrence reads off the binary digits of `r√2`. -/
+theorem cor35_digits_case2 (r j : ℕ) :
+    su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+        (⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ)) (2 * (j + 1) + 1)
+      - 2 * su (Real.sqrt 2) (Real.sqrt 2) (1 / 2) (1 / 2)
+        (⌊Real.sqrt 2 * (r : ℝ)⌋ + (r : ℤ)) (2 * j + 1)
+      = binDigit ((r : ℝ) * Real.sqrt 2) (j + 1) := by
+  rw [(cor35_pair_case2 r (j + 1)).2, (cor35_pair_case2 r j).2, ← cor35_floorDiff]; ring
 
 end Erdos482.General
