@@ -105,4 +105,54 @@ theorem selfref_crux_solvable_iff (g : ℕ) (hg : 2 ≤ g) :
     rw [e1]
     exact ⟨by linarith [h.1], by linarith [h.2]⟩
 
+/-- **The offset is unique: `c = ½` is forced for `g = 2`.**  If `0 ≤ {x} − √2·{x/2} + c·√2 < 1`
+holds for **all** `x`, then `c = ½`.  Lower bound `c ≥ ½` from `x = 1`; upper bound `c ≤ ½` from the
+family `x = 1 − t` (`t ↓ 0`), whose upper crux gives `c·√2 < √2/2 + t·(1 − √2/2)` and hence `c ≤ ½`
+in the limit.  Together with `selfref_crux_solvable_iff`: Graham–Pollak's `⌊√2·(u + ½)⌋` is the unique
+self-referential base-`g` digit recurrence — both the base (`2`) and the offset (`½`) are forced. -/
+theorem selfref_crux_offset_unique (c : ℝ)
+    (hc : ∀ x : ℝ, 0 ≤ Int.fract x - Real.sqrt 2 * Int.fract (x / 2) + c * Real.sqrt 2 ∧
+        Int.fract x - Real.sqrt 2 * Int.fract (x / 2) + c * Real.sqrt 2 < 1) :
+    c = 1 / 2 := by
+  have hs2 : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
+  have hspos : 0 < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
+  have hs1 : (1 : ℝ) ≤ Real.sqrt 2 := by nlinarith [hs2, hspos]
+  have hs32 : Real.sqrt 2 ≤ 3 / 2 := by nlinarith [hs2, sq_nonneg (Real.sqrt 2 - 2)]
+  set s : ℝ := Real.sqrt 2 with hsdef
+  -- lower bound : x = 1
+  have hlo : 1 / 2 ≤ c := by
+    have h1 := hc 1
+    have hf1 : Int.fract (1 : ℝ) = 0 := by rw [show (1 : ℝ) = ((1 : ℕ) : ℝ) by norm_num,
+      Int.fract_natCast]
+    have hf2 : Int.fract ((1 : ℝ) / 2) = 1 / 2 := Int.fract_eq_self.mpr (by constructor <;> norm_num)
+    rw [hf1, hf2] at h1
+    nlinarith [h1.1, hspos]
+  -- upper bound : x = 1 − t, t ↓ 0
+  have hhi : c ≤ 1 / 2 := by
+    apply le_of_forall_pos_le_add
+    intro ε hε
+    set K : ℝ := (1 - s / 2) / s with hK
+    have hKpos : 0 < K := by rw [hK]; exact div_pos (by linarith) hspos
+    set t : ℝ := min (ε / K) (1 / 2) with ht
+    have htpos : 0 < t := lt_min (div_pos hε hKpos) (by norm_num)
+    have htle : t ≤ ε / K := min_le_left _ _
+    have ht12 : t ≤ 1 / 2 := min_le_right _ _
+    have hx := hc (1 - t)
+    have hf1 : Int.fract (1 - t) = 1 - t := Int.fract_eq_self.mpr ⟨by linarith, by linarith⟩
+    have hf2 : Int.fract ((1 - t) / 2) = (1 - t) / 2 :=
+      Int.fract_eq_self.mpr ⟨by linarith, by linarith⟩
+    rw [hf1, hf2] at hx
+    -- hx.2 : (1 − t) − s·((1−t)/2) + c·s < 1, i.e. c·s < s/2 + t·(1 − s/2)
+    have hcs : c * s < s / 2 + t * (1 - s / 2) := by nlinarith [hx.2]
+    -- t·(1 − s/2) ≤ ε·s   (from t ≤ ε/K and K = (1 − s/2)/s)
+    have htK : t * (1 - s / 2) ≤ ε * s := by
+      have h1 : t * (1 - s / 2) ≤ (ε / K) * (1 - s / 2) :=
+        mul_le_mul_of_nonneg_right htle (by linarith)
+      have h1s : (1 : ℝ) - s / 2 ≠ 0 := by linarith
+      have h2 : (ε / K) * (1 - s / 2) = ε * s := by
+        rw [hK, div_div_eq_mul_div, div_mul_cancel₀ _ h1s]
+      linarith [h1, h2.le, h2.ge]
+    nlinarith [hcs, htK, hspos]
+  linarith [hlo, hhi]
+
 end Erdos482.General
