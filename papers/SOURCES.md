@@ -9,7 +9,7 @@ Provenance + verbatim formalization targets for the papers behind this repo. **P
 |---|---|---|---|
 | `0902.4168` | *A fancy way to obtain the binary digits of 759250125√2* | arXiv, 2009 | the α√2 trick (Thm 3.2 / Cor 3.3) — **already formalized** (see `src/Erdos482/Stoll.lean`). ⚠️ has errors: see `STOLL-PAIR5-ERRATUM.md`. |
 | **[St05]** | *On families of nonlinear recurrences related to digits* | J. Integer Seq. **8** (2005), Art. 05.3.2 (8pp) | **the general resolution** — any real `w>0`, any base `g≥2`. PDF: `papers/St05-stoll-JIS2005.pdf` (open-access, [JIS](https://cs.uwaterloo.ca/journals/JIS/VOL8/Stoll/stoll56.pdf)). |
-| **[St06]** | *On a problem of Erdős and Graham concerning digits* | Acta Arith. **125** (2006), 89–100 | deeper/sharper treatment. DOI [10.4064/aa125-1-8](https://doi.org/10.4064/aa125-1-8). **NOT yet obtained** (IMPAN outage 2026-06-06); likely not on the critical path — St05 alone answers Erdős–Graham. |
+| **[St06]** | *On a problem of Erdős and Graham concerning digits* (**solo Thomas Stoll**, Wien) | Acta Arith. **125.1** (2006), 89–100 | deeper/sharper treatment. DOI [10.4064/aa125-1-8](https://doi.org/10.4064/aa125-1-8). **OBTAINED 2026-06-13** — PDF sent directly by Thomas Stoll (email reply). PDF: `papers/St06-stoll-ActaArith2006.pdf` (gitignored, copyrighted Acta Arith./IMPAN — do NOT commit). Stoll notes this *"should be the only one mentioned"* on Bloom's #482 page. |
 
 The erdosproblems.com #482 page marks the problem **SOLVED** on the strength of [St05]+[St06].
 Erdős–Graham [ErGr80, p.96] asked for "similar results for √m and other algebraic numbers" but said
