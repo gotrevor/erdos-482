@@ -18,8 +18,14 @@ sub-subcones `𝒟₁..₆ × {+,−}` via the cone-agnostic master `st06_thm31_
 
 **Remaining (Tier 3 — the binary families + capstone, all NOT covered by Thm 3.1):**
 - **Thm 3.3** (binary `g=2`): `u₁=m`, `a=2k+1+(t+2l)/(t+2m)`, `b=2/a`, `½−(2l+1)/(2(2m+1)) ≤ ε <
-  ½+(…)`; conclusion `u_{2n+1}−2u_{2n−1}=dₙ` AND `u_{2n+2}−2u_{2n}=d_{n+1}+k(2dₙ−1)`.  `√2,(1,0,0),ε=½`
-  → Graham–Pollak.  (Note: this repo's base-2 `Erdos482.Stoll` already has the √2 special case.)
+  ½+(2l+1)/(2(2m+1))` (interval **independent of k**); conclusion `u_{2n+1}−2u_{2n−1}=dₙ` AND
+  `u_{2n+2}−2u_{2n}=d_{n+1}+k(2dₙ−1)`.  `√2,(1,0,0),ε=½` → Graham–Pollak.  **NUMERICALLY VERIFIED**
+  (`tools/sandbox/st06_thm33_verify.py`, both conclusions, many params, both ε-endpoints) — KEY: `dₙ`
+  is indexed with **`d₁` = the integer digit** (`dₙ = ⌊t·2^{n−1}⌋ − 2⌊t·2^{n−2}⌋`), same convention as
+  `Cor13e.lean`.  (This repo's base-2 `Erdos482.Stoll` already has the √2 special case.)  Formalization
+  plan: the closed forms are `u_{2n+1} = m·2ⁿ + ⌊t·2^{n−1}⌋` (the `digit_of_evenClosed_coeff` machinery
+  in `St06Example.lean` already reads off conclusion (1)); conclusion (2) needs the even-index closed
+  form `u_{2n} = …` (carry term with `k`).  Engine = a binary analogue of `st06_thm31_closed_core`.
 - **Thm 3.4** (the other binary family): `a=2k+1+2l/(t+2m)`, k-dependent ε-bounds.
 - **Cor 3.5** (Beatty unification): needs mathlib `Beatty`/`Nat.beattySeq` (confirm availability at
   v4.29.1).  Numerically verify every formula first (extend `tools/sandbox/st06_*.py`).
