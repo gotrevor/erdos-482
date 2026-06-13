@@ -4,6 +4,7 @@ import Erdos482.General.St06Example
 import Erdos482.General.St06Thm31
 import Erdos482.General.St06Thm33
 import Erdos482.General.St06Thm34
+import Erdos482.General.St06Cor35
 
 /-!
 # Erdős–Graham #482 — the general resolution (any `w > 0`, any base `g ≥ 2`)
