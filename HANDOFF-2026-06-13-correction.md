@@ -41,12 +41,13 @@ proved the self-referential digit phenomenon is **exactly** the √2/base-2 mira
   This explains the cubic wall structurally: even quadratic `√g` already dies for `g≥3` (digit range
   too wide); the cubic `2^{1/3}` 3-step map is a separate, still-open failure (3 floors can't align).
 
-## 🤖 Aristotle
-- `thm34astep` (`d9a743f9`) — **COMPLETE**, independently re-proved `st06_thm34_astep_eps`,
-  axiom-clean. Cross-validates this lap's central a-step crux.
-- `selfrefwall` (`8c772507`) — **was RUNNING at handoff** cross-validating
-  `selfref_crux_fails_of_three_le`. Next lap: `aristotle show 8c772507`; if COMPLETE, it's confirmatory
-  (already proven locally + axiom-clean). Then submit the next bounded lemma to keep one in flight.
+## 🤖 Aristotle (both central theorems independently cross-validated, axiom-clean)
+- `thm34astep` (`d9a743f9`) — **COMPLETE**, independently re-proved `st06_thm34_astep_eps`. ✅
+- `selfrefwall` (`8c772507`) — **COMPLETE**, independently re-proved `selfref_crux_fails_of_three_le`
+  via the same two-witness strategy. ✅
+- `selfrefunique` (`121e5a16`) — **RUNNING at handoff**, cross-validating `selfref_crux_offset_unique`
+  (the last unchecked new theorem). Next lap: `aristotle show 121e5a16` (confirmatory only — proven
+  locally + axiom-clean), then submit the next bounded lemma to keep one in flight.
 
 ## 🎬 Next actions
 1. Poll/verify `selfrefwall` Aristotle job (confirmatory only).
