@@ -91,11 +91,13 @@ proven), exactly as pair 5 was resolved. What's left is optional polish (top-lev
 curiosity of whether Stoll's printed Thm 3.4 interval is a per-w claim — see `ON-LINE-REQUEST.md`).
 
 ## What's happened (newest first)
-- **2026-06-13 (review lap — Cor 3.5 capstone + Thm 3.4 obstruction)**: Two St06 closures. (1) **Thm 3.4
-  full interval RESOLVED** (like pair 5): `st06_thm34_bstep_value` + `_bstep_band` (exact general-ε
-  b-step + lands-iff-band) + `_band_fails_below/above_half` (machine-checked Diophantine obstruction —
-  no ε≠½ is t-universal). (2) Engine cross-validated on Aristotle (`cor35engine`: independently proved
-  `cor35_pair` from `crux` alone). All axiom-clean.
+- **2026-06-13 (review lap — Cor 3.5 capstone + Thm 3.4 obstruction)**: Two St06 closures + polish. (1)
+  **Thm 3.4 full interval RESOLVED** (like pair 5): `st06_thm34_bstep_value` + `_bstep_band` (exact
+  general-ε b-step + lands-iff-band) + `_band_fails_below/above_half` (machine-checked Diophantine
+  obstruction — no ε≠½ is t-universal). (2) Polish: `isBit` corollaries for Thm 3.3/3.4 (GP diff ∈{0,1}),
+  faithfulness certs `st06_cor35_recovers_gp` (r=1→√2) + `binDigit_three_sqrt2_first_four` (r=3→3√2).
+  (3) Cubic exploration `notes/CUBIC-EXPLORATION.md` (negative: the trick doesn't extend to 2^{1/3}).
+  All axiom-clean; 4 Aristotle cross-validations (engine/bstep_value/bstep_band confirmed from `crux`).
 - **2026-06-13 (review lap — Cor 3.5 capstone)**: Closed **St06 Corollary 3.5** entirely, **without the
   PDF**. Reverse-engineered the exact statement numerically (`tools/sandbox/st06_cor35_*.py`): the GP
   recurrence from start `m` tracks `w(m)=r·α` (the Beatty real, `α∈{1+√2,1+1/√2}`, `m=⌊rα⌋`), reading
