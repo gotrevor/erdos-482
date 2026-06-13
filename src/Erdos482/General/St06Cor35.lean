@@ -341,4 +341,37 @@ theorem st06_cor35_recovers_gp (j : ℕ) :
   rw [hfl] at this
   simpa using this
 
+/-- **Faithfulness certificate (a non-trivial number).**  The binary expansion of `3√2 = 4.2426… =
+100.00111…₂` begins (after the radix point) `0, 0, 1, 1` — and by Cor 3.5 (`cor35_digits_case1` at
+`r = 3`, Beatty start `n = ⌊3(1+1/√2)⌋ = 5`) these are exactly the first four Graham–Pollak differences
+of the recurrence started at `5`.  Unlike `r = 1, 2` (which reproduce `√2`'s digits, possibly shifted),
+`3√2`'s expansion is genuinely new — anchoring the abstract `r√2` family to a concrete witness. -/
+theorem binDigit_three_sqrt2_first_four :
+    binDigit ((3 : ℝ) * Real.sqrt 2) 1 = 0 ∧ binDigit ((3 : ℝ) * Real.sqrt 2) 2 = 0 ∧
+      binDigit ((3 : ℝ) * Real.sqrt 2) 3 = 1 ∧ binDigit ((3 : ℝ) * Real.sqrt 2) 4 = 1 := by
+  have hs2 : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
+  have hsnn : (0 : ℝ) ≤ Real.sqrt 2 := Real.sqrt_nonneg 2
+  have lo : (1.41421 : ℝ) < Real.sqrt 2 := by nlinarith [hs2, hsnn]
+  have hi : Real.sqrt 2 < 1.41422 := by nlinarith [hs2, hsnn]
+  have g0 : ⌊(3 : ℝ) * Real.sqrt 2 * 2 ^ 0⌋ = 4 := by
+    have h : (3 : ℝ) * Real.sqrt 2 * 2 ^ 0 = 3 * Real.sqrt 2 := by ring
+    rw [h, Int.floor_eq_iff]; exact ⟨by push_cast; nlinarith [lo], by push_cast; nlinarith [hi]⟩
+  have g1 : ⌊(3 : ℝ) * Real.sqrt 2 * 2 ^ 1⌋ = 8 := by
+    have h : (3 : ℝ) * Real.sqrt 2 * 2 ^ 1 = 6 * Real.sqrt 2 := by ring
+    rw [h, Int.floor_eq_iff]; exact ⟨by push_cast; nlinarith [lo], by push_cast; nlinarith [hi]⟩
+  have g2 : ⌊(3 : ℝ) * Real.sqrt 2 * 2 ^ 2⌋ = 16 := by
+    have h : (3 : ℝ) * Real.sqrt 2 * 2 ^ 2 = 12 * Real.sqrt 2 := by ring
+    rw [h, Int.floor_eq_iff]; exact ⟨by push_cast; nlinarith [lo], by push_cast; nlinarith [hi]⟩
+  have g3 : ⌊(3 : ℝ) * Real.sqrt 2 * 2 ^ 3⌋ = 33 := by
+    have h : (3 : ℝ) * Real.sqrt 2 * 2 ^ 3 = 24 * Real.sqrt 2 := by ring
+    rw [h, Int.floor_eq_iff]; exact ⟨by push_cast; nlinarith [lo], by push_cast; nlinarith [hi]⟩
+  have g4 : ⌊(3 : ℝ) * Real.sqrt 2 * 2 ^ 4⌋ = 67 := by
+    have h : (3 : ℝ) * Real.sqrt 2 * 2 ^ 4 = 48 * Real.sqrt 2 := by ring
+    rw [h, Int.floor_eq_iff]; exact ⟨by push_cast; nlinarith [lo], by push_cast; nlinarith [hi]⟩
+  refine ⟨?_, ?_, ?_, ?_⟩ <;> simp only [binDigit]
+  · rw [show (1 : ℕ) - 1 = 0 from rfl, g1, g0]; norm_num
+  · rw [show (2 : ℕ) - 1 = 1 from rfl, g2, g1]; norm_num
+  · rw [show (3 : ℕ) - 1 = 2 from rfl, g3, g2]; norm_num
+  · rw [show (4 : ℕ) - 1 = 3 from rfl, g4, g3]; norm_num
+
 end Erdos482.General
