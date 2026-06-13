@@ -44,16 +44,18 @@ The **full `𝒜₂` cone (both signs of `k`)** of St06 Thm 3.1 is formalized an
   `su(2j)=m·gʲ+⌊t·gʲ/g⌋`, `(g−1)·su(2j+1)=l(k·gʲ−1)`, and the GP-difference digit extraction, for
   ALL `(g≥3, m≥1, 0<l≤g−1, k≷0)` with `(g−1)∣(k−1)l`.
 - `st06_example11_from_thm31` — Example 1.1 recovered as the `𝒟₂⁻` instance `(3,3,2,−1)`, `t=e`, `ε=π`.
-- `d1m_core` / `st06_thm31_d1m_digits` — subcone **`𝒟₁⁻`** (`l < 0`), proving the master handles the
-  negative-`l` cone end-to-end.
+- **ALL of `Ω₁` (the `m≥1` half) is now done**: cores `d1m/d1p/d2m/d2p/d3m/d3p_core` and digit theorems
+  `st06_thm31_{d1m,d1p,d2m,d2p,d3m,d3p}_digits` — i.e. subcones **𝒟₁±, 𝒟₂±, 𝒟₃±** (l<0, 0<l≤g−1,
+  l>g−1; both signs of k). **6 of the 12 sub-subcones** of Thm 3.1, all axiom-clean.
 
 **Comprehensive erratum** (`notes/ST06-THM31-ERRATUM.md`): the correct Thm 3.1 offset condition is
 `1 + γᵢ^s ≤ ε < δᵢ^s` — the "+1" the plan added belongs ONLY on the lower endpoint — **verified for all
 12 sub-subcones** (0 failures / ~250k points, incl. the `Ω₂`, `m≤−2` cones).
 
-**Remaining St06:** subcones `𝒟₁⁺, 𝒟₃±` (`Ω₁`) and `𝒟₄₋₆±` (`Ω₂`, `m≤−2`, need a P<0 polynomial
-variant) — each is one `*_core` interval lemma over the shared master (`PENDING_WORK.md §0′` has the
-verified endpoint table). Then Thms 3.3/3.4 (binary `g=2`), Cor 3.5 (Beatty).
+**Remaining St06:** the `Ω₂` half — subcones `𝒟₄₋₆±` (`m≤−2`, where `t+mg < 0`, so the `÷(g−1)(t+mg)`
+step flips; needs a P<0 polynomial variant of the `*_core` shape) — each one `*_core` lemma over the
+shared master (`PENDING_WORK.md §0′` + erratum `γ,δ` table give verified endpoints). Then Thms 3.3/3.4
+(binary `g=2`), Cor 3.5 (Beatty).
 
 ## Where it stands
 The **headline** (Graham–Pollak: the GP sequence reads off the binary digits of √2) and the **bonus**

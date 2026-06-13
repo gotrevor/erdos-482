@@ -420,4 +420,214 @@ theorem st06_thm31_d1m_digits (g : ℕ) [NeZero g] (hg : 3 ≤ g) (t : ℝ) (ht0
     hdvd a b ε ha hb (fun f hf0 hf1 => d1m_core g hg t ht1 ht2 m l k hm hl hk a ε ha hε_lo hε_hi f hf0 hf1)).1
   exact digit_of_evenClosed_coeff g (by omega) t ht0 m _ hclosed n hn
 
+/-! ## Subcone `𝒟₃` (cone `𝒜₃`: `l > g−1`) -/
+
+/-- **Even→odd inequality core (`𝒟₃⁻`, `k < 0`, `l > g−1`).**  `kl < 0` so `a < 0`.  Corrected `𝒟₃⁻`
+ε-interval `1 + (g−l−1)(m+1)/(kl) ≤ ε < −(mg+1)/(kg)`.  The upper-bound algebra uses `(g−1−l)(g−t) < 0`
+(here `g−1−l < 0` since `l > g−1`). -/
+theorem d3m_core (g : ℕ) (hg : 3 ≤ g) (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (m l k : ℤ) (hm : 1 ≤ m) (hl : (g : ℤ) - 1 < l) (hk : k < 0)
+    (a ε : ℝ)
+    (ha : a = ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))))
+    (hε_lo : 1 + ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) + 1) / ((k : ℝ) * (l : ℝ)) ≤ ε)
+    (hε_hi : ε < -((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (g : ℝ)))
+    (f : ℝ) (hf0 : 0 ≤ f) (hf1 : f < 1) :
+    0 ≤ (l : ℝ) / ((g : ℝ) - 1) + a * (ε - f) ∧
+      (l : ℝ) / ((g : ℝ) - 1) + a * (ε - f) < 1 := by
+  have hgR : (3 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+  have hg1 : (0 : ℝ) < (g : ℝ) - 1 := by linarith
+  have hmR : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+  have hlR : (g : ℝ) - 1 < (l : ℝ) := by
+    have : (((g : ℤ) - 1 : ℤ) : ℝ) < ((l : ℤ) : ℝ) := by exact_mod_cast hl
+    push_cast at this; linarith
+  have hl0 : (0 : ℝ) < (l : ℝ) := by linarith
+  have hkR : (k : ℝ) < 0 := by exact_mod_cast hk
+  have hgpos : (0 : ℝ) < (g : ℝ) := by linarith
+  have hP : (0 : ℝ) < t + (m : ℝ) * (g : ℝ) := by nlinarith
+  have hkg : (k : ℝ) * (g : ℝ) < 0 := by nlinarith
+  have hkl : (k : ℝ) * (l : ℝ) < 0 := mul_neg_of_neg_of_pos hkR hl0
+  have hklg : (k : ℝ) * (l : ℝ) * (g : ℝ) < 0 := by nlinarith
+  -- clear the divisions in the ε-bounds
+  have hHi : -((m : ℝ) * (g : ℝ) + 1) < ε * ((k : ℝ) * (g : ℝ)) := by
+    rw [lt_div_iff_of_neg hkg] at hε_hi; exact hε_hi
+  have hLo : (ε - 1) * ((k : ℝ) * (l : ℝ)) ≤ ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) + 1) := by
+    have hX : ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) + 1) / ((k : ℝ) * (l : ℝ)) ≤ ε - 1 := by linarith
+    rwa [div_le_iff_of_neg hkl] at hX
+  subst ha
+  set P : ℝ := t + (m : ℝ) * (g : ℝ) with hPdef
+  have hden : (0 : ℝ) < ((g : ℝ) - 1) * P := mul_pos hg1 hP
+  have hlowpoly : 0 ≤ (l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f) := by
+    nlinarith [mul_lt_mul_of_pos_left hHi hl0, mul_nonneg (le_of_lt (neg_pos.mpr hklg)) hf0,
+      mul_pos hl0 hP, ht1, hl0]
+  have hhighpoly : (l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f) < ((g : ℝ) - 1) * P := by
+    nlinarith [mul_le_mul_of_nonneg_left hLo (le_of_lt hgpos), mul_neg_of_neg_of_pos hklg (show (0 : ℝ) < 1 - f by linarith),
+      mul_pos (show (0 : ℝ) < (l : ℝ) - ((g : ℝ) - 1) by linarith) (show (0 : ℝ) < (g : ℝ) - t by linarith), hP]
+  have hfrac : (l : ℝ) / ((g : ℝ) - 1)
+      + ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * P) * (ε - f)
+      = ((l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f)) / (((g : ℝ) - 1) * P) := by
+    field_simp
+  rw [hfrac]
+  exact ⟨div_nonneg hlowpoly (le_of_lt hden), (div_lt_one hden).mpr hhighpoly⟩
+
+/-- **St06 Theorem 3.1 — digit extraction, subcone `𝒟₃⁻`** (`k<0`, `l>g−1`).  Master + `d3m_core`. -/
+theorem st06_thm31_d3m_digits (g : ℕ) [NeZero g] (hg : 3 ≤ g) (t : ℝ) (ht0 : 0 ≤ t)
+    (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (m l k : ℤ) (hm : 1 ≤ m) (hl : (g : ℤ) - 1 < l) (hk : k < 0)
+    (hdvd : ((g : ℤ) - 1) ∣ (k - 1) * l)
+    (a b ε : ℝ)
+    (ha : a = ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))))
+    (hb : b = (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))) / ((k : ℝ) * (l : ℝ)))
+    (hε_lo : 1 + ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) + 1) / ((k : ℝ) * (l : ℝ)) ≤ ε)
+    (hε_hi : ε < -((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (g : ℝ)))
+    (n : ℕ) (hn : 1 ≤ n) :
+    su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * n)
+        - g * su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * n - 2)
+      = ((Real.digits (t * (g : ℝ) ^ (n - 1) / g) g 0 : ℕ) : ℤ) := by
+  have hl0 : 0 < l := by
+    have hgz : (3 : ℤ) ≤ (g : ℤ) := by exact_mod_cast hg
+    omega
+  have hPne : t + (m : ℝ) * (g : ℝ) ≠ 0 := by
+    have hm1 : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+    have hg3 : (3 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+    positivity
+  have hclosed := (st06_thm31_closed_core g (by omega) t ht1 ht2 m l k (ne_of_gt hl0) (ne_of_lt hk) hPne
+    hdvd a b ε ha hb (fun f hf0 hf1 => d3m_core g hg t ht1 ht2 m l k hm hl hk a ε ha hε_lo hε_hi f hf0 hf1)).1
+  exact digit_of_evenClosed_coeff g (by omega) t ht0 m _ hclosed n hn
+
+/-- **Even→odd inequality core (`𝒟₃⁺`, `k > 0`, `l > g−1`).**  `kl > 0` so `a > 0`.  Corrected `𝒟₃⁺`
+ε-interval `1 − (mg+1)/(kg) ≤ ε < (g−l−1)(m+1)/(kl)`. -/
+theorem d3p_core (g : ℕ) (hg : 3 ≤ g) (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (m l k : ℤ) (hm : 1 ≤ m) (hl : (g : ℤ) - 1 < l) (hk : 0 < k)
+    (a ε : ℝ)
+    (ha : a = ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))))
+    (hε_lo : 1 - ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (g : ℝ)) ≤ ε)
+    (hε_hi : ε < ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) + 1) / ((k : ℝ) * (l : ℝ)))
+    (f : ℝ) (hf0 : 0 ≤ f) (hf1 : f < 1) :
+    0 ≤ (l : ℝ) / ((g : ℝ) - 1) + a * (ε - f) ∧
+      (l : ℝ) / ((g : ℝ) - 1) + a * (ε - f) < 1 := by
+  have hgR : (3 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+  have hg1 : (0 : ℝ) < (g : ℝ) - 1 := by linarith
+  have hmR : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+  have hlR : (g : ℝ) - 1 < (l : ℝ) := by
+    have : (((g : ℤ) - 1 : ℤ) : ℝ) < ((l : ℤ) : ℝ) := by exact_mod_cast hl
+    push_cast at this; linarith
+  have hl0 : (0 : ℝ) < (l : ℝ) := by linarith
+  have hkR : (0 : ℝ) < (k : ℝ) := by exact_mod_cast hk
+  have hgpos : (0 : ℝ) < (g : ℝ) := by linarith
+  have hP : (0 : ℝ) < t + (m : ℝ) * (g : ℝ) := by nlinarith
+  have hkg : (0 : ℝ) < (k : ℝ) * (g : ℝ) := by positivity
+  have hkl : (0 : ℝ) < (k : ℝ) * (l : ℝ) := by positivity
+  have hklg : (0 : ℝ) < (k : ℝ) * (l : ℝ) * (g : ℝ) := by positivity
+  have hLo : -((m : ℝ) * (g : ℝ) + 1) ≤ (ε - 1) * ((k : ℝ) * (g : ℝ)) := by
+    have hX : -((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (g : ℝ)) ≤ ε - 1 := by rw [neg_div]; linarith
+    rwa [div_le_iff₀ hkg] at hX
+  have hHi : ε * ((k : ℝ) * (l : ℝ)) < ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) + 1) := by
+    rw [lt_div_iff₀ hkl] at hε_hi; exact hε_hi
+  subst ha
+  set P : ℝ := t + (m : ℝ) * (g : ℝ) with hPdef
+  have hden : (0 : ℝ) < ((g : ℝ) - 1) * P := mul_pos hg1 hP
+  have hlowpoly : 0 ≤ (l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f) := by
+    nlinarith [mul_le_mul_of_nonneg_left hLo (le_of_lt hl0), mul_pos hklg (show (0 : ℝ) < 1 - f by linarith),
+      mul_pos hl0 hP, ht1, hl0]
+  have hhighpoly : (l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f) < ((g : ℝ) - 1) * P := by
+    nlinarith [mul_lt_mul_of_pos_left hHi hgpos, mul_nonneg (le_of_lt hklg) hf0,
+      mul_pos (show (0 : ℝ) < (l : ℝ) - ((g : ℝ) - 1) by linarith) (show (0 : ℝ) < (g : ℝ) - t by linarith), hP]
+  have hfrac : (l : ℝ) / ((g : ℝ) - 1)
+      + ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * P) * (ε - f)
+      = ((l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f)) / (((g : ℝ) - 1) * P) := by
+    field_simp
+  rw [hfrac]
+  exact ⟨div_nonneg hlowpoly (le_of_lt hden), (div_lt_one hden).mpr hhighpoly⟩
+
+/-- **St06 Theorem 3.1 — digit extraction, subcone `𝒟₃⁺`** (`k>0`, `l>g−1`).  Master + `d3p_core`. -/
+theorem st06_thm31_d3p_digits (g : ℕ) [NeZero g] (hg : 3 ≤ g) (t : ℝ) (ht0 : 0 ≤ t)
+    (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (m l k : ℤ) (hm : 1 ≤ m) (hl : (g : ℤ) - 1 < l) (hk : 0 < k)
+    (hdvd : ((g : ℤ) - 1) ∣ (k - 1) * l)
+    (a b ε : ℝ)
+    (ha : a = ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))))
+    (hb : b = (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))) / ((k : ℝ) * (l : ℝ)))
+    (hε_lo : 1 - ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (g : ℝ)) ≤ ε)
+    (hε_hi : ε < ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) + 1) / ((k : ℝ) * (l : ℝ)))
+    (n : ℕ) (hn : 1 ≤ n) :
+    su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * n)
+        - g * su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * n - 2)
+      = ((Real.digits (t * (g : ℝ) ^ (n - 1) / g) g 0 : ℕ) : ℤ) := by
+  have hl0 : 0 < l := by
+    have hgz : (3 : ℤ) ≤ (g : ℤ) := by exact_mod_cast hg
+    omega
+  have hPne : t + (m : ℝ) * (g : ℝ) ≠ 0 := by
+    have hm1 : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+    have hg3 : (3 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+    positivity
+  have hclosed := (st06_thm31_closed_core g (by omega) t ht1 ht2 m l k (ne_of_gt hl0) (ne_of_gt hk) hPne
+    hdvd a b ε ha hb (fun f hf0 hf1 => d3p_core g hg t ht1 ht2 m l k hm hl hk a ε ha hε_lo hε_hi f hf0 hf1)).1
+  exact digit_of_evenClosed_coeff g (by omega) t ht0 m _ hclosed n hn
+
+/-- **Even→odd inequality core (`𝒟₁⁺`, `k > 0`, `l < 0`).**  `kl < 0` so `a < 0`.  Corrected `𝒟₁⁺`
+ε-interval `1 + (g−l−1)(mg+1)/(klg) ≤ ε < −(m+1)/k`.  Completes the `𝒜₁` (and hence `Ω₁`) cones. -/
+theorem d1p_core (g : ℕ) (hg : 3 ≤ g) (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (m l k : ℤ) (hm : 1 ≤ m) (hl : l < 0) (hk : 0 < k)
+    (a ε : ℝ)
+    (ha : a = ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))))
+    (hε_lo : 1 + ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (l : ℝ) * (g : ℝ)) ≤ ε)
+    (hε_hi : ε < -((m : ℝ) + 1) / (k : ℝ))
+    (f : ℝ) (hf0 : 0 ≤ f) (hf1 : f < 1) :
+    0 ≤ (l : ℝ) / ((g : ℝ) - 1) + a * (ε - f) ∧
+      (l : ℝ) / ((g : ℝ) - 1) + a * (ε - f) < 1 := by
+  have hgR : (3 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+  have hg1 : (0 : ℝ) < (g : ℝ) - 1 := by linarith
+  have hmR : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+  have hlR : (l : ℝ) < 0 := by exact_mod_cast hl
+  have hkR : (0 : ℝ) < (k : ℝ) := by exact_mod_cast hk
+  have hgpos : (0 : ℝ) < (g : ℝ) := by linarith
+  have hP : (0 : ℝ) < t + (m : ℝ) * (g : ℝ) := by nlinarith
+  have hlg_neg : (l : ℝ) * (g : ℝ) < 0 := mul_neg_of_neg_of_pos hlR hgpos
+  have hklg : (k : ℝ) * (l : ℝ) * (g : ℝ) < 0 := by
+    have : (k : ℝ) * (l : ℝ) < 0 := mul_neg_of_pos_of_neg hkR hlR
+    nlinarith
+  have hHi : ε * (k : ℝ) < -((m : ℝ) + 1) := by
+    rw [lt_div_iff₀ hkR] at hε_hi; exact hε_hi
+  have hLo : (ε - 1) * ((k : ℝ) * (l : ℝ) * (g : ℝ)) ≤ ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) * (g : ℝ) + 1) := by
+    have hX : ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (l : ℝ) * (g : ℝ)) ≤ ε - 1 := by
+      linarith
+    rwa [div_le_iff_of_neg hklg] at hX
+  subst ha
+  set P : ℝ := t + (m : ℝ) * (g : ℝ) with hPdef
+  have hden : (0 : ℝ) < ((g : ℝ) - 1) * P := mul_pos hg1 hP
+  have hlowpoly : 0 ≤ (l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f) := by
+    nlinarith [mul_lt_mul_of_neg_right hHi hlg_neg, mul_nonneg (le_of_lt (neg_pos.mpr hklg)) hf0,
+      mul_pos (neg_pos.mpr hlR) (show (0 : ℝ) < (g : ℝ) - t by linarith), hP, hmR]
+  have hhighpoly : (l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f) < ((g : ℝ) - 1) * P := by
+    nlinarith [hLo, mul_neg_of_neg_of_pos hklg (show (0 : ℝ) < 1 - f by linarith),
+      mul_nonneg (show (0 : ℝ) ≤ (g : ℝ) - 1 - (l : ℝ) by linarith) (show (0 : ℝ) ≤ t - 1 by linarith), hP]
+  have hfrac : (l : ℝ) / ((g : ℝ) - 1)
+      + ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * P) * (ε - f)
+      = ((l : ℝ) * P + ((k : ℝ) * (l : ℝ) * (g : ℝ)) * (ε - f)) / (((g : ℝ) - 1) * P) := by
+    field_simp
+  rw [hfrac]
+  exact ⟨div_nonneg hlowpoly (le_of_lt hden), (div_lt_one hden).mpr hhighpoly⟩
+
+/-- **St06 Theorem 3.1 — digit extraction, subcone `𝒟₁⁺`** (`k>0`, `l<0`).  Master + `d1p_core`. -/
+theorem st06_thm31_d1p_digits (g : ℕ) [NeZero g] (hg : 3 ≤ g) (t : ℝ) (ht0 : 0 ≤ t)
+    (ht1 : 1 ≤ t) (ht2 : t < (g : ℝ))
+    (m l k : ℤ) (hm : 1 ≤ m) (hl : l < 0) (hk : 0 < k)
+    (hdvd : ((g : ℤ) - 1) ∣ (k - 1) * l)
+    (a b ε : ℝ)
+    (ha : a = ((k : ℝ) * (l : ℝ) * (g : ℝ)) / (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))))
+    (hb : b = (((g : ℝ) - 1) * (t + (m : ℝ) * (g : ℝ))) / ((k : ℝ) * (l : ℝ)))
+    (hε_lo : 1 + ((g : ℝ) - (l : ℝ) - 1) * ((m : ℝ) * (g : ℝ) + 1) / ((k : ℝ) * (l : ℝ) * (g : ℝ)) ≤ ε)
+    (hε_hi : ε < -((m : ℝ) + 1) / (k : ℝ))
+    (n : ℕ) (hn : 1 ≤ n) :
+    su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * n)
+        - g * su a b ε ((l : ℝ) / ((g : ℝ) - 1)) m (2 * n - 2)
+      = ((Real.digits (t * (g : ℝ) ^ (n - 1) / g) g 0 : ℕ) : ℤ) := by
+  have hPne : t + (m : ℝ) * (g : ℝ) ≠ 0 := by
+    have hm1 : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+    have hg3 : (3 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg
+    positivity
+  have hclosed := (st06_thm31_closed_core g (by omega) t ht1 ht2 m l k (ne_of_lt hl) (ne_of_gt hk) hPne
+    hdvd a b ε ha hb (fun f hf0 hf1 => d1p_core g hg t ht1 ht2 m l k hm hl hk a ε ha hε_lo hε_hi f hf0 hf1)).1
+  exact digit_of_evenClosed_coeff g (by omega) t ht0 m _ hclosed n hn
+
 end Erdos482.General

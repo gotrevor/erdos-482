@@ -11,20 +11,21 @@ theorem are *not* theorems — §1, §2) plus optional cosmetic polish.
 
 ## 0′. 🆕 St06 FUN-EXTENSION (branch `st06`) — Theorem 3.1, remaining subcones (2026-06-13)
 
-Tier 1 (Example 1.1, `St06Example.lean`) and Tier 2 for the **full `𝒜₂` cone + subcone `𝒟₁⁻`** are
-**DONE & axiom-clean** (`St06Thm31.lean`): `st06_thm31_closed_core` (cone-agnostic master),
-`d2m_core`/`d2p_core`/`d1m_core`, and `st06_thm31_{d2m,d2p,d1m}_digits`.  The master makes each remaining
-sub-subcone a thin wrapper = **one `*_core` interval lemma** (≈30 lines, the `d2m_core`/`d1m_core` shape).
+Tier 1 (Example 1.1, `St06Example.lean`) and Tier 2 for **the ENTIRE `Ω₁` half (subcones 𝒟₁±, 𝒟₂±,
+𝒟₃±)** are **DONE & axiom-clean** (`St06Thm31.lean`): `st06_thm31_closed_core` (cone-agnostic master),
+the six cores `d{1,2,3}{m,p}_core`, and the six `st06_thm31_d{1,2,3}{m,p}_digits`.  The master makes
+each cone a thin wrapper = **one `*_core` interval lemma** (≈30 lines, the existing cores are templates).
 
 **Corrected ε-intervals — verified numerically (~250k pts, all 12 sub-subcones), `1+γᵢ^s ≤ ε < δᵢ^s`
 with NO `+1` on the upper endpoint** (see `notes/ST06-THM31-ERRATUM.md` for the `γ,δ` line-table).
 The reduced core is `0 ≤ l/(g−1)+a(ε−f) < 1`, `a = klg/((g−1)(t+mg))`, identical for every cone.
 
-Remaining sub-subcones (each: derive the 2 cleared ε-facts → `nlinarith`; sign of `a = sign(kl)`;
-sign of `P=t+mg` is `+` on `Ω₁`/𝒟₁₋₃, `−` on `Ω₂`/𝒟₄₋₆ which **flips the `÷(g−1)P` step**):
-`𝒟₁⁺` (l<0,k>0,a<0), `𝒟₃±` (l>g−1), then the `Ω₂` cones `𝒟₄,₅,₆±` (m≤−2, need a P<0 polynomial
-variant).  Endpoints from the `γ,δ` table in the erratum.  Then Tier 3: Thms 3.3/3.4 (binary `g=2`,
-NOT covered by Thm 3.1), Cor 3.5 (Beatty unification).
+**Remaining: the `Ω₂` half** — subcones `𝒟₄,₅,₆±` (`m ≤ −2`).  Each: derive the 2 cleared ε-facts →
+`nlinarith`, sign of `a = sign(kl)`.  KEY DIFFERENCE: `P = t+mg < 0` on `Ω₂` (since `m≤−2`, `t<g`), so
+`(g−1)P < 0` — the `÷(g−1)P` and `div_lt_one` steps **flip**.  Plan: prove a `core_neg` variant (or
+generalize the existing cores to `sign P`).  Endpoints from the `γ,δ` table (erratum) + `Ω₂` membership
+`(mg+g)/(2g−1) < l < −(mg+1)/(2g−1)`.  Then Tier 3: Thms 3.3/3.4 (binary `g=2`, NOT covered by Thm 3.1),
+Cor 3.5 (Beatty unification).
 
 ## 0. 🆕 NEXT TRACK — formalize Stoll [St05]: the REAL #482 resolution (any `w>0`, any base `g`)
 
