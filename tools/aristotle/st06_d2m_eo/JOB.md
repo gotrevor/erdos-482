@@ -5,7 +5,12 @@
 **Goal:** real-analysis core of St06 Thm 3.1's even→odd step for subcone 𝒟₂⁻ — the two-sided bound
 `0 ≤ l/(g−1) + a(ε−f) < 1`. Pure inequality (no floor in conclusion). See `Problem.lean`.
 
-**Status:** submitted, awaiting result. Verify in our kernel + `#print axioms` before trusting.
+**Status:** COMPLETE (2026-06-13) — Aristotle proved it (axiom-clean per its own check), independently
+confirming the statement. We ALSO proved the same lemma by hand as `d2m_core` in
+`src/Erdos482/General/St06Thm31.lean` (already in the build, kernel-verified axiom-clean), so the
+Aristotle proof is a cross-validation, not ported. The full 𝒟₂⁻ subcone of St06 Thm 3.1 is now
+formalized (`st06_thm31_d2m_closed` / `_digits`), with Example 1.1 recovered as the `(3,3,2,−1)`
+instance (`st06_example11_from_thm31`).
 
 **Key finding baked into the statement (numerically verified, ~1M points):** the 𝒟₂⁻ ε-interval is
 `1 + (g−l−1)(mg+1)/(klg) ≤ ε < −(mg+1)/(kg)` — the UPPER endpoint has **no extra "+1"** (the
