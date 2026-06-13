@@ -7,13 +7,18 @@ All axiom-clean (`[propext, Classical.choice, Quot.sound]`), build green (8273 j
 - **Thm 3.3** (binary family 1, `St06Thm33.lean`) — BOTH conclusions, full ε-interval `½±(2l+1)/(2(2m+1))`:
   `st06_thm33_{acrux,bcrux,closed,digits,even_digits,grahampollak}`. Even closed form
   `su(2j+1)=2k·A+(m+l)2ʲ+⌊t·2ʲ⌋+k`; the hard nonlinear b-crux proved locally (the `s` cancels → `y∈[0,1)`).
-- **Thm 3.4** (binary family 2, `St06Thm34.lean`) — at **ε=½** (t-universal): `a=2k+1+2l/(t+2m)`,
-  even form `(2k+1)A+k+l·2ʲ`; `st06_thm34_{acrux,bcrux,closed,digits,even_digits}` (concl. 2 = `(2k+1)dₙ−k`).
-  **Full interval RESOLVED this lap** (like pair 5): `st06_thm34_bstep_value` (exact general-ε b-step
-  value), `st06_thm34_bstep_band` (lands iff `frac∈(−d,1−d]`, cf. `pair5_estep_band`), and
-  `st06_thm34_band_fails_below_half`/`_above_half` — a **machine-checked Diophantine obstruction**: no
-  single `ε≠½` extracts digits for every `w` (d=0/d=1 boundary branches pull opposite ways). So Stoll's
-  printed k-dependent interval is NOT a t-universal theorem; ε=½ is the proven ceiling.
+- **Thm 3.4** (binary family 2, `St06Thm34.lean`) — `a=2k+1+2l/(t+2m)`, even form `(2k+1)A+k+l·2ʲ`;
+  `st06_thm34_{acrux,bcrux,closed,digits,even_digits}` (concl. 2 = `(2k+1)dₙ−k`).
+  **⚠️ FULL INTERVAL CORRECTED 2026-06-13 (ON-LINE findings, `archive/findings/…thm34.md`).** The
+  prior lap's "Diophantine obstruction / ε=½ is the ceiling" was an artifact of a **swapped recurrence**
+  (`ε` on the b-step = Theorem **3.3**'s placement). Stoll's actual 3.4 puts `ε` on the **a-step**
+  (`su a b ε (1/2) m`), which is `t`-uniform, so the **full symmetric interval is a GENUINE theorem**:
+  `st06_thm34_astep_eps` (a-step floor crux for every `ε ∈ ½ ± (m−l+½)/D₁`, `D₁=(2m+1)(2k+1)+2l`,
+  uniform over all `t∈[1,2)`, no Diophantine input), and `st06_thm34_{closed,digits,isBit}_eps` (full
+  closed forms / conclusion-(1) digit theorem / bit, for every `ε` in the interval). The `ε`-on-b-step
+  theorems (`st06_thm34_bstep_value/band`, `_band_fails_below/above_half`) are kept, **re-labeled
+  `[SWAPPED-VARIANT, NOT Thm 3.4]`** — sound Lean about the 3.3-placement, but not about Theorem 3.4.
+  Lesson: `#print axioms` clean ≠ statement-faithful.
 - **Cor 3.5** (Beatty capstone, `St06Cor35.lean`) — **COMPLETE this lap, no PDF needed**. The GP
   recurrence `su √2 √2 ½ ½ n` started at any `n>0` reads off the binary digits of `r·√2` for the unique
   `r≥1` fixed by which Beatty sequence (`1+√2` / `1+1/√2`) contains `n`:
@@ -84,14 +89,20 @@ Quot.sound]`, zero custom axioms, zero `sorry`): (1) the **headline** (Graham–
 **bonus** (Stoll [0902.4168] Thm 3.2's 7 pairs + Cor 3.3, with pair 5 resolved to its honest ε=½
 content); (2) the **general #482 resolution** (Stoll [St05]: `erdos482_resolution`, any `w>0` any base
 `g≥2`); (3) the **St06 fun-extension** (Acta Arith. 125): Example 1.1, Thm 3.1 (all 12 cones), Thm 3.3
-(full), Thm 3.4 (ε=½ + the full-interval Diophantine obstruction), and **Cor 3.5 (the Beatty-unification
-capstone)** — both closed this lap. **No open mathematical item remains**: Thm 3.4's full interval is now
-machine-checked as *not a t-universal theorem* (the pair-5 phenomenon, both obstruction directions
-proven), exactly as pair 5 was resolved. What's left is optional polish (top-level showcase wiring; the
-curiosity of whether Stoll's printed Thm 3.4 interval is a per-w claim — see `ON-LINE-REQUEST.md`).
+(full), **Thm 3.4 full GENUINE symmetric interval** (`st06_thm34_{astep,closed,digits,isBit}_eps`,
+corrected 2026-06-13 from the swapped-recurrence false "obstruction" — see Thm 3.4 entry above), and
+**Cor 3.5 (the Beatty-unification capstone)**. Thm 3.4's printed interval is now machine-checked as a
+**genuine t-universal theorem** (every `ε ∈ ½ ± (m−l+½)/D₁` works for all `w`), NOT the spurious
+"only ε=½" the prior lap reported. What's left is optional polish (top-level showcase wiring).
 
 ## What's happened (newest first)
-- **2026-06-13 (review lap — Cor 3.5 capstone + Thm 3.4 obstruction)**: Two St06 closures + polish. (1)
+- **2026-06-13 (correction lap — Thm 3.4 genuine full interval)**: Harvested ON-LINE findings that the
+  prior lap's Thm 3.4 "obstruction" formalized a **swapped recurrence** (`ε` on the b-step = Thm 3.3's
+  placement; Stoll's 3.4 has `ε` on the a-step). Proved the GENUINE full symmetric interval as a real
+  `t`-universal theorem: `st06_thm34_astep_eps` (a-step floor crux, every `ε∈½±(m−l+½)/D₁`, all `t∈[1,2)`,
+  no Diophantine input) + `st06_thm34_{closed,digits,isBit}_eps`. Re-labeled the b-step "obstruction"
+  theorems `[SWAPPED-VARIANT, NOT Thm 3.4]` (kept as documented contrast). All axiom-clean; build 🟢 8273.
+- **2026-06-13 (review lap — Cor 3.5 capstone + Thm 3.4 obstruction [SUPERSEDED, see above])**: Two St06 closures + polish. (1)
   **Thm 3.4 full interval RESOLVED** (like pair 5): `st06_thm34_bstep_value` + `_bstep_band` (exact
   general-ε b-step + lands-iff-band) + `_band_fails_below/above_half` (machine-checked Diophantine
   obstruction — no ε≠½ is t-universal). (2) Polish: `isBit` corollaries for Thm 3.3/3.4 (GP diff ∈{0,1}),
@@ -152,20 +163,19 @@ curiosity of whether Stoll's printed Thm 3.4 interval is a per-w claim — see `
 
 ## Outstanding
 ### Short-term (mirror PENDING_WORK top)
-- **No open mathematical items.** All St06 main theorems formalized & axiom-clean; Thm 3.4's full
-  interval resolved via the machine-checked obstruction (not a t-universal theorem).
+- **No open mathematical items.** All St06 main theorems formalized & axiom-clean; **Thm 3.4's full
+  symmetric interval is now a genuine t-universal theorem** (`st06_thm34_digits_eps`, corrected this lap
+  from the swapped-recurrence false obstruction).
 - **Optional polish**: wire `st06_cor35`/`erdos482_resolution` into a single top-level St06 showcase;
-  unified Thm 3.3/3.4/Cor 3.5 `isBit` master; concrete `r=2`→digits-of-`2√2` certificate for Cor 3.5.
-- **Curiosity (non-blocking)**: whether Stoll's *printed* Thm 3.4 interval is a genuine per-`w`
-  (Diophantine) claim or a transcription artifact — needs the PDF (`ON-LINE-REQUEST.md`). Either way our
-  honest content (ε=½ + obstruction) stands.
+  unified Thm 3.3/3.4/Cor 3.5 `isBit` master; concrete `r=2`→digits-of-`2√2` certificate for Cor 3.5;
+  retire the swapped `_bstep_*` theorems entirely (currently kept as documented contrast).
 ### Long-term
 - "Generalize to other algebraic numbers" — Stoll [St05] already resolves it elementarily (DONE as
   `erdos482_resolution`); deeper generalizations (cubic irrationals, etc.) would need new math.
 ### To completion
 - The headline + Thm 3.2 (7 pairs) + Cor 3.3 + St05 general (`erdos482_resolution`) + St06 (Ex 1.1,
-  Thm 3.1/3.3/3.4@½, Cor 3.5) are all done & **axiom-clean**. "Done" for St06 = add Thm 3.4's honest
-  conditional interval (the full interval is not a t-universal theorem). Nothing on the critical path open.
+  Thm 3.1/3.3/3.4 [full genuine interval], Cor 3.5) are all done & **axiom-clean**. Nothing on the
+  critical path open.
 
 ## Axiom ledger
 All headline theorems verified `#print axioms` this lap = trust base only; **0 math axioms** (🟢).
@@ -177,13 +187,15 @@ All headline theorems verified `#print axioms` this lap = trust base only; **0 m
 | `st06_example11_ternary_e` | uncond (St06 Ex 1.1, base-3 digits of e) | trust base | 🟢 clean |
 | `st06_thm31_d{1..6}{m,p}_digits` | uncond (St06 Thm 3.1, all 12 cones) | trust base | 🟢 clean |
 | `st06_thm33_digits` (+ `_grahampollak`) | uncond (St06 Thm 3.3, full ε-interval) | trust base | 🟢 clean |
-| `st06_thm34_digits` (+ `_bstep_band`, `_band_fails_below/above_half`) | St06 Thm 3.4 at ε=½ + full-interval Diophantine obstruction | trust base | 🟢 clean |
+| `st06_thm34_digits_eps` (+ `_astep_eps`, `_closed_eps`, `_isBit_eps`) | St06 Thm 3.4, GENUINE full symmetric ε-interval (t-universal) | trust base | 🟢 clean |
+| `st06_thm34_bstep_band` / `_band_fails_below/above_half` | ⚠️ SWAPPED-VARIANT (ε on b-step = Thm 3.3 placement), NOT Thm 3.4 | trust base | 🟢 clean Lean, unfaithful statement |
 | `st06_cor35` (+ `_realDigits`, `_isBit`) | uncond (St06 Cor 3.5, Beatty unification) | trust base | 🟢 clean |
 
 No 🟡/🟠/🔴 axioms anywhere: the whole development is elementary (floors, √2, π/e bounds, Rayleigh from
-mathlib). The ONLY genuinely-open item is Thm 3.4's full k-dependent interval — Diophantine / not
-t-universal (the pair-5 phenomenon; ε=½ is the honest ceiling), needing the PDF's per-w argument, NOT
-an axiom to discharge.
+mathlib). Thm 3.4's full k-dependent interval — once mis-formalized as a Diophantine "obstruction" — is
+now proven as a genuine `t`-universal theorem (`st06_thm34_digits_eps`): `ε` sits on the a-step, whose
+floor bracket is uniform over `t`, so Stoll's printed symmetric interval holds for every `w`. No open
+axiom anywhere.
 
 ## Pointers
 `HANDOFF.md` (completion pointer) · session batons archived in `archive/handoff/` ·
