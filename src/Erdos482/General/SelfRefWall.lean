@@ -85,4 +85,24 @@ theorem selfref_crux_fails_of_three_le (g : ℕ) (hg : 3 ≤ g) (c : ℝ) :
     nlinarith [hmul, hlin, hs2]
   nlinarith [hkey, hs_lt_g, hgR3]
 
+/-- **Characterization: the self-referential digit crux is solvable iff the base is 2.**  For an
+integer base `g ≥ 2`, there exists an offset `c` making `0 ≤ {x} − √g·{x/g} + c·√g < 1` hold for
+**all** `x` **iff `g = 2`** (and then `c = ½` works, by `Erdos482.crux`).  This is the exact sense in
+which Graham–Pollak's `⌊√2·(u + ½)⌋` digit recurrence is a one-off: no base `g ≥ 3` admits the
+analogous self-referential extractor. -/
+theorem selfref_crux_solvable_iff (g : ℕ) (hg : 2 ≤ g) :
+    (∃ c : ℝ, ∀ x : ℝ, 0 ≤ Int.fract x - Real.sqrt g * Int.fract (x / g) + c * Real.sqrt g ∧
+        Int.fract x - Real.sqrt g * Int.fract (x / g) + c * Real.sqrt g < 1) ↔ g = 2 := by
+  constructor
+  · rintro ⟨c, hc⟩
+    by_contra hne
+    obtain ⟨x, hx⟩ := selfref_crux_fails_of_three_le g (by omega) c
+    exact hx (hc x)
+  · rintro rfl
+    refine ⟨1 / 2, fun x => ?_⟩
+    have h := Erdos482.crux x
+    have e1 : ((2 : ℕ) : ℝ) = 2 := by norm_num
+    rw [e1]
+    exact ⟨by linarith [h.1], by linarith [h.2]⟩
+
 end Erdos482.General
