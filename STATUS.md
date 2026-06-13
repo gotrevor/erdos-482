@@ -1,6 +1,19 @@
 # STATUS — erdos-482 📊
 
-**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8268 jobs) · **Updated**: lap 2026-06-07 · `7cbcd8c` (**#482 COMPLETE & axiom-clean; headline now reads literal digits of any w≥1; St06 unobtainable + off critical path; only optional showcases remain**)
+**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8273 jobs) · **Updated**: lap 2026-06-13 (`st06` branch) (**#482 COMPLETE & axiom-clean on `main`; St06 fun-extension on `st06`: Tiers 1+2 done, Tier 3 = Thm 3.3 full + Thm 3.4 (ε=½) + Cor 3.5 Beatty foundation now done**)
+
+## 🎁 St06 fun-extension (branch `st06`) — Tier 3 mostly DONE (2026-06-13)
+All axiom-clean (`[propext, Classical.choice, Quot.sound]`), build green (8273 jobs):
+- **Thm 3.3** (binary family 1, `St06Thm33.lean`) — BOTH conclusions, full ε-interval `½±(2l+1)/(2(2m+1))`:
+  `st06_thm33_{acrux,bcrux,closed,digits,even_digits,grahampollak}`. Even closed form
+  `su(2j+1)=2k·A+(m+l)2ʲ+⌊t·2ʲ⌋+k`; the hard nonlinear b-crux proved locally (the `s` cancels → `y∈[0,1)`).
+- **Thm 3.4** (binary family 2, `St06Thm34.lean`) — at **ε=½** (t-universal): `a=2k+1+2l/(t+2m)`,
+  even form `(2k+1)A+k+l·2ʲ`; `st06_thm34_{acrux,bcrux,closed,digits,even_digits}` (concl. 2 = `(2k+1)dₙ−k`).
+  ⚠️ The full k-dependent interval is **Diophantine, not t-universal** (the two digit-branches meet at ½,
+  the pair-5 phenomenon) — see `notes/ST06-THM34-FINDINGS.md`; exact PDF statement requested in `ON-LINE-REQUEST.md`.
+- **Cor 3.5** (Beatty capstone, `St06Cor35.lean`) — verified **Beatty foundation**:
+  `holderConjugate_one_add_sqrt2` ((1+√2,1+1/√2) Hölder conjugate), `beatty_partition_sqrt2` (Rayleigh),
+  `beatty_unique_sqrt2` (every n>0 in exactly one Beatty seq). Remaining: per-`m` `w(r)`+M-shift packaging.
 
 ## 🏆 St05 COMPLETE — Erdős #482 resolved in full generality (2026-06-06)
 The whole of Stoll [St05] is now machine-checked and **axiom-clean** (`src/Erdos482/General/`):

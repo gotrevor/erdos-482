@@ -16,7 +16,17 @@ sub-subcones `𝒟₁..₆ × {+,−}` via the cone-agnostic master `st06_thm31_
 `d{1..6}{m,p}_core` interval lemmas, and the twelve `st06_thm31_d{1..6}{m,p}_digits`.  Corrected
 ε-intervals `1+γᵢ^s ≤ ε < δᵢ^s` (erratum), verified ~250k pts.
 
-**Remaining (Tier 3 — the binary families + capstone, all NOT covered by Thm 3.1):**
+**TIER 3 UPDATE (2026-06-13): Thm 3.3 (full), Thm 3.4 (ε=½), Cor 3.5 (Beatty foundation) DONE.**
+- ✅ **Thm 3.3** — `St06Thm33.lean`, both conclusions + full ε-interval + GP cross-check. Axiom-clean.
+- ✅ **Thm 3.4** — `St06Thm34.lean`, **ε=½** case (both conclusions). The full k-dependent interval is
+  **Diophantine / not t-universal** (pair-5 phenomenon; `notes/ST06-THM34-FINDINGS.md`) — PDF asked in
+  `ON-LINE-REQUEST.md`. So the ε=½ formalization is likely the honest ceiling absent a per-w argument.
+- 🟡 **Cor 3.5** — `St06Cor35.lean`: Beatty foundation done (Hölder conjugacy, Rayleigh partition,
+  exactly-one-Beatty-seq). **Remaining**: package, per representable `m`, the `w=w(r)` construction
+  (`w=r√2−2⌊r/√2⌋` or `2r√2−2⌊r√2⌋`) + `M=⌊log₂w⌋` index shift onto `st06_thm33`'s GP instance
+  (`m=1,l=k=0`). Needs the PDF's exact index convention (ON-LINE-REQUEST) to avoid an off-by-M error.
+
+**Original Tier 3 transcription (kept for reference):**
 - **Thm 3.3** (binary `g=2`): `u₁=m`, `a=2k+1+(t+2l)/(t+2m)`, `b=2/a`, `½−(2l+1)/(2(2m+1)) ≤ ε <
   ½+(2l+1)/(2(2m+1))` (interval **independent of k**); conclusion `u_{2n+1}−2u_{2n−1}=dₙ` AND
   `u_{2n+2}−2u_{2n}=d_{n+1}+k(2dₙ−1)`.  `√2,(1,0,0),ε=½` → Graham–Pollak.  **NUMERICALLY VERIFIED**
