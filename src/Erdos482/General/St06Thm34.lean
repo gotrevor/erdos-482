@@ -137,6 +137,111 @@ theorem st06_thm34_bcrux
   · push_cast; linarith [hfrac_lo]
   · push_cast; linarith [hfrac_hi]
 
+/-- **Thm 3.4 general-`ε` b-step value.**  For *any* `ε`, the even→odd b-step value has the closed
+form `2(ms+B) + 1 − frac`, with `frac = (2·Nq − 2(t+2m)ε)/Da`, `Nq = (t+2m)/2 + l(1 − t·s + 2B)`,
+`Da = (2k+1)(t+2m) + 2l`.  This isolates the exact dependence on `ε` (the `ε = ½` crux is the case
+where `frac` lands in the admissible band for *every* fractional part). -/
+theorem st06_thm34_bstep_value
+    (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < 2) (s : ℤ)
+    (m l k : ℤ) (hm : 1 ≤ m) (hl1 : 1 ≤ l) (hlm : l ≤ m) (hk : 0 ≤ k)
+    (B : ℤ) (a b : ℝ) (ha : a = (2 * k + 1) + 2 * l / (t + 2 * m)) (hb : b = 2 / a) (ε : ℝ) :
+    b * (((2 * k + 1) * (m * s + B) + k + l * s : ℤ) : ℝ) + b * ε
+      = 2 * ((m * s + B : ℤ) : ℝ) + 1
+        - (2 * ((t + 2 * m) / 2 + l * (1 - t * s + 2 * B)) - 2 * (t + 2 * m) * ε)
+            / ((2 * k + 1) * (t + 2 * m) + 2 * l) := by
+  have hmR : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+  have hl1R : (1 : ℝ) ≤ (l : ℝ) := by exact_mod_cast hl1
+  have hkR : (0 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
+  have hden : (0 : ℝ) < t + 2 * m := by linarith
+  have ha_pos : (0 : ℝ) < a := by rw [ha]; have := div_pos (by linarith : (0:ℝ) < 2 * l) hden; linarith
+  have hane : a ≠ 0 := ne_of_gt ha_pos
+  set Da : ℝ := (2 * k + 1) * (t + 2 * m) + 2 * l with hDa
+  have hDa_pos : (0 : ℝ) < Da := by rw [hDa]; nlinarith [hkR, hden, ht1, hl1R]
+  have hDane : Da ≠ 0 := ne_of_gt hDa_pos
+  have ha_eq : a = Da / (t + 2 * m) := by rw [ha, hDa]; field_simp
+  have hb_eq : b = 2 * (t + 2 * m) / Da := by rw [hb, ha_eq, div_div_eq_mul_div]
+  set Nq : ℝ := (t + 2 * m) / 2 + l * (1 - t * s + 2 * B) with hNq
+  have hclear : (t + 2 * m) * (((2 * k + 1) * (m * s + B) + k + l * s : ℤ) : ℝ)
+      = Da * (((m * s + B : ℤ) : ℝ) + 1 / 2) - Nq := by
+    rw [hDa, hNq]; push_cast; ring
+  rw [hb_eq]
+  rw [show 2 * (t + 2 * m) / Da * (((2 * k + 1) * (m * s + B) + k + l * s : ℤ) : ℝ)
+        + 2 * (t + 2 * m) / Da * ε
+      = (2 * (t + 2 * m) * ((((2 * k + 1) * (m * s + B) + k + l * s : ℤ) : ℝ) + ε)) / Da from by ring]
+  rw [eq_sub_iff_add_eq, ← add_div, div_eq_iff hDane]
+  linear_combination (2 : ℝ) * hclear
+
+/-- **Thm 3.4 general-`ε` b-step band** (the precise ε-condition; the analogue of `pair5_estep_band`).
+With `d = C − 2B ∈ {0,1}` the b-step lands on the digit value `2ms + C` **iff** `frac ∈ (−d, 1−d]`,
+where `frac = (2·Nq − 2(t+2m)ε)/Da`.  At `ε = ½` this band is satisfied for every fractional part
+(`st06_thm34_bcrux`); for `ε ≠ ½` the `d = 0` (large `t·s − 2B`) and `d = 1` (small `t·s − 2B`)
+branches pull in opposite directions, so no single `ε ≠ ½` works for all `w` — the Diophantine
+obstruction. -/
+theorem st06_thm34_bstep_band
+    (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < 2) (s : ℤ)
+    (m l k : ℤ) (hm : 1 ≤ m) (hl1 : 1 ≤ l) (hlm : l ≤ m) (hk : 0 ≤ k)
+    (B C : ℤ) (a b : ℝ) (ha : a = (2 * k + 1) + 2 * l / (t + 2 * m)) (hb : b = 2 / a) (ε : ℝ) :
+    ⌊b * (((2 * k + 1) * (m * s + B) + k + l * s : ℤ) : ℝ) + b * ε⌋ = 2 * m * s + C
+      ↔ -((C : ℝ) - 2 * B)
+            < (2 * ((t + 2 * m) / 2 + l * (1 - t * s + 2 * B)) - 2 * (t + 2 * m) * ε)
+                / ((2 * k + 1) * (t + 2 * m) + 2 * l)
+          ∧ (2 * ((t + 2 * m) / 2 + l * (1 - t * s + 2 * B)) - 2 * (t + 2 * m) * ε)
+                / ((2 * k + 1) * (t + 2 * m) + 2 * l) ≤ 1 - ((C : ℝ) - 2 * B) := by
+  rw [st06_thm34_bstep_value t ht1 ht2 s m l k hm hl1 hlm hk B a b ha hb ε, Int.floor_eq_iff]
+  constructor
+  · rintro ⟨h1, h2⟩; push_cast at h1 h2; constructor <;> linarith
+  · rintro ⟨h1, h2⟩; push_cast; constructor <;> linarith
+
+/-- **Thm 3.4 obstruction, ε < ½.**  On a `d = 1` digit step (`C = 2B+1`) with `t·s` close to the
+boundary (`2l(t·s − C) < (t+2m)(1−2ε)`), the b-step does **not** land on `2ms + C`: `frac > 0 = 1−d`
+breaks the band's upper bound.  So no `ε < ½` extracts the digits for every `w` — the Diophantine
+obstruction (cf. `pair5_band_fails_below_half`). -/
+theorem st06_thm34_band_fails_below_half
+    (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < 2) (s : ℤ)
+    (m l k : ℤ) (hm : 1 ≤ m) (hl1 : 1 ≤ l) (hlm : l ≤ m) (hk : 0 ≤ k)
+    (B C : ℤ) (a b : ℝ) (ha : a = (2 * k + 1) + 2 * l / (t + 2 * m)) (hb : b = 2 / a) (ε : ℝ)
+    (hd : (C : ℝ) = 2 * B + 1) (hy0 : (C : ℝ) ≤ t * s)
+    (hsmall : 2 * l * (t * s - C) < (t + 2 * m) * (1 - 2 * ε)) :
+    ⌊b * (((2 * k + 1) * (m * s + B) + k + l * s : ℤ) : ℝ) + b * ε⌋ ≠ 2 * m * s + C := by
+  have hmR : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+  have hl1R : (1 : ℝ) ≤ (l : ℝ) := by exact_mod_cast hl1
+  have hkR : (0 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
+  have hden : (0 : ℝ) < t + 2 * m := by linarith
+  have hDa_pos : (0 : ℝ) < (2 * k + 1) * (t + 2 * m) + 2 * l := by nlinarith [hkR, hden, ht1, hl1R]
+  rw [Ne, st06_thm34_bstep_band t ht1 ht2 s m l k hm hl1 hlm hk B C a b ha hb ε]
+  rintro ⟨-, hhi⟩
+  have hnum : 0 < 2 * ((t + 2 * m) / 2 + l * (1 - t * s + 2 * B)) - 2 * (t + 2 * m) * ε := by
+    nlinarith [hsmall, hd]
+  have hfrac : 0 < (2 * ((t + 2 * m) / 2 + l * (1 - t * s + 2 * B)) - 2 * (t + 2 * m) * ε)
+      / ((2 * k + 1) * (t + 2 * m) + 2 * l) := div_pos hnum hDa_pos
+  -- but the band's upper bound forces frac ≤ 1 − (C − 2B) = 0
+  have : (1 : ℝ) - ((C : ℝ) - 2 * B) = 0 := by rw [hd]; ring
+  linarith [hhi, hfrac, this]
+
+/-- **Thm 3.4 obstruction, ε > ½.**  On a `d = 0` digit step (`C = 2B`) with `t·s` close to the upper
+boundary (`(t+2m)(2ε−1) > 2l(2B+1 − t·s)`), the b-step does **not** land on `2ms + C`: `frac < 0 = −d`
+breaks the band's lower bound.  So no `ε > ½` works either (cf. `pair5_band_fails_above_half`). -/
+theorem st06_thm34_band_fails_above_half
+    (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < 2) (s : ℤ)
+    (m l k : ℤ) (hm : 1 ≤ m) (hl1 : 1 ≤ l) (hlm : l ≤ m) (hk : 0 ≤ k)
+    (B C : ℤ) (a b : ℝ) (ha : a = (2 * k + 1) + 2 * l / (t + 2 * m)) (hb : b = 2 / a) (ε : ℝ)
+    (hd : (C : ℝ) = 2 * B) (hy1 : t * s < C + 1)
+    (hbig : (t + 2 * m) * (2 * ε - 1) > 2 * l * (2 * B + 1 - t * s)) :
+    ⌊b * (((2 * k + 1) * (m * s + B) + k + l * s : ℤ) : ℝ) + b * ε⌋ ≠ 2 * m * s + C := by
+  have hmR : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
+  have hl1R : (1 : ℝ) ≤ (l : ℝ) := by exact_mod_cast hl1
+  have hkR : (0 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
+  have hden : (0 : ℝ) < t + 2 * m := by linarith
+  have hDa_pos : (0 : ℝ) < (2 * k + 1) * (t + 2 * m) + 2 * l := by nlinarith [hkR, hden, ht1, hl1R]
+  rw [Ne, st06_thm34_bstep_band t ht1 ht2 s m l k hm hl1 hlm hk B C a b ha hb ε]
+  rintro ⟨hlo, -⟩
+  have hnum : 2 * ((t + 2 * m) / 2 + l * (1 - t * s + 2 * B)) - 2 * (t + 2 * m) * ε < 0 := by
+    nlinarith [hbig, hd]
+  have hfrac : (2 * ((t + 2 * m) / 2 + l * (1 - t * s + 2 * B)) - 2 * (t + 2 * m) * ε)
+      / ((2 * k + 1) * (t + 2 * m) + 2 * l) < 0 := div_neg_of_neg_of_pos hnum hDa_pos
+  have : -((C : ℝ) - 2 * B) = 0 := by rw [hd]; ring
+  linarith [hlo, hfrac, this]
+
 /-- **St06 Theorem 3.4 — joint closed forms** at `ε = ½` (binary, second family). -/
 theorem st06_thm34_closed (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < 2)
     (m l k : ℤ) (hm : 1 ≤ m) (hl1 : 1 ≤ l) (hlm : l ≤ m) (hk : 0 ≤ k)
