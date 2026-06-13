@@ -1,3 +1,8 @@
+# WARNING: SWAPPED RECURRENCE — NOT Stoll's Theorem 3.4.  This script puts eps on the
+# b-step (n even) and 1/2 on the a-step (n odd), which is Theorem 3.3's placement.  Stoll's
+# actual Theorem 3.4 has eps on the a-step; see st06_thm34_HOSTCHECK.py for the CORRECT
+# (paper) recurrence and the full-interval confirmation that backs the Lean theorems
+# st06_thm34_{astep,closed,digits,isBit}_eps in src/.../St06Thm34.lean.  Kept for the record.
 from decimal import Decimal, getcontext
 import random
 getcontext().prec=80
