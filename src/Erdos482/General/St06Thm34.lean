@@ -202,4 +202,20 @@ theorem st06_thm34_digits (t : ℝ) (ht0 : 0 ≤ t) (ht1 : 1 ≤ t) (ht2 : t < 2
   have := digit_of_evenClosed_coeff 2 (le_refl 2) t ht0 m _ hclosed n hn
   simpa using this
 
+/-- **St06 Theorem 3.4, conclusion (2)** at `ε = ½` — the even-index Graham–Pollak difference:
+`su(2n+1) − 2·su(2n−1) = (2k+1)·dₙ − k`, where `dₙ = ⌊t·2^{n−1}⌋ − 2⌊t·2^{n−1}/2⌋` is the `n`-th
+binary digit.  (Pure algebra from the even closed form; the `l·2ʲ` term telescopes away.) -/
+theorem st06_thm34_even_digits (t : ℝ) (ht1 : 1 ≤ t) (ht2 : t < 2)
+    (m l k : ℤ) (hm : 1 ≤ m) (hl1 : 1 ≤ l) (hlm : l ≤ m) (hk : 0 ≤ k)
+    (a b : ℝ) (ha : a = (2 * k + 1) + 2 * l / (t + 2 * m)) (hb : b = 2 / a)
+    (n : ℕ) (hn : 1 ≤ n) :
+    su a b (1 / 2) (1 / 2) m (2 * n + 1) - 2 * su a b (1 / 2) (1 / 2) m (2 * n - 1)
+      = (2 * k + 1) * (⌊t * (2 : ℝ) ^ (n - 1)⌋ - 2 * ⌊t * (2 : ℝ) ^ (n - 1) / 2⌋) - k := by
+  have hE := (st06_thm34_closed t ht1 ht2 m l k hm hl1 hlm hk a b ha hb).2
+  obtain ⟨n', rfl⟩ : ∃ n', n = n' + 1 := ⟨n - 1, by omega⟩
+  have hfl : ⌊t * (2 : ℝ) ^ (n' + 1) / 2⌋ = ⌊t * (2 : ℝ) ^ n'⌋ := by congr 1; rw [pow_succ]; ring
+  rw [hE (n' + 1), show 2 * (n' + 1) - 1 = 2 * n' + 1 from by omega, hE n',
+    show n' + 1 - 1 = n' from by omega, hfl, pow_succ]
+  ring
+
 end Erdos482.General
