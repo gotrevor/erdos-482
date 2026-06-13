@@ -32,33 +32,27 @@ formalized and **axiom-clean** (`src/Erdos482/General/St06Example.lean`):
 St06 Thm 3.1's ε-interval for subcone 𝒟₂⁻ has a spurious "+1" on the upper endpoint — the correct
 (numerically verified, ~1M points) interval is `1+γ₂⁻ ≤ ε < δ₂⁻` (not `< 1+δ₂⁻`).
 
-### Tier 2 — St06 Theorem 3.1, subcones 𝒟₂⁻ AND 𝒟₂⁺ DONE (2026-06-13)
-The **full `𝒜₂` cone (both signs of `k`)** of St06 Thm 3.1 is formalized and **axiom-clean**
-(`src/Erdos482/General/St06Thm31.lean`):
-- `st06_thm31_closed_core` — a **cone-agnostic master** joint-induction: it takes the even→odd
-  inequality core as an abstract hypothesis, so each subcone reduces to supplying its verified
-  ε-interval core. The odd→even step and the closed-form induction are shared across all six cones.
-- `d2m_core` / `d2p_core` — the even→odd inequality cores for `k<0` / `k>0` (hand-proved; the `k<0`
-  one independently confirmed by Aristotle, `tools/aristotle/st06_d2m_eo`).
-- `st06_thm31_d2m_closed` / `_d2p_closed` (+ `_d2m_digits` / `_d2p_digits`) — the joint closed forms
-  `su(2j)=m·gʲ+⌊t·gʲ/g⌋`, `(g−1)·su(2j+1)=l(k·gʲ−1)`, and the GP-difference digit extraction, for
-  ALL `(g≥3, m≥1, 0<l≤g−1, k≷0)` with `(g−1)∣(k−1)l`.
+### Tier 2 — St06 Theorem 3.1 COMPLETE (all 6 cones, both signs — 2026-06-13)
+**The entire headline of St06 (Theorem 3.1, the 3-parameter `(m,l,k)` family) is formalized and
+axiom-clean** (`src/Erdos482/General/St06Thm31.lean`), across **all 12 sub-subcones** `𝒟₁..₆ × {+,−}`:
+- `st06_thm31_closed_core` — a **cone-agnostic master** joint-induction taking the even→odd inequality
+  core as an abstract hypothesis; the odd→even step and closed-form induction are shared by every cone
+  (and it needs only `t+mg ≠ 0`, so it serves both `Ω₁` `P>0` and `Ω₂` `P<0` unchanged).
+- twelve `*_core` interval lemmas `d{1..6}{m,p}_core` (the even→odd two-sided bound, one per
+  sub-subcone) + twelve `st06_thm31_d{1..6}{m,p}_digits` (GP difference = base-`g` digit of `w`):
+  - `Ω₁` (`m≥1`, `P=t+mg>0`): `𝒟₁±, 𝒟₂±, 𝒟₃±` (l<0, 0<l≤g−1, l>g−1; k≷0).
+  - `Ω₂` (`m≤−2`, `P<0`, the `÷(g−1)P` step flips via `div_lt_one_of_neg`+`neg_div_neg_eq`):
+    `𝒟₄±, 𝒟₅±, 𝒟₆±`.
+  All with `(g−1)∣(k−1)l`, every `#print axioms` = the trust base.
 - `st06_example11_from_thm31` — Example 1.1 recovered as the `𝒟₂⁻` instance `(3,3,2,−1)`, `t=e`, `ε=π`.
-- **ALL of `Ω₁` (the `m≥1` half) is now done**: cores `d1m/d1p/d2m/d2p/d3m/d3p_core` and digit theorems
-  `st06_thm31_{d1m,d1p,d2m,d2p,d3m,d3p}_digits` — i.e. subcones **𝒟₁±, 𝒟₂±, 𝒟₃±** (l<0, 0<l≤g−1,
-  l>g−1; both signs of k). **6 of the 12 sub-subcones** of Thm 3.1, all axiom-clean.
 
 **Comprehensive erratum** (`notes/ST06-THM31-ERRATUM.md`): the correct Thm 3.1 offset condition is
 `1 + γᵢ^s ≤ ε < δᵢ^s` — the "+1" the plan added belongs ONLY on the lower endpoint — **verified for all
-12 sub-subcones** (0 failures / ~250k points, incl. the `Ω₂`, `m≤−2` cones).
+12 sub-subcones** (0 failures / ~250k points). All twelve formalized cores use these corrected intervals.
+Aristotle independently confirmed the `𝒟₂⁻` and `𝒟₁⁻` cores (`tools/aristotle/st06_d{1,2}m_eo`).
 
-**`Ω₂` started** (`m≤−2`, `t+mg < 0`): subcone **`𝒟₅⁻`** done (`d5m_core` / `st06_thm31_d5m_digits`) —
-the P<0 template that flips the `÷(g−1)P` step (uses `div_lt_one_of_neg` + `neg_div_neg_eq`). The master
-needed NO change. **7 of 12 sub-subcones done.**
-
-**Remaining St06:** the other 5 `Ω₂` sub-subcones `𝒟₄±, 𝒟₅⁺, 𝒟₆±` (each = one P<0 `*_core` lemma on the
-`d5m_core` template, endpoints from the erratum `γ,δ` table). Then Thms 3.3/3.4 (binary `g=2`), Cor 3.5
-(Beatty).
+**Remaining St06 (Tier 3):** Thms 3.3 / 3.4 (the binary `g=2` families, NOT covered by Thm 3.1) and
+Cor 3.5 (Beatty unification of the Borwein–Bailey examples). See `PENDING_WORK.md`.
 
 ## Where it stands
 The **headline** (Graham–Pollak: the GP sequence reads off the binary digits of √2) and the **bonus**

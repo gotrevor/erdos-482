@@ -11,21 +11,18 @@ theorem are *not* theorems — §1, §2) plus optional cosmetic polish.
 
 ## 0′. 🆕 St06 FUN-EXTENSION (branch `st06`) — Theorem 3.1, remaining subcones (2026-06-13)
 
-Tier 1 (Example 1.1, `St06Example.lean`) and Tier 2 for **the ENTIRE `Ω₁` half (subcones 𝒟₁±, 𝒟₂±,
-𝒟₃±)** are **DONE & axiom-clean** (`St06Thm31.lean`): `st06_thm31_closed_core` (cone-agnostic master),
-the six cores `d{1,2,3}{m,p}_core`, and the six `st06_thm31_d{1,2,3}{m,p}_digits`.  The master makes
-each cone a thin wrapper = **one `*_core` interval lemma** (≈30 lines, the existing cores are templates).
+**St06 Theorem 3.1 is COMPLETE & axiom-clean** (`St06Thm31.lean`) — Tier 1 (Example 1.1) + all 12
+sub-subcones `𝒟₁..₆ × {+,−}` via the cone-agnostic master `st06_thm31_closed_core`, the twelve
+`d{1..6}{m,p}_core` interval lemmas, and the twelve `st06_thm31_d{1..6}{m,p}_digits`.  Corrected
+ε-intervals `1+γᵢ^s ≤ ε < δᵢ^s` (erratum), verified ~250k pts.
 
-**Corrected ε-intervals — verified numerically (~250k pts, all 12 sub-subcones), `1+γᵢ^s ≤ ε < δᵢ^s`
-with NO `+1` on the upper endpoint** (see `notes/ST06-THM31-ERRATUM.md` for the `γ,δ` line-table).
-The reduced core is `0 ≤ l/(g−1)+a(ε−f) < 1`, `a = klg/((g−1)(t+mg))`, identical for every cone.
-
-**Remaining: the `Ω₂` half** — subcones `𝒟₄,₅,₆±` (`m ≤ −2`).  Each: derive the 2 cleared ε-facts →
-`nlinarith`, sign of `a = sign(kl)`.  KEY DIFFERENCE: `P = t+mg < 0` on `Ω₂` (since `m≤−2`, `t<g`), so
-`(g−1)P < 0` — the `÷(g−1)P` and `div_lt_one` steps **flip**.  Plan: prove a `core_neg` variant (or
-generalize the existing cores to `sign P`).  Endpoints from the `γ,δ` table (erratum) + `Ω₂` membership
-`(mg+g)/(2g−1) < l < −(mg+1)/(2g−1)`.  Then Tier 3: Thms 3.3/3.4 (binary `g=2`, NOT covered by Thm 3.1),
-Cor 3.5 (Beatty unification).
+**Remaining (Tier 3 — the binary families + capstone, all NOT covered by Thm 3.1):**
+- **Thm 3.3** (binary `g=2`): `u₁=m`, `a=2k+1+(t+2l)/(t+2m)`, `b=2/a`, `½−(2l+1)/(2(2m+1)) ≤ ε <
+  ½+(…)`; conclusion `u_{2n+1}−2u_{2n−1}=dₙ` AND `u_{2n+2}−2u_{2n}=d_{n+1}+k(2dₙ−1)`.  `√2,(1,0,0),ε=½`
+  → Graham–Pollak.  (Note: this repo's base-2 `Erdos482.Stoll` already has the √2 special case.)
+- **Thm 3.4** (the other binary family): `a=2k+1+2l/(t+2m)`, k-dependent ε-bounds.
+- **Cor 3.5** (Beatty unification): needs mathlib `Beatty`/`Nat.beattySeq` (confirm availability at
+  v4.29.1).  Numerically verify every formula first (extend `tools/sandbox/st06_*.py`).
 
 ## 0. 🆕 NEXT TRACK — formalize Stoll [St05]: the REAL #482 resolution (any `w>0`, any base `g`)
 
