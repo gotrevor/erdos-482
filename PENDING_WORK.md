@@ -39,12 +39,24 @@ unformalized — the doc over-claimed. *(Filed for cross-check: `ON-LINE-REQUEST
    **unconditional** cubic impossibility — no equidistribution needed, sidestepping the open `{α^n ξ}`
    problem entirely. **2026-06-14 evidence (`tools/sandbox/cubic_uniform_escape_probe.py`, float64):**
    random schedules fail in ≤52 blocks (mean 0.9); the literature triple `(1/6,1/3,4/3)` fails at ~51–64;
-   a 31³ grid (span ±0.06) around it, varied starts, found **nothing past ~51**. So `sup N` *looks*
-   bounded (~64) — but this is float64 + coarse grid, so a measure-zero special-algebraic schedule could
-   survive far longer (Liouville-like). **Next concrete step:** rerun the probe with `mpmath` high
-   precision, adaptive/finer search near survivors, and varied `u₀`; if the bound holds (~64), pursue the
-   finite proof (this is the win); if survival is unbounded under fine-tuning, fall back to path #1
-   (done) + path #2. This decides whether the cubic is unconditionally closeable.
+   a 31³ grid (span ±0.06) around it, varied starts, found **nothing past ~51** in float.
+   **⚠️ But float64 caps at ~52 BECAUSE `u` doubles each block and hits the `2^53` integer wall —
+   the "cap" is a PRECISION ARTIFACT, not a bound.** Exact `Decimal`(400-digit)+`Fraction` check
+   (`first_fail_exact`): the doc triple genuinely fails at block **63** (matches doc "j=64"), and
+   float's 52 was spurious. So float searches **cannot** resolve `sup N`. **Next concrete step:** run an
+   **exact-arithmetic** search (rational offsets, `Decimal` orbit) — local-search/continuation maximising
+   `first_fail_exact` — to see if any schedule survives ≫63. If `sup N` is finite, that finite bound +
+   a decidable check gives the unconditional proof (the win). If survival climbs unboundedly under
+   exact fine-tuning, the cubic needs the (open) `{α^n ξ}` equidistribution and only the CONDITIONAL
+   theorem (`cubic_threestep_digit_pair_fails`, done) is provable. **This single exact search decides
+   whether the cubic is unconditionally closeable** — highest-leverage next numerical experiment.
+   **2026-06-14 exact-search result (partial):** an exact local search (rational offsets, 400-digit
+   `Decimal` orbit) found a schedule surviving **≥91 blocks** — so the doc triple's 63 is NOT the sup and
+   the earlier "sup ~64" guess is WRONG. The search then plateaued at 91, but that is almost certainly a
+   local-search stall (discrete/non-convex landscape), not a true bound. **Verdict: leans toward
+   `sup N = ∞` (path #3 likely dead → equidistribution genuinely required), but UNRESOLVED.** A proper
+   test needs continuation / constraint-propagation (track the offset-polytope satisfying the first `k`
+   digit constraints; check if it stays nonempty as `k→∞`), not random hill-climbing.
 
 **⚠️ This file below is now largely historical — see [`STATUS.md`](STATUS.md) for the authoritative state.**
 The project is **COMPLETE and axiom-clean** (zero `sorry`, zero custom axioms): the headline

@@ -23,8 +23,46 @@ unconditional result needs the (open) {a^n xi} equidistribution and only the CON
 (`cubic_threestep_digit_pair_fails`) is provable.
 """
 import math, random
+from decimal import Decimal, getcontext
+from fractions import Fraction
 
 A = 2.0 ** (1.0 / 3.0)
+
+# ---------------------------------------------------------------------------
+# ⚠️ FLOAT-PRECISION CAVEAT (2026-06-14): u doubles each block, so by block ~52
+# u ≈ 2^52 hits float64's 2^53 integer-precision wall — float `first_fail` then
+# reports SPURIOUS failures. The float "survival caps at ~52" is therefore an
+# ARTIFACT, not a uniform bound. Use `first_fail_exact` (below) past ~block 45.
+# Exact check: the literature triple (1/6,1/3,4/3) genuinely fails at block 63
+# (matches the doc's "j=64", off-by-one), NOT 52. Whether sup over schedules is
+# finite (⇒ path #3 unconditional proof) is OPEN and needs an exact-arithmetic
+# search — float searches cannot resolve it.
+# ---------------------------------------------------------------------------
+
+getcontext().prec = 400
+_x = Decimal("1.26")
+for _ in range(80):
+    _x = (2 * _x + Decimal(2) / (_x * _x)) / 3
+A_EXACT = _x  # 2^(1/3) to ~400 digits
+
+
+def _dfloor(d):
+    return int(d.to_integral_value(rounding="ROUND_FLOOR"))
+
+
+def first_fail_exact(c0, c1, c2, u0=1, maxstep=400):
+    """Exact survival length with rational offsets (Fraction) and ~400-digit a."""
+    C0, C1, C2 = (Decimal(c.numerator) / Decimal(c.denominator) for c in (c0, c1, c2))
+    u = u0
+    for j in range(maxstep):
+        v1 = _dfloor(A_EXACT * (Decimal(u) + C0))
+        v2 = _dfloor(A_EXACT * (Decimal(v1) + C1))
+        v3 = _dfloor(A_EXACT * (Decimal(v2) + C2))
+        d = v3 - 2 * u
+        if d not in (0, 1):
+            return j
+        u = v3
+    return None
 
 
 def first_fail(c0, c1, c2, u0=1, maxstep=3000):
@@ -65,6 +103,7 @@ def grid_near(base=(1 / 6, 1 / 3, 4 / 3), n=31, span=0.06, cap=400):
 
 
 if __name__ == "__main__":
-    print("doc triple (1/6,1/3,4/3):", first_fail(1 / 6, 1 / 3, 4 / 3, 1))
+    print("doc triple (1/6,1/3,4/3) float:", first_fail(1 / 6, 1 / 3, 4 / 3, 1),
+          " EXACT:", first_fail_exact(Fraction(1, 6), Fraction(1, 3), Fraction(4, 3)))
     random_scan()
     grid_near()
