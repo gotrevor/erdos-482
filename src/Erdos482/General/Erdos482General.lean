@@ -30,6 +30,7 @@ import Erdos482.General.GeneralOrbit
 import Erdos482.General.GeneralTorusEquidist
 import Erdos482.General.BaseGTorusEquidist
 import Erdos482.General.GeneralTorusFinish
+import Erdos482.General.BaseGFinish
 import Erdos482.General.GeneralSubsumes
 
 /-!

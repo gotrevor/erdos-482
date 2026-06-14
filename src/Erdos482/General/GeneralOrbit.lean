@@ -105,6 +105,58 @@ theorem dStepPartial_eq_dGpd (α : ℝ) (c : ℕ → ℝ) (W : ℝ) (n e : ℕ) 
   refine Finset.sum_congr rfl (fun k _ => ?_)
   rw [dStepF_eq_orbitF]
 
+/-- **Real-multiplier orbit bridge** (base-agnostic).  `dStepF_orbit` only uses `W·2ⁿ` as a single
+real; replacing it with any real `M` gives the same closed form — so the floor errors of `dStepF α c ⌊M⌋`
+are `orbitF` at the coordinate vector `r i = {αⁱ·M}`.  At `M = W·2ⁿ` this is `dStepF_eq_orbitF`; at
+`M = W·gⁿ` it is the base-`g` bridge. -/
+theorem dStepF_orbit_real (α : ℝ) (c : ℕ → ℝ) (M : ℝ) (k : ℕ) :
+    dStepF α c (⌊M⌋) k
+      = Int.fract (Int.fract (α ^ (k + 1) * M) - α ^ (k + 1) * Int.fract M
+          + (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - dStepF α c (⌊M⌋) j))
+          + α * c k) := by
+  set u : ℤ := ⌊M⌋ with hu
+  have hclosed := affine_rec_closed α (dStepV α c u) (fun j => α * c j - dStepF α c u j)
+    (dStepV_succ α c u) k
+  have harg : α * (dStepV α c u k + c k)
+      = (Int.fract (α ^ (k + 1) * M) - α ^ (k + 1) * Int.fract M
+          + (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - dStepF α c u j)) + α * c k)
+        + ((⌊α ^ (k + 1) * M⌋ : ℤ) : ℝ) := by
+    have hv0 : dStepV α c u 0 = (u : ℝ) := by rw [dStepV]
+    have huf : (u : ℝ) = M - Int.fract M := by rw [hu]; exact (Int.self_sub_fract _).symm
+    have hflr : Int.fract (α ^ (k + 1) * M) + ((⌊α ^ (k + 1) * M⌋ : ℤ) : ℝ)
+        = α ^ (k + 1) * M := Int.fract_add_floor _
+    have hsum : α * (∑ j ∈ Finset.range k, α ^ (k - 1 - j) * (α * c j - dStepF α c u j))
+        = ∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - dStepF α c u j) := by
+      rw [Finset.mul_sum]
+      refine Finset.sum_congr rfl (fun j hj => ?_)
+      rw [Finset.mem_range] at hj
+      rw [show k - j = (k - 1 - j) + 1 by omega, pow_succ]; ring
+    rw [hclosed, hv0, huf]
+    linear_combination hsum - hflr
+  rw [dStepF, harg, Int.fract_add_intCast]
+
+/-- The floor error along the `M`-orbit IS `orbitF` at the canonical coordinates `r i = {αⁱ·M}`. -/
+theorem dStepF_eq_orbitF_real (α : ℝ) (c : ℕ → ℝ) (M : ℝ) (k : ℕ) :
+    dStepF α c (⌊M⌋) k = orbitF α c (fun i => Int.fract (α ^ i * M)) k := by
+  induction k using Nat.strong_induction_on with
+  | _ k IH =>
+    rw [dStepF_orbit_real, orbitF_eq]
+    have hsum : (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - dStepF α c (⌊M⌋) j))
+        = ∑ j ∈ Finset.range k,
+            α ^ (k - j) * (α * c j - orbitF α c (fun i => Int.fract (α ^ i * M)) j) := by
+      refine Finset.sum_congr rfl (fun j hj => ?_)
+      rw [IH j (Finset.mem_range.mp hj)]
+    rw [hsum]
+    simp only [pow_zero, one_mul]
+
+/-- The partial defect along the `M`-orbit IS `dGpd` at the canonical coordinates `r i = {αⁱ·M}`. -/
+theorem dStepPartial_eq_dGpd_real (α : ℝ) (c : ℕ → ℝ) (M : ℝ) (e : ℕ) :
+    dStepPartial α c (⌊M⌋) (e + 1)
+      = dGpd α c (fun i => Int.fract (α ^ i * M)) e := by
+  rw [dStepPartial_eq_sum, dGpd]
+  refine Finset.sum_congr rfl (fun k _ => ?_)
+  rw [dStepF_eq_orbitF_real]
+
 /-- Finite sum of functions continuous at a point is continuous at that point. -/
 private theorem continuousAt_finset_sum {ι X : Type*} [TopologicalSpace X]
     (s : Finset ι) (f : ι → X → ℝ) {x : X} (h : ∀ i ∈ s, ContinuousAt (f i) x) :
