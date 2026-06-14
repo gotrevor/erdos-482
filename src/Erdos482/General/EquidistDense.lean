@@ -76,6 +76,32 @@ theorem isEquidistributed_dense {X : Type*} [TopologicalSpace X] [CompactSpace X
   have : (∫ y, f y ∂μ : ℝ) = 0 := by exact_mod_cast hInt0
   linarith [hReal]
 
+/-- **A continuous function confined on a dense orbit to a closed set is confined everywhere on an open
+set.**  If `Set.range x` is dense, `f` is continuous on an open `U`, `S` is closed, and `f (x n) ∈ S`
+whenever `x n ∈ U`, then `f y ∈ S` for *all* `y ∈ U`.  (Relative density: `U ∩ range x` is dense in `U`,
+and `f` maps its relative closure into the closed `S`.)  The clean contrapositive form of the cubic
+finish: a defect that is continuous and exceeds the digit window somewhere on an open box cannot be
+confined to that window along the dense orbit.  Provenance: Aristotle `291bb0fb`, verified
+in-kernel + axiom-clean. -/
+theorem dense_continuousOn_image_subset {X : Type*} [TopologicalSpace X]
+    {x : ℕ → X} (hx : Dense (Set.range x))
+    {U : Set X} (hU : IsOpen U) {f : X → ℝ} (hf : ContinuousOn f U)
+    {S : Set ℝ} (hS : IsClosed S)
+    (hmem : ∀ n, x n ∈ U → f (x n) ∈ S) :
+    ∀ y ∈ U, f y ∈ S := by
+  intro y hy
+  have h_closure : y ∈ closure (U ∩ Set.range x) := by
+    rw [mem_closure_iff]
+    intro o ho hyo
+    rcases hx.inter_nhds_nonempty (IsOpen.mem_nhds (hU.inter ho) ⟨hy, hyo⟩) with ⟨z, hz, hz'⟩
+    exact ⟨z, by aesop⟩
+  rw [mem_closure_iff_nhdsWithin_neBot] at h_closure
+  have h_tendsto : Filter.Tendsto f (nhdsWithin y (U ∩ Set.range x)) (nhds (f y)) :=
+    (hf.continuousWithinAt hy).mono_left (nhdsWithin_mono _ Set.inter_subset_left)
+  refine hS.mem_of_tendsto h_tendsto (Filter.eventually_of_mem self_mem_nhdsWithin fun z hz => ?_)
+  obtain ⟨hzU, m, rfl⟩ := hz
+  exact hmem m hzU
+
 /-- **A dense orbit realizes values above any threshold strictly below a continuity-point value.**
 If `Set.range x` is dense, `f` is continuous at `p`, and `c < f p`, then some orbit point `x n` has
 `c < f (x n)`.  (The superlevel set `{y | c < f y}` is a neighborhood of `p`; density meets it.)  The
