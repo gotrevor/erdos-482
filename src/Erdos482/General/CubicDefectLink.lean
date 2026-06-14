@@ -1,4 +1,5 @@
 import Erdos482.General.CubicDefect
+import Mathlib.Topology.Algebra.Order.Floor
 
 /-!
 # The cubic defect as a function of the base-2 orbit point (toward the density contradiction)
@@ -76,5 +77,59 @@ theorem cubicPartialDefect_orbit_eq (α c0 c1 c2 W : ℝ) (n : ℕ) :
             + α ^ 2 * c0 + α * c1) := by
   unfold cubicPartialDefect
   rw [cubic_f1_orbit, cubic_f2_orbit, cubic_f1_orbit]
+
+/-- The partial defect, as a function of the three orbit fractional coordinates `(r₁,r₂,r₃)`. -/
+noncomputable def cubicGpd (α c0 c1 r1 r2 r3 : ℝ) : ℝ :=
+  α ^ 2 * Int.fract (r2 - α * r1 + α * c0)
+    + α * Int.fract (r3 - α ^ 2 * r1 - α * Int.fract (r2 - α * r1 + α * c0) + α ^ 2 * c0 + α * c1)
+
+/-- `cubicGpd` evaluated at the canonical orbit coordinates IS the partial defect at `⌊W·2ⁿ⌋`. -/
+theorem cubicPartialDefect_eq_Gpd (α c0 c1 c2 W : ℝ) (n : ℕ) :
+    cubicPartialDefect α c0 c1 c2 (⌊W * 2 ^ n⌋)
+      = cubicGpd α c0 c1 (Int.fract (W * 2 ^ n)) (Int.fract (α * (W * 2 ^ n)))
+          (Int.fract (α ^ 2 * (W * 2 ^ n))) :=
+  cubicPartialDefect_orbit_eq α c0 c1 c2 W n
+
+/-- **The partial-defect function `cubicGpd` is continuous at any point whose two internal `fract`
+arguments are non-integers.**  (Affine maps are continuous and `Int.fract` is continuous off `ℤ`
+— `continuousAt_fract` — so the composition is continuous at such points.)  At such a continuity
+point the dense cubic orbit realizes defect values arbitrarily close to `cubicGpd`'s value
+(`EquidistDense.exists_lt_of_dense_continuousAt`); choosing the point so the value leaves the digit
+window `(C−2, C]` finishes the a.e.-`W` cubic impossibility. -/
+theorem continuousAt_cubicGpd (α c0 c1 : ℝ) (p : ℝ × ℝ × ℝ)
+    (hA : p.2.1 - α * p.1 + α * c0 ≠ (⌊p.2.1 - α * p.1 + α * c0⌋ : ℤ))
+    (hB : p.2.2 - α ^ 2 * p.1
+            - α * Int.fract (p.2.1 - α * p.1 + α * c0) + α ^ 2 * c0 + α * c1
+          ≠ (⌊p.2.2 - α ^ 2 * p.1
+                - α * Int.fract (p.2.1 - α * p.1 + α * c0) + α ^ 2 * c0 + α * c1⌋ : ℤ)) :
+    ContinuousAt (fun q : ℝ × ℝ × ℝ => cubicGpd α c0 c1 q.1 q.2.1 q.2.2) p := by
+  have hcoord : ContinuousAt (fun q : ℝ × ℝ × ℝ => q.1) p := continuous_fst.continuousAt
+  have hcoord2 : ContinuousAt (fun q : ℝ × ℝ × ℝ => q.2.1) p :=
+    (continuous_fst.comp continuous_snd).continuousAt
+  have hcoord3 : ContinuousAt (fun q : ℝ × ℝ × ℝ => q.2.2) p :=
+    (continuous_snd.comp continuous_snd).continuousAt
+  have hAmap : ContinuousAt (fun q : ℝ × ℝ × ℝ => q.2.1 - α * q.1 + α * c0) p := by fun_prop
+  have hfractA : ContinuousAt
+      (fun q : ℝ × ℝ × ℝ => Int.fract (q.2.1 - α * q.1 + α * c0)) p :=
+    ContinuousAt.comp (g := Int.fract) (f := fun q : ℝ × ℝ × ℝ => q.2.1 - α * q.1 + α * c0)
+      (continuousAt_fract hA) hAmap
+  have hBmap : ContinuousAt
+      (fun q : ℝ × ℝ × ℝ => q.2.2 - α ^ 2 * q.1
+          - α * Int.fract (q.2.1 - α * q.1 + α * c0) + α ^ 2 * c0 + α * c1) p := by
+    apply ContinuousAt.add
+    apply ContinuousAt.add
+    apply ContinuousAt.sub
+    · exact (hcoord3.sub (hcoord.const_mul (α ^ 2)))
+    · exact hfractA.const_mul α
+    · exact continuousAt_const
+    · exact continuousAt_const
+  have hfractB : ContinuousAt
+      (fun q : ℝ × ℝ × ℝ => Int.fract (q.2.2 - α ^ 2 * q.1
+          - α * Int.fract (q.2.1 - α * q.1 + α * c0) + α ^ 2 * c0 + α * c1)) p :=
+    ContinuousAt.comp (g := Int.fract)
+      (f := fun q : ℝ × ℝ × ℝ => q.2.2 - α ^ 2 * q.1
+          - α * Int.fract (q.2.1 - α * q.1 + α * c0) + α ^ 2 * c0 + α * c1)
+      (continuousAt_fract hB) hBmap
+  exact (hfractA.const_mul (α ^ 2)).add (hfractB.const_mul α)
 
 end Erdos482.General
