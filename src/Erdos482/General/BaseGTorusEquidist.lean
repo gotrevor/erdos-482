@@ -2,6 +2,7 @@ import Erdos482.General.BaseGEquidist
 import Erdos482.General.MultidimWeyl
 import Erdos482.General.EquidistDense
 import Erdos482.General.DELEngine
+import Erdos482.General.RpowLinIndep
 
 /-!
 # a.e.-`W` equidistribution of the base-`g` torus orbit `gⁿ(W, αW, …, α^{d-1}W)`
@@ -90,5 +91,22 @@ theorem ae_W_dTorusG_orbit_dense {g d : ℕ} (hg : 2 ≤ g)
     ∀ᵐ W ∂(volume : Measure ℝ), Dense (Set.range (dTorusOrbitG g d W)) := by
   filter_upwards [ae_W_dTorusG_orbit_equidistributed hg hli] with W hW
   exact isEquidistributedTorus_dense hW
+
+/-- **Eisenstein discharges the lin-indep hypothesis.**  If `1 ≤ d` and a prime `p` divides `g` exactly
+once (`p ∣ g`, `p² ∤ g`), then `Xᵈ − g` is irreducible (Eisenstein at `p`), so `{1, α, …, α^{d-1}}`
+(`α = g^{1/d}`) are ℤ-linearly independent: `dXiG g d m = 0 ⟹ m = 0`.  Hence the hypothesis of the
+torus-density theorems is met for any such `(g, d)`. -/
+theorem dXiG_ne_zero {g d : ℕ} (hd : 1 ≤ d) {p : ℕ} (hp : p.Prime) (hpg : p ∣ g)
+    (hpg2 : ¬ (p ^ 2 ∣ g)) {m : Fin d → ℤ} (hm : m ≠ 0) : dXiG g d m ≠ 0 := by
+  intro h
+  have hlin := rpow_lin_indep_int_base g d hd p hp hpg hpg2 m (by rw [dXiG] at h; exact h)
+  exact hm (funext hlin)
+
+/-- **The base-`g` `Tᵈ` orbit is dense for a.e. `W` — unconditionally** for any `(g, d)` admitting an
+Eisenstein prime (`p ∣ g`, `p² ∤ g`).  Combines `ae_W_dTorusG_orbit_dense` with `dXiG_ne_zero`. -/
+theorem ae_W_dTorusG_orbit_dense_eisenstein {g d : ℕ} (hg : 2 ≤ g) (hd : 1 ≤ d)
+    {p : ℕ} (hp : p.Prime) (hpg : p ∣ g) (hpg2 : ¬ (p ^ 2 ∣ g)) :
+    ∀ᵐ W ∂(volume : Measure ℝ), Dense (Set.range (dTorusOrbitG g d W)) :=
+  ae_W_dTorusG_orbit_dense hg (fun m hm => dXiG_ne_zero hd hp hpg hpg2 hm)
 
 end Erdos482.General
