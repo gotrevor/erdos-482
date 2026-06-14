@@ -1,6 +1,38 @@
 # PENDING_WORK — Erdős #482 / Stoll
 
-## ★★★ STATE 2026-06-14 (~lap baton, build 🟢 8286) — equidistribution backbone DONE; defect-link in progress
+## ★★★★ STATE 2026-06-14 (build 🟢 8285) — **UNCONDITIONAL a.e.-`W` CUBIC IMPOSSIBILITY: COMPLETE & AXIOM-CLEAN**
+
+The "for-fun" frontier (attack-path #2) is **DONE**.  The entire repo is now **sorry-free AND
+custom-axiom-free** — every declaration depends only on `[propext, Classical.choice, Quot.sound]`.
+
+**`src/Erdos482/General/CubicFinish.lean`** assembles the three remaining pieces and discharges the
+geometric crux.  Headline results (all axiom-clean):
+- **`ae_no_cubic_schedule_reads_base_two`** — for a.e. `W`, **NO** 3-periodic schedule `(c₀,c₁,c₂)`
+  whatsoever makes the cubic three-step floor map read `W`'s base-2 digits (∃ step with digit ∉{0,1}).
+  *Uniform over all schedules* — the exceptional set is the schedule-independent orbit-density set.
+- **`ae_not_cubicDigitRepresentable`** — the set of `W` some fixed cubic schedule digit-represents is null.
+- **`ae_not_cubicReadsBaseTwo`** — the self-referential capstone: the set of `W` whose base-2 doubling
+  some cubic schedule *computes* (`cubicV3(⌊W·2ⁿ⌋)=⌊W·2ⁿ⁺¹⌋` ∀n) is null.
+- supporting: `torusRep`/`continuousAt_torusRep` (ℝ/ℤ chart), `cubicGpdTorus`/`cubicGpdTorus_orbit`/
+  `continuousAt_cubicGpdTorus` (partial defect as a continuous-off-jumps `T³` function),
+  `cbrt2_cube`, `one_lt_cbrt2`, `fract_shift_realize` + `cubicGpd_exceeds_window(_general)` (the
+  width-`(α²+α)>2` geometric crux, harvested from Aristotle `7b1ff2ad` + ported/verified in-kernel).
+
+### ▶▶ NEXT FRONTIERS (the impossibility is done; these EXTEND it)
+1. **Degree-`d` generalization** (`α = 2^{1/d}`): the same machinery (ℤ-independence of `{1,α,…,α^{d-1}}`
+   via irreducibility of `xᵈ−2`; `T^d` equidistribution from `MultidimWeyl`; defect-window reduction)
+   should give the analogous a.e.-`W` impossibility for the `d`-step self-referential floor map.
+   Hardest new prerequisite: `Irreducible (X^d - 2)` over ℚ (Eisenstein at 2) ⇒ `2^{1/d}` has degree `d`.
+2. **Recurrence-orbit bridge** (`binary_floor_eq`, Aristotle `b8320752` IN FLIGHT): a digit-reading cubic
+   *recurrence* orbit `orbit(n+1)=cubicV3(orbit n)` (not a-priori pinned to `W`) has binary value `W'`
+   with `orbit n = ⌊W'·2ⁿ⌋` (non-dyadic) ⇒ the set of such `W'` is null.  Marginal extra generality over
+   `ae_not_cubicReadsBaseTwo`; the floor identity is a clean reusable library lemma regardless.
+3. **Fixed-`W` version** — OPEN MATH (cf. `{(3/2)ⁿ}` not even known dense); needs Borel normality, not
+   in mathlib.  Not attemptable; a literature/infrastructure lap at best.
+
+---
+
+## ARCHIVE — ★★★ STATE 2026-06-14 (~lap baton, build 🟢 8286) — equidistribution backbone DONE; defect-link in progress
 
 **This lap built the ENTIRE analytic backbone of the a.e.-`W` cubic + the algebraic half of the geometry
 finish.**  All axiom-clean (`[propext, Classical.choice, Quot.sound]`).  New decls:
