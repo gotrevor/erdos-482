@@ -1,0 +1,85 @@
+import Mathlib.Dynamics.Ergodic.AddCircle
+import Mathlib.MeasureTheory.Integral.IntervalIntegral.Periodic
+import Mathlib.Topology.Bases
+
+/-!
+# A.e. density of the doubling-map orbit on `ℝ/ℤ`
+
+The cubic self-referential frontier (`General/CubicDefect.lean`) reduces to a statement about the
+**doubling map** `x ↦ 2x` on the circle: the block orbit `uₙ = ⌊W·2ⁿ⌋` makes the first internal-floor
+error a doubling-map orbit `≈ {αW·2ⁿ}`, so the residual obstruction is whether that orbit avoids a
+constrained set (the two-plane confinement of `cubic_orbit_defect_confined`).  For a *specific* `W` this
+is the open "is this number base-2 normal" question; but for **almost every** `W` the orbit cannot avoid
+any nonempty open set, which already rules out the measure-zero confinement.
+
+This file proves that unconditional a.e. statement, using only the ergodicity of `×2` on `AddCircle`
+(`AddCircle.ergodic_nsmul`, already in mathlib) — **no pointwise Birkhoff theorem is needed**:
+
+* `ae_orbit_mem_of_isOpen`: for any nonempty open `U`, a.e. `x` has its forward doubling-orbit enter
+  `U`.  (Heart: the "ever hits `U`" set `A = ⋃ₙ T⁻ⁿU` satisfies `T⁻¹A ⊆ A` and `μ A ≥ μ U > 0`, so
+  ergodicity forces `A` conull.)
+* `ae_dense_orbit_doubling`: a.e. `x` has a **dense** doubling-orbit (intersect the previous over a
+  countable basis).
+
+These are the ergodic core of attack-path #2 (the a.e.-`W` unconditional cubic route) in
+`PENDING_WORK.md`.  Density (not full equidistribution) already contradicts the two-plane confinement,
+so this is the right tool — the remaining gap to a complete a.e.-`W` cubic theorem is the *skew-product*
+step relating the joint internal-floor coordinates `(f₁,f₂,f₃)` to this single doubling orbit.
+-/
+
+open MeasureTheory Filter Set TopologicalSpace
+
+noncomputable section
+namespace Erdos482.General
+
+/-- **For any nonempty open `U`, almost every point's forward doubling-orbit enters `U`.**  `T x = 2•x`
+on `ℝ/ℤ` is ergodic, the set `A = {x | ∃ n, Tⁿ x ∈ U}` of points ever hitting `U` satisfies
+`T⁻¹A ⊆ A` and `μ A ≥ μ U > 0`, so by `Ergodic.ae_empty_or_univ_of_preimage_ae_le` it is conull. -/
+theorem ae_orbit_mem_of_isOpen (U : Set (AddCircle (1:ℝ))) (hU : IsOpen U) (hUne : U.Nonempty) :
+    ∀ᵐ x : AddCircle (1:ℝ) ∂volume, ∃ n : ℕ, (fun y : AddCircle (1:ℝ) => (2:ℕ) • y)^[n] x ∈ U := by
+  set T : AddCircle (1:ℝ) → AddCircle (1:ℝ) := fun y => (2:ℕ) • y with hT
+  have herg : Ergodic T volume := AddCircle.ergodic_nsmul (by norm_num)
+  have hcontT : Continuous T := by fun_prop
+  set A : Set (AddCircle (1:ℝ)) := {x | ∃ n : ℕ, T^[n] x ∈ U} with hAdef
+  have hAeq : A = ⋃ n : ℕ, T^[n] ⁻¹' U := by ext x; simp [hAdef]
+  have hA : MeasurableSet A := by
+    rw [hAeq]
+    exact MeasurableSet.iUnion (fun n => (hcontT.iterate n).measurable hU.measurableSet)
+  have hpre : T ⁻¹' A ⊆ A := by
+    rintro x ⟨n, hn⟩
+    exact ⟨n + 1, by rw [Function.iterate_succ_apply]; exact hn⟩
+  have hposU : 0 < volume U := hU.measure_pos volume hUne
+  have hUA : U ⊆ A := fun x hx => ⟨0, by simpa using hx⟩
+  have hposA : 0 < volume A := lt_of_lt_of_le hposU (measure_mono hUA)
+  have hle : T ⁻¹' A ≤ᵐ[volume] A := HasSubset.Subset.eventuallyLE hpre
+  have huniv : A =ᵐ[volume] univ := by
+    rcases herg.ae_empty_or_univ_of_preimage_ae_le hA.nullMeasurableSet hle with h | h
+    · exact absurd (by rw [measure_congr h]; simp : volume A = 0) (ne_of_gt hposA)
+    · exact h
+  filter_upwards [huniv] with x hx
+  exact hx.mpr (mem_univ x)
+
+/-- **Almost every point has a dense doubling-orbit on `ℝ/ℤ`.**  Intersect `ae_orbit_mem_of_isOpen`
+over a countable topological basis: a.e. `x` meets every nonempty basic open, hence has dense orbit.
+This is the unconditional a.e. input behind the cubic self-referential frontier's path #2 (it already
+contradicts any measure-zero confinement of the orbit), and uses only `×2`-ergodicity — not Birkhoff. -/
+theorem ae_dense_orbit_doubling :
+    ∀ᵐ x : AddCircle (1:ℝ) ∂volume,
+      Dense (Set.range (fun n : ℕ => (fun y : AddCircle (1:ℝ) => (2:ℕ) • y)^[n] x)) := by
+  set T : AddCircle (1:ℝ) → AddCircle (1:ℝ) := fun y => (2:ℕ) • y with hT
+  have hbasis := isBasis_countableBasis (AddCircle (1:ℝ))
+  have hcount := countable_countableBasis (AddCircle (1:ℝ))
+  have key : ∀ᵐ x ∂volume, ∀ U ∈ countableBasis (AddCircle (1:ℝ)),
+      (U ∩ Set.range (fun n : ℕ => T^[n] x)).Nonempty := by
+    rw [ae_ball_iff hcount]
+    intro U hU
+    have hUne : U.Nonempty :=
+      nonempty_iff_ne_empty.mpr (fun h => empty_notMem_countableBasis _ (h ▸ hU))
+    have hUopen : IsOpen U := hbasis.isOpen hU
+    filter_upwards [ae_orbit_mem_of_isOpen U hUopen hUne] with x hx
+    obtain ⟨n, hn⟩ := hx
+    exact ⟨T^[n] x, hn, ⟨n, rfl⟩⟩
+  filter_upwards [key] with x hx
+  exact hbasis.dense_iff.mpr (fun U hU _ => hx U hU)
+
+end Erdos482.General
