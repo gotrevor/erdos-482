@@ -141,4 +141,33 @@ theorem exists_partial_defect_outside_window (d : ℕ) (hd : 3 ≤ d) (C : ℝ) 
     (fun k _ => pow_pos hαpos _) t htin
   exact ⟨f, hf, by rw [hsum]; exact htout⟩
 
+/-- **A strict-interior scaling escapes the window.**  For `S > 2` and any `C`, there is `τ ∈ (0,1)`
+with `τ·S ∉ (C-2, C]`.  (`τ·S` ranges over the open interval `(0, S)` of length `> 2`.)  This is the
+form needed for the final general-`d` assembly: take the constant defect target `fₖ = τ`, so the
+partial defect is `τ·S_d` with `S_d > 2` (`rrt_window_gt_two`), realized strictly inside `(0,1)` so the
+torus coordinates are nonzero. -/
+theorem exists_scale_outside_window (S C : ℝ) (hS : 2 < S) :
+    ∃ τ, τ ∈ Set.Ioo (0 : ℝ) 1 ∧ τ * S ∉ Set.Ioc (C - 2) C := by
+  have hSpos : (0 : ℝ) < S := by linarith
+  by_cases hC : C ≤ 0
+  · refine ⟨1 / 2, ⟨by norm_num, by norm_num⟩, ?_⟩
+    rw [Set.mem_Ioc]; rintro ⟨_, h2⟩; nlinarith
+  · have hC : 0 < C := not_le.mp hC
+    by_cases hCS : C < S
+    · refine ⟨(C / S + 1) / 2, ⟨?_, ?_⟩, ?_⟩
+      · have : (0 : ℝ) < C / S := div_pos hC hSpos; linarith
+      · have : C / S < 1 := (div_lt_one hSpos).mpr hCS; linarith
+      · rw [Set.mem_Ioc]; rintro ⟨_, h2⟩
+        have hτS : (C / S + 1) / 2 * S = (C + S) / 2 := by field_simp
+        rw [hτS] at h2; linarith
+    · have hCS : S ≤ C := not_lt.mp hCS
+      refine ⟨min ((C - 2) / S) (1 / 2), ⟨?_, ?_⟩, ?_⟩
+      · exact lt_min (div_pos (by linarith) hSpos) (by norm_num)
+      · exact lt_of_le_of_lt (min_le_right _ _) (by norm_num)
+      · rw [Set.mem_Ioc]; rintro ⟨h1, _⟩
+        have hle : min ((C - 2) / S) (1 / 2) * S ≤ (C - 2) / S * S :=
+          mul_le_mul_of_nonneg_right (min_le_left _ _) hSpos.le
+        rw [div_mul_cancel₀ _ (ne_of_gt hSpos)] at hle
+        linarith
+
 end Erdos482.General
