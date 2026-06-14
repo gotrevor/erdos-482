@@ -82,4 +82,55 @@ theorem ae_dense_orbit_doubling :
   filter_upwards [key] with x hx
   exact hbasis.dense_iff.mpr (fun U hU _ => hx U hU)
 
+/-- The projection `π : ℝ → ℝ/ℤ` intertwines the real doubling `t ↦ 2t` with the circle doubling
+`y ↦ 2•y`: `π(2ⁿ·t) = (y ↦ 2•y)^[n] (π t)`. -/
+theorem doubling_iterate_eq (t : ℝ) (n : ℕ) :
+    ((2 ^ n * t : ℝ) : AddCircle (1:ℝ))
+      = (fun y : AddCircle (1:ℝ) => (2:ℕ) • y)^[n] ((t : AddCircle (1:ℝ))) := by
+  induction n with
+  | zero => simp
+  | succ k ih =>
+    rw [Function.iterate_succ_apply', ← ih, ← QuotientAddGroup.mk_nsmul]
+    congr 1
+    simp [nsmul_eq_mul]
+    ring
+
+/-- **ℝ-line form: a.e. real `t` has a dense base-2 orbit `{2ⁿ·t mod 1}`.**  Pull
+`ae_dense_orbit_doubling` back along the measure-preserving projection `ℝ → ℝ/ℤ` (the bad set is a
+countable union of pieces, each a measure-preserving preimage of the null circle-bad set).  This is the
+real-line input the cubic frontier's path #2 uses: with `t = αW`, `{2ⁿαW mod 1}` is dense for a.e. `W`.
+(Density only — the path #2 *equidistribution* on the measure-zero curve `(W,αW,α²W)` needs the Weyl/DEL
+mean square `WeylDoubling.doubling_weyl_L2_mean`, not just this.) -/
+theorem ae_fract_dense_real :
+    ∀ᵐ t : ℝ ∂volume,
+      Dense (Set.range (fun n : ℕ => ((2 ^ n * t : ℝ) : AddCircle (1:ℝ)))) := by
+  haveI : Fact (0 < (1:ℝ)) := ⟨one_pos⟩
+  set Nbad : Set (AddCircle (1:ℝ)) :=
+    {x | ¬ Dense (Set.range (fun n : ℕ => (fun y : AddCircle (1:ℝ) => (2:ℕ) • y)^[n] x))} with hN
+  have hNnull : volume Nbad = 0 := ae_iff.mp ae_dense_orbit_doubling
+  have hrange : ∀ t : ℝ,
+      (Set.range (fun n : ℕ => ((2 ^ n * t : ℝ) : AddCircle (1:ℝ))))
+        = Set.range (fun n : ℕ => (fun y : AddCircle (1:ℝ) => (2:ℕ) • y)^[n] ((t : AddCircle (1:ℝ)))) :=
+    fun t => congrArg Set.range (funext fun n => doubling_iterate_eq t n)
+  rw [ae_iff]
+  have hpre :
+      {t : ℝ | ¬ Dense (Set.range (fun n : ℕ => ((2 ^ n * t : ℝ) : AddCircle (1:ℝ))))}
+        = ((↑) : ℝ → AddCircle (1:ℝ)) ⁻¹' Nbad := by
+    ext t; simp only [Set.mem_setOf_eq, Set.mem_preimage, hN, hrange t]
+  rw [hpre]
+  have cover : ((↑) : ℝ → AddCircle (1:ℝ)) ⁻¹' Nbad
+      ⊆ ⋃ k : ℤ, (((↑) : ℝ → AddCircle (1:ℝ)) ⁻¹' Nbad ∩ Set.Ioc (k:ℝ) ((k:ℝ) + 1)) := by
+    intro x hx
+    rw [Set.mem_iUnion]
+    refine ⟨⌈x⌉ - 1, hx, ?_⟩
+    constructor
+    · push_cast; have := Int.ceil_lt_add_one x; linarith
+    · push_cast; have := Int.le_ceil x; linarith
+  have hpiece : ∀ k : ℤ,
+      volume (((↑) : ℝ → AddCircle (1:ℝ)) ⁻¹' Nbad ∩ Set.Ioc (k:ℝ) ((k:ℝ) + 1)) = 0 := by
+    intro k
+    have hnull := (AddCircle.measurePreserving_mk (1:ℝ) (k:ℝ)).quasiMeasurePreserving.preimage_null hNnull
+    rwa [Measure.restrict_apply' measurableSet_Ioc] at hnull
+  exact measure_mono_null cover (measure_iUnion_null hpiece)
+
 end Erdos482.General
