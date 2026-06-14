@@ -1,5 +1,48 @@
 # PENDING_WORK — Erdős #482 / Stoll
 
+## ★★ SHARPENED ROADMAP (2026-06-14 ~07:00) — the a.e.-W cubic reduces to *a.e. equidistribution of {2ⁿs}*
+
+This lap proved three axiom-clean bricks and, in doing so, pinned the EXACT remaining infrastructure for
+the a.e.-`W` unconditional cubic. Corrects the prior handoff (which framed the wall as "a Birkhoff port").
+
+**Done this lap (all axiom-clean, build 🟢 8276):**
+1. `CubicDefect.cubic_orbit_defect_confined` / `_no_wide_defect_pair` — the orbit-level ceiling: a
+   digit-reading orbit pins every combined defect to the two-point set `{C, C−1}` (two parallel
+   hyperplanes in `[0,1)³`); any two defects differ by `≤ 1`.
+2. `CubicDefect.cubic_lin_indep_int` — `{1, α, α²}` are ℤ-linearly independent (`α=2^{1/3}`, degree 3).
+   *This is the key brick:* it guarantees `ξ := a+bα+cα² ≠ 0` for `(a,b,c)≠0`, which is exactly what the
+   Weyl-sum reduction below needs.
+3. `DoublingOrbit.ae_dense_orbit_doubling` — a.e. `x∈ℝ/ℤ` has a DENSE `×2`-orbit, from
+   `AddCircle.ergodic_nsmul` alone (no Birkhoff). `ae_orbit_mem_of_isOpen` is the reusable core.
+
+**The precise reduction (worked out this lap).** A digit-reading orbit forces the joint floor coords
+`(f₁,f₂,f₃)` — which are functions of `2ⁿ(W, αW, α²W) mod 1` — to stay on the two-plane set
+`{α²x+αy+z ∈ {C,C−1}}`. To contradict, the orbit `2ⁿ(W,αW,α²W)` must be **dense (better: equidistributed)
+in `T³`** for a.e. `W`. By Weyl: equidistribution in `T³` ⟺ for every `(a,b,c)≠0`,
+`(1/N)Σ e^{2πi·2ⁿ·ξW} → 0` with `ξ=a+bα+cα²`. Brick #2 gives `ξ≠0`, so this is the **1-D** statement
+"`{2ⁿ·(ξW)}` equidistributes for a.e. `W`" (a.e. `ξW` since `ξ≠0`). So:
+
+> **a.e.-`W` cubic ⟸ [a.e. equidistribution of the doubling orbit `{2ⁿ s}`, `s∈ℝ`] + [lin-indep ✓].**
+
+**Why DENSITY (#3) is NOT enough (the subtle catch).** The initial points `(W,αW,α²W)` lie on a
+**measure-zero curve** in `T³`. `ae_dense_orbit_doubling` gives dense orbits for a.e. *point of `T³`*,
+which says nothing about a.e. point of a null curve. And single-coordinate density doesn't contradict the
+two-plane confinement (on a plane, `f₁` still ranges freely while `f₂,f₃` compensate). The curve-transfer
+genuinely needs the **equidistribution** level, i.e. the Weyl-sum + Borel–Cantelli (Davenport–Erdős–LeVeque)
+a.e. result — which is strictly stronger than the ergodic density I proved.
+
+**The genuine remaining brick (next-lap target).** `a.e. equidistribution of {2ⁿ s}`, provable WITHOUT
+general Birkhoff via **Davenport–Erdős–LeVeque**: the orthogonality `∫₀¹|(1/N)Σ_{n<N} e^{2πik2ⁿs}|² ds
+= 1/N` (characters `e^{2πik2ⁿs}` are L²-orthogonal since `2ⁿ−2ᵐ≠0` for `n≠m`) + Borel–Cantelli (in
+mathlib) along the subsequence `N_j=j²` + monotonicity. The first concrete sub-brick is that
+orthogonality integral (clean, bounded — good Aristotle candidate). mathlib has `strong_law_ae` (SLLN)
+and Borel–Cantelli; it lacks the pointwise Birkhoff theorem but the DEL route does not use it.
+
+**Aristotle in flight:** `fractdense` (`17030c67`) — the ℝ-line pullback of #3 (circle-valued form).
+Provenance: `cubiclinindep` (`e608a9e2`) independently re-proved brick #2 axiom-clean.
+
+---
+
 ## ★ ACTIVE FRONTIER (2026-06-14): cubic self-referential impossibility (Tier-2)
 
 **Where it stands.** The single-floor "Tier-1" the findings doc proposed is FALSE (refuted this lap:
