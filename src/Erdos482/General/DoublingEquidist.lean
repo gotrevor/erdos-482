@@ -139,6 +139,28 @@ theorem ae_of_ae_restrict_Icc01_of_periodic {P : ℝ → Prop}
     rw [hset, measure_preimage_add_right]; exact h0
   exact measure_mono_null cover (measure_iUnion_null hpiece)
 
+/-- **Per-frequency a.e. vanishing of the doubling Weyl average over all of `ℝ`.**  For `k ≠ 0`, almost
+every real `s` (full Lebesgue `volume`) has `(1/N)∑_{n<N} e(k·2ⁿ·s) → 0`.  Lifts the `[0,1]`-restricted
+`ae_doubling_weyl_tendsto` via the periodicity bridge: the doubling Weyl sum is `1`-periodic in `s`
+(`e(k·2ⁿ·(s+1)) = e(k·2ⁿ·s)`, as `k·2ⁿ ∈ ℤ`).  This is the form `DELEngine.ae_comp_mul_left` scales to
+`s = ξ·W` in the `T³` lift. -/
+theorem ae_doubling_weyl_tendsto_real (k : ℤ) (hk : k ≠ 0) :
+    ∀ᵐ (s : ℝ) ∂(volume : Measure ℝ),
+      Tendsto (fun N : ℕ => (N:ℂ)⁻¹ * ∑ n ∈ range N,
+          Complex.exp (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ) ^ n : ℤ) : ℂ) * s)) atTop (𝓝 0) := by
+  refine ae_of_ae_restrict_Icc01_of_periodic (fun s => ?_) (ae_doubling_weyl_tendsto k hk)
+  have hfun : (fun N : ℕ => (N:ℂ)⁻¹ * ∑ n ∈ range N,
+        Complex.exp (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ) ^ n : ℤ) : ℂ) * ((s + 1 : ℝ))))
+      = (fun N : ℕ => (N:ℂ)⁻¹ * ∑ n ∈ range N,
+        Complex.exp (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ) ^ n : ℤ) : ℂ) * (s:ℝ))) := by
+    funext N
+    refine congrArg _ (Finset.sum_congr rfl (fun n _ => ?_))
+    rw [show (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ) ^ n : ℤ) : ℂ) * ((s + 1 : ℝ) : ℂ))
+          = (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ) ^ n : ℤ) : ℂ) * (s : ℝ))
+            + ((k * (2:ℤ) ^ n : ℤ) : ℂ) * (2 * ↑Real.pi * Complex.I) by push_cast; ring,
+      Complex.exp_add, Complex.exp_int_mul_two_pi_mul_I, mul_one]
+  rw [hfun]
+
 /-- **Step (b) over all of `ℝ`.**  For almost every real `s` (full Lebesgue `volume`), the doubling orbit
 `n ↦ ↑(2ⁿ·s)` is equidistributed on `ℝ/ℤ`.  Lifts `ae_doubling_orbit_equidistributed` (a.e.-`[0,1]`) to
 `ℝ` via the periodicity bridge: the orbit `↑(2ⁿ·s)` is `1`-periodic in `s` (`2ⁿ ∈ ℤ` is killed mod 1).
