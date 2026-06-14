@@ -1,6 +1,46 @@
 # PENDING_WORK — Erdős #482 / Stoll
 
-## ★★★★★ STATE 2026-06-14 (build 🟢 8293) — **GENERAL degree-`d`: algebraic + abstract-geometric obstruction SKELETON COMPLETE & axiom-clean**
+## ★★★★★ STATE 2026-06-14 (build 🟢 8298) — **GENERAL degree-`d` IMPOSSIBILITY: COMPLETE, UNCONDITIONAL & AXIOM-CLEAN**
+
+The geometry crux is **discharged**.  `GeneralTorusFinish.exists_exceeding_torus_point` (the
+nonzero-coordinate realization) is proven and fed into the assembly, so the general-`d` headline is now
+**unconditional** — no remaining hypothesis.  Repo is sorry-free + custom-axiom-free; full build 🟢 8298.
+
+**The unconditional headline + full capstone parity (all `[propext, Classical.choice, Quot.sound]`):**
+- `GeneralTorusFinish.ae_no_dStep_schedule_reads_base_two (d) (hd : 3 ≤ d)` — for a.e. `W`, **no**
+  degree-`d` schedule reads `W`'s base-2 digits (uniform over schedules).
+- `ae_dStep_not_reads_base_two` (fixed schedule), `ae_not_dStepDigitRepresentable`,
+  `ae_not_dStepReadsBaseTwo`, `ae_not_dStepRecurrenceRepresentable` (self-referential capstone via
+  `dStepZ` + `binary_floor_eq`) — full parity with the cubic/quartic story, now at arbitrary `d ≥ 3`.
+- **Subsumption check** (`GeneralSubsumes`): `ae_no_cubic_schedule_reads_base_two_via_general` (d=3) and
+  `…quartic…_via_general` (d=4) re-derive the hand-rolled headlines from the general one via
+  `cubicV3_eq_dStepV`/`quarticV4_eq_dStepV` — kernel-checked cross-development consistency.
+
+**How the crux was cracked.** Constant defect target `τ ∈ (0,1)` from `exists_scale_outside_window_strict`
+(strict window escape, uses `S_d > 2` = `rrt_window_gt_two`); coordinate vector `realizeR0 α c τ σ` with a
+free seed `σ` for `r 0`.  Then `orbitF` is the constant `τ` *independent of `σ`* (`orbitF_realizeR0`), so
+`dGpdTorus = τ·S_d ∉ window` and every inner arg is non-integer (`τ ≠ 0`).  Seed `σ` chosen in the
+**uncountable** `(0,1)` outside the **countable** bad set (each = affine-preimage of `ℤ`,
+`Cardinal.Real.Ioo_countable_iff`) that would zero a coordinate → all torus coords nonzero.
+
+### ▶▶ NEXT FRONTIER — base-`g` generalization (`α = g^{1/d}`, base-`g` digits)
+The whole base-2 development (`dStepV` doubling `2u`, window width 2, digits `{0,1}`) generalizes to base
+`g ≥ 2`: `α = g^{1/d}`, window width `g`, digits `{0,…,g-1}`.  **Down payment done**:
+`RpowWindow.geom_window_gt_base` (abstract: `α>1`, `αᵈ=g`, escape bound `α < 2g/(g+1)` ⟹ window width
+`> g`; `rrt_window_gt_two` is now its `g=2` instance).  Note the escape bound `g^{1/d} < 2g/(g+1)` needs
+**larger `d` for larger `g`** (`d=3` works for `g=2` but fails for `g=10`), so the base-`g` impossibility
+holds for `d ≥ d₀(g)` — the threshold is part of the statement.  Remaining: a base-`g` `dStepV`
+(replace `2u` by `g·u`), the `g`-digit window-confinement lemma, and re-run the orbit/geometry assembly.
+This is a fresh multi-lap sub-project; the analytic engine (`MultidimWeyl`/`EquidistDense`) is already
+degree- and base-agnostic.
+
+### ▶▶ OTHER FRONTIER — fixed-`W` version (OPEN MATH, not attemptable here)
+For a *specific* `W` (not a.e.): needs density of `{(g^{i/d}·gⁿ·W mod 1)}` for fixed `W`, i.e. Borel
+normality / equidistribution results not in mathlib (cf. `{(3/2)ⁿ}` not even known dense).
+
+---
+
+## ARCHIVE — ★★★★★ STATE 2026-06-14 (build 🟢 8293) — **GENERAL degree-`d`: algebraic + abstract-geometric obstruction SKELETON COMPLETE & axiom-clean**
 
 Cubic + quartic were both already DONE & axiom-clean (see ★★★★ below).  **This lap built the
 uniform, degree-agnostic skeleton of the general degree-`d` (`α = 2^{1/d}`) impossibility** — the
