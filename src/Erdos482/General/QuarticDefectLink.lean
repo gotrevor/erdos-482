@@ -102,4 +102,63 @@ theorem quarticPartialDefect_eq_Gpd (α c0 c1 c2 c3 W : ℝ) (n : ℕ) :
   rw [quartic_f1_orbit, quartic_f2_orbit, quartic_f3_orbit, quartic_f1_orbit, quartic_f2_orbit,
     quartic_f1_orbit]
 
+/-- **`quarticGpd` is continuous at any point whose three internal `fract` arguments are non-integers.**
+(Affine maps are continuous and `Int.fract` is continuous off `ℤ` — `continuousAt_fract` — so the
+3-level composition is continuous at such points.)  Degree-4 analogue of `continuousAt_cubicGpd`. -/
+theorem continuousAt_quarticGpd (α c0 c1 c2 : ℝ) (p : ℝ × ℝ × ℝ × ℝ)
+    (hA : p.2.1 - α * p.1 + α * c0 ≠ (⌊p.2.1 - α * p.1 + α * c0⌋ : ℤ))
+    (hB : p.2.2.1 - α ^ 2 * p.1 - α * Int.fract (p.2.1 - α * p.1 + α * c0) + α ^ 2 * c0 + α * c1
+          ≠ (⌊p.2.2.1 - α ^ 2 * p.1 - α * Int.fract (p.2.1 - α * p.1 + α * c0)
+                + α ^ 2 * c0 + α * c1⌋ : ℤ))
+    (hC : p.2.2.2 - α ^ 3 * p.1 - α ^ 2 * Int.fract (p.2.1 - α * p.1 + α * c0)
+            - α * Int.fract (p.2.2.1 - α ^ 2 * p.1 - α * Int.fract (p.2.1 - α * p.1 + α * c0)
+                + α ^ 2 * c0 + α * c1) + α ^ 3 * c0 + α ^ 2 * c1 + α * c2
+          ≠ (⌊p.2.2.2 - α ^ 3 * p.1 - α ^ 2 * Int.fract (p.2.1 - α * p.1 + α * c0)
+                - α * Int.fract (p.2.2.1 - α ^ 2 * p.1 - α * Int.fract (p.2.1 - α * p.1 + α * c0)
+                    + α ^ 2 * c0 + α * c1) + α ^ 3 * c0 + α ^ 2 * c1 + α * c2⌋ : ℤ)) :
+    ContinuousAt (fun q : ℝ × ℝ × ℝ × ℝ => quarticGpd α c0 c1 c2 q.1 q.2.1 q.2.2.1 q.2.2.2) p := by
+  have hc1 : ContinuousAt (fun q : ℝ × ℝ × ℝ × ℝ => q.1) p := continuous_fst.continuousAt
+  have hc2 : ContinuousAt (fun q : ℝ × ℝ × ℝ × ℝ => q.2.1) p :=
+    (continuous_fst.comp continuous_snd).continuousAt
+  have hc3 : ContinuousAt (fun q : ℝ × ℝ × ℝ × ℝ => q.2.2.1) p :=
+    (continuous_fst.comp (continuous_snd.comp continuous_snd)).continuousAt
+  have hc4 : ContinuousAt (fun q : ℝ × ℝ × ℝ × ℝ => q.2.2.2) p :=
+    (continuous_snd.comp (continuous_snd.comp continuous_snd)).continuousAt
+  have hAmap : ContinuousAt (fun q : ℝ × ℝ × ℝ × ℝ => q.2.1 - α * q.1 + α * c0) p := by fun_prop
+  have hfractA : ContinuousAt
+      (fun q : ℝ × ℝ × ℝ × ℝ => Int.fract (q.2.1 - α * q.1 + α * c0)) p :=
+    ContinuousAt.comp (g := Int.fract) (f := fun q : ℝ × ℝ × ℝ × ℝ => q.2.1 - α * q.1 + α * c0)
+      (continuousAt_fract hA) hAmap
+  have hBmap : ContinuousAt
+      (fun q : ℝ × ℝ × ℝ × ℝ => q.2.2.1 - α ^ 2 * q.1
+          - α * Int.fract (q.2.1 - α * q.1 + α * c0) + α ^ 2 * c0 + α * c1) p := by
+    refine ((((hc3.sub (hc1.const_mul (α ^ 2))).sub (hfractA.const_mul α)).add
+      continuousAt_const).add continuousAt_const)
+  have hfractB : ContinuousAt
+      (fun q : ℝ × ℝ × ℝ × ℝ => Int.fract (q.2.2.1 - α ^ 2 * q.1
+          - α * Int.fract (q.2.1 - α * q.1 + α * c0) + α ^ 2 * c0 + α * c1)) p :=
+    ContinuousAt.comp (g := Int.fract)
+      (f := fun q : ℝ × ℝ × ℝ × ℝ => q.2.2.1 - α ^ 2 * q.1
+          - α * Int.fract (q.2.1 - α * q.1 + α * c0) + α ^ 2 * c0 + α * c1)
+      (continuousAt_fract hB) hBmap
+  have hCmap : ContinuousAt
+      (fun q : ℝ × ℝ × ℝ × ℝ => q.2.2.2 - α ^ 3 * q.1
+          - α ^ 2 * Int.fract (q.2.1 - α * q.1 + α * c0)
+          - α * Int.fract (q.2.2.1 - α ^ 2 * q.1 - α * Int.fract (q.2.1 - α * q.1 + α * c0)
+              + α ^ 2 * c0 + α * c1) + α ^ 3 * c0 + α ^ 2 * c1 + α * c2) p := by
+    refine (((((hc4.sub (hc1.const_mul (α ^ 3))).sub (hfractA.const_mul (α ^ 2))).sub
+      (hfractB.const_mul α)).add continuousAt_const).add continuousAt_const).add continuousAt_const
+  have hfractC : ContinuousAt
+      (fun q : ℝ × ℝ × ℝ × ℝ => Int.fract (q.2.2.2 - α ^ 3 * q.1
+          - α ^ 2 * Int.fract (q.2.1 - α * q.1 + α * c0)
+          - α * Int.fract (q.2.2.1 - α ^ 2 * q.1 - α * Int.fract (q.2.1 - α * q.1 + α * c0)
+              + α ^ 2 * c0 + α * c1) + α ^ 3 * c0 + α ^ 2 * c1 + α * c2)) p :=
+    ContinuousAt.comp (g := Int.fract)
+      (f := fun q : ℝ × ℝ × ℝ × ℝ => q.2.2.2 - α ^ 3 * q.1
+          - α ^ 2 * Int.fract (q.2.1 - α * q.1 + α * c0)
+          - α * Int.fract (q.2.2.1 - α ^ 2 * q.1 - α * Int.fract (q.2.1 - α * q.1 + α * c0)
+              + α ^ 2 * c0 + α * c1) + α ^ 3 * c0 + α ^ 2 * c1 + α * c2)
+      (continuousAt_fract hC) hCmap
+  exact ((hfractA.const_mul (α ^ 3)).add (hfractB.const_mul (α ^ 2))).add (hfractC.const_mul α)
+
 end Erdos482.General
