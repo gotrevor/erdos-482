@@ -155,4 +155,153 @@ theorem selfref_crux_offset_unique (c : ℝ)
     nlinarith [hcs, htK, hspos]
   linarith [hlo, hhi]
 
+/-!
+## The single-internal-floor crux is *solvable* for every sub-2 multiplier — the cubic obstruction is NOT here
+
+An ON-LINE literature finding (`archive/findings/…cubic-selfref-literature.md`) proposed a "Tier-1"
+cubic impossibility: that for `α = 2^{1/3}` reading base 2, **no** constant offset `c` makes the
+single-internal-floor crux `0 ≤ {x} − α·{x/2} + c·α < 1` hold for all `x` (expecting the two-witness
+method of `selfref_crux_fails_of_three_le` to scale up).
+
+**That expectation is FALSE.**  The two-witness method does *not* scale to this object, because here
+the *division stays at base 2* while only the multiplier changes — unlike `selfref_crux_fails_of_three_le`,
+where both the division (`/g`) and the multiplier (`√g`) grow together.  In fact `c = ½` works for
+**every** multiplier `0 ≤ β < 2` (and fails exactly at `β = 2`).  The reason is a clean width-1 identity:
+with `t := {x/2}` one has `{x} = 2t − ⌊2t⌋`, so
+
+* for `t < ½`:  `{x} − β t + β/2 = t(2−β) + β/2 ∈ [β/2, 1)`;
+* for `t ≥ ½`:  `{x} − β t + β/2 = t(2−β) − 1 + β/2 ∈ [0, 1−β/2)`.
+
+Both half-open ranges sit inside `[0,1)` precisely when `0 ≤ β < 2`.  (HOSTCHECK: 2M random samples at
+`β = 2^{1/3}` give zero violations; `β = 2` gives ~50%.)
+
+**Consequence for the cubic story.**  The genuine cubic obstruction is therefore *not* at the
+single-floor level at all — it lives in the **3-step offset schedule** (two internal floors whose
+rounding errors must cancel simultaneously; the `j ≈ 64` numeric breakdown of `cubic_recover.py`).
+`selfref_crux_solvable_iff` (multiplier *and* division both `= g`) is the self-referential statement
+that genuinely fails for `g ≥ 3`; the divide-by-2 single floor below is a *different* object that
+survives, and conflating the two was the finding doc's error.  This corrects the record and sharpens
+where the cubic wall actually is.
+-/
+
+/-- **Single-internal-floor, divide-by-2 crux is solvable for every `0 ≤ β < 2`, with `c = ½`.**
+For any multiplier `β ∈ [0,2)` and all `x`, `0 ≤ {x} − β·{x/2} + β/2 < 1`.  In particular the
+`α = 2^{1/3}` "cubic single floor" *is* solvable (`onefloor_div2_crux_cbrt2`) — the proposed Tier-1
+cubic impossibility is false; the real cubic obstruction is in the multi-floor schedule, not here. -/
+theorem onefloor_div2_crux_solvable (β : ℝ) (hβ0 : 0 ≤ β) (hβ2 : β < 2) (x : ℝ) :
+    0 ≤ Int.fract x - β * Int.fract (x / 2) + β / 2 ∧
+      Int.fract x - β * Int.fract (x / 2) + β / 2 < 1 := by
+  set t := Int.fract (x / 2) with ht
+  have ht0 : 0 ≤ t := Int.fract_nonneg _
+  have ht1 : t < 1 := Int.fract_lt_one _
+  -- `{x} = {2t}` since `x = 2t + 2⌊x/2⌋` and `2⌊x/2⌋` is an integer
+  have hxt : Int.fract x = Int.fract (2 * t) := by
+    have hsplit : x = 2 * t + ((2 * ⌊x / 2⌋ : ℤ) : ℝ) := by
+      have h := Int.floor_add_fract (x / 2)   -- ↑⌊x/2⌋ + {x/2} = x/2
+      rw [← ht] at h
+      push_cast
+      linarith
+    conv_lhs => rw [hsplit]
+    rw [Int.fract_add_intCast]
+  rcases lt_or_ge t (1 / 2) with hlt | hge
+  · -- `2t ∈ [0,1)`
+    have h2t : Int.fract (2 * t) = 2 * t := Int.fract_eq_self.mpr ⟨by linarith, by linarith⟩
+    rw [hxt, h2t]
+    refine ⟨?_, ?_⟩
+    · nlinarith [mul_nonneg ht0 (show (0:ℝ) ≤ 2 - β by linarith), hβ0]
+    · nlinarith [mul_pos (show (0:ℝ) < 1 / 2 - t by linarith) (show (0:ℝ) < 2 - β by linarith)]
+  · -- `2t ∈ [1,2)`, so `{2t} = 2t − 1`
+    have h2t : Int.fract (2 * t) = 2 * t - 1 := by
+      have h1 : Int.fract (2 * t - ((1 : ℤ) : ℝ)) = Int.fract (2 * t) := Int.fract_sub_intCast (2 * t) 1
+      rw [← h1, Int.fract_eq_self.mpr ⟨by push_cast; linarith, by push_cast; linarith⟩]
+      push_cast; ring
+    rw [hxt, h2t]
+    refine ⟨?_, ?_⟩
+    · nlinarith [mul_nonneg (show (0:ℝ) ≤ t - 1 / 2 by linarith) (show (0:ℝ) ≤ 2 - β by linarith)]
+    · nlinarith [mul_pos (show (0:ℝ) < 1 - t by linarith) (show (0:ℝ) < 2 - β by linarith)]
+
+/-- **The cubic single-internal-floor crux IS solvable** (`β = 2^{1/3}`, `c = ½`): for all `x`,
+`0 ≤ {x} − 2^{1/3}·{x/2} + 2^{1/3}/2 < 1`.  Directly refutes the literature finding's proposed
+"Tier-1" cubic impossibility — the obstruction is not at the single-floor level. -/
+theorem onefloor_div2_crux_cbrt2 (x : ℝ) :
+    0 ≤ Int.fract x - (2 : ℝ) ^ ((1 : ℝ) / 3) * Int.fract (x / 2) + (2 : ℝ) ^ ((1 : ℝ) / 3) / 2 ∧
+      Int.fract x - (2 : ℝ) ^ ((1 : ℝ) / 3) * Int.fract (x / 2) + (2 : ℝ) ^ ((1 : ℝ) / 3) / 2 < 1 := by
+  have hnn : (0 : ℝ) ≤ (2 : ℝ) ^ ((1 : ℝ) / 3) := Real.rpow_nonneg (by norm_num) _
+  have hlt : (2 : ℝ) ^ ((1 : ℝ) / 3) < 2 := by
+    have h : (2 : ℝ) ^ ((1 : ℝ) / 3) < (2 : ℝ) ^ (1 : ℝ) :=
+      Real.rpow_lt_rpow_of_exponent_lt (by norm_num : (1 : ℝ) < 2) (by norm_num : (1 : ℝ) / 3 < 1)
+    rwa [Real.rpow_one] at h
+  exact onefloor_div2_crux_solvable _ hnn hlt x
+
+/-- **Sharp characterization of the single-floor divide-by-2 crux.**  For `0 ≤ β`, there exists an
+offset `c` making `0 ≤ {x} − β·{x/2} + c·β < 1` hold for **all** `x` **iff `β < 2`**.  The forward
+direction is `onefloor_div2_crux_solvable` (`c = ½`); the reverse needs only the two integer witnesses
+`x = 0` (forces `c·β < 1`) and `x = 1` (forces `c·β ≥ β/2`), which together give `β/2 < 1`, i.e.
+`β < 2` — no limit argument.  So `β = 2` is the exact breakdown point (and `β = √2`, `2^{1/3}` are both
+comfortably inside the solvable régime; crux-solvability alone does *not* single out the base, unlike
+the genuinely self-referential `selfref_crux_solvable_iff`). -/
+theorem onefloor_div2_crux_solvable_iff (β : ℝ) (hβ0 : 0 ≤ β) :
+    (∃ c : ℝ, ∀ x : ℝ, 0 ≤ Int.fract x - β * Int.fract (x / 2) + c * β ∧
+        Int.fract x - β * Int.fract (x / 2) + c * β < 1) ↔ β < 2 := by
+  constructor
+  · rintro ⟨c, hc⟩
+    by_contra hge
+    push_neg at hge   -- `2 ≤ β`
+    have hf1 : Int.fract (1 : ℝ) = 0 := by
+      rw [show (1 : ℝ) = ((1 : ℤ) : ℝ) by norm_num, Int.fract_intCast]
+    have hf12 : Int.fract ((1 : ℝ) / 2) = 1 / 2 := Int.fract_eq_self.mpr (by constructor <;> norm_num)
+    have hf02 : Int.fract ((0 : ℝ) / 2) = 0 := by rw [show (0 : ℝ) / 2 = 0 by ring, Int.fract_zero]
+    have h0 := hc 0
+    have h1 := hc 1
+    rw [Int.fract_zero, hf02] at h0
+    rw [hf1, hf12] at h1
+    nlinarith [h0.2, h1.1, hge]
+  · intro hβ2
+    exact ⟨1 / 2, fun x => by
+      have h := onefloor_div2_crux_solvable β hβ0 hβ2 x
+      exact ⟨by linarith [h.1], by linarith [h.2]⟩⟩
+
+/-- **The offset `c = ½` is unique** for the single-floor divide-by-2 crux at any multiplier
+`β ∈ (0,2)`.  If `0 ≤ {x} − β·{x/2} + c·β < 1` holds for all `x`, then `c = ½`.  Lower bound `c ≥ ½`
+from `x = 1`; upper bound `c ≤ ½` from the family `x = 1 − t`, `t ↓ 0`.  So across the whole solvable
+régime the offset is rigid — exactly `½`, never the multiplier-dependent value one might expect; the
+freedom is entirely in `β`, not in `c`. -/
+theorem onefloor_div2_offset_unique (β : ℝ) (hβ0 : 0 < β) (hβ2 : β < 2) (c : ℝ)
+    (hc : ∀ x : ℝ, 0 ≤ Int.fract x - β * Int.fract (x / 2) + c * β ∧
+        Int.fract x - β * Int.fract (x / 2) + c * β < 1) :
+    c = 1 / 2 := by
+  -- lower bound : x = 1
+  have hlo : 1 / 2 ≤ c := by
+    have h1 := hc 1
+    have hf1 : Int.fract (1 : ℝ) = 0 := by
+      rw [show (1 : ℝ) = ((1 : ℤ) : ℝ) by norm_num, Int.fract_intCast]
+    have hf2 : Int.fract ((1 : ℝ) / 2) = 1 / 2 := Int.fract_eq_self.mpr (by constructor <;> norm_num)
+    rw [hf1, hf2] at h1
+    nlinarith [h1.1, hβ0]
+  -- upper bound : x = 1 − t, t ↓ 0
+  have hhi : c ≤ 1 / 2 := by
+    apply le_of_forall_pos_le_add
+    intro ε hε
+    set K : ℝ := (1 - β / 2) / β with hK
+    have hKpos : 0 < K := div_pos (by linarith) hβ0
+    set t : ℝ := min (ε / K) (1 / 2) with ht
+    have htpos : 0 < t := lt_min (div_pos hε hKpos) (by norm_num)
+    have htle : t ≤ ε / K := min_le_left _ _
+    have ht12 : t ≤ 1 / 2 := min_le_right _ _
+    have hx := hc (1 - t)
+    have hf1 : Int.fract (1 - t) = 1 - t := Int.fract_eq_self.mpr ⟨by linarith, by linarith⟩
+    have hf2 : Int.fract ((1 - t) / 2) = (1 - t) / 2 :=
+      Int.fract_eq_self.mpr ⟨by linarith, by linarith⟩
+    rw [hf1, hf2] at hx
+    have hcs : c * β < β / 2 + t * (1 - β / 2) := by nlinarith [hx.2]
+    have htK : t * (1 - β / 2) ≤ ε * β := by
+      have h1 : t * (1 - β / 2) ≤ (ε / K) * (1 - β / 2) :=
+        mul_le_mul_of_nonneg_right htle (by linarith)
+      have hne : (1 : ℝ) - β / 2 ≠ 0 := by linarith
+      have h2 : (ε / K) * (1 - β / 2) = ε * β := by
+        rw [hK, div_div_eq_mul_div, div_mul_cancel₀ _ hne]
+      linarith [h1, h2.le, h2.ge]
+    nlinarith [hcs, htK, hβ0]
+  linarith
+
 end Erdos482.General

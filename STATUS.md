@@ -191,6 +191,7 @@ All headline theorems verified `#print axioms` this lap = trust base only; **0 m
 | `st06_thm34_bstep_band` / `_band_fails_below/above_half` | ⚠️ SWAPPED-VARIANT (ε on b-step = Thm 3.3 placement), NOT Thm 3.4 | trust base | 🟢 clean Lean, unfaithful statement |
 | `st06_cor35` (+ `_realDigits`, `_isBit`) | uncond (St06 Cor 3.5, Beatty unification) | trust base | 🟢 clean |
 | `selfref_crux_solvable_iff` (+ `_fails_of_three_le`, `_offset_unique`) | NEW: self-ref digit crux solvable iff g=2, and then offset c=½ is forced | trust base | 🟢 clean |
+| `onefloor_div2_crux_solvable_iff` (+ `_crux_solvable`, `_crux_cbrt2`, `_offset_unique`) | NEW: single-floor /2 crux (mult β, free base 2) solvable ⇔ β<2 (c=½ forced); **refutes findings-doc "Tier-1" cubic impossibility** — cubic 2^{1/3} single floor IS solvable, obstruction is purely multi-floor | trust base | 🟢 clean |
 
 No 🟡/🟠/🔴 axioms anywhere: the whole development is elementary (floors, √2, π/e bounds, Rayleigh from
 mathlib). Thm 3.4's full k-dependent interval — once mis-formalized as a Diophantine "obstruction" — is

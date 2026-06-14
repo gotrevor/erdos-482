@@ -40,3 +40,21 @@ the **quadratic** self-referential extractor `⌊√g·(u+c)⌋` for base `g ≥
 The √2 / base-2 case is the unique survivor.  The cubic `2^{1/3}` 3-step map is a further, separate
 failure of the same flavour (three floors can't align), still open as sub-questions (a)/(b) above, but
 the headline "self-reference is a base-2 miracle" is now machine-checked.
+
+**UPDATE 2026-06-14 — the literature finding's proposed "Tier-1" cubic impossibility is FALSE; the
+single-floor obstruction does NOT exist; the real cubic wall is purely multi-floor.**  The ON-LINE
+findings doc (`archive/findings/…cubic-selfref-literature.md`) recommended, as a quick `SelfRefWall`-tier
+win, proving that **no constant offset `c`** makes the *single-internal-floor* divide-by-2 crux
+`0 ≤ {x} − α·{x/2} + c·α < 1` hold for all `x` with `α = 2^{1/3}` — expecting the two-witness method to
+scale up.  **It does not.**  HOSTCHECK (2M samples) and a Lean proof both show `c = ½` works:
+`SelfRefWall.onefloor_div2_crux_cbrt2`.  The general fact is `onefloor_div2_crux_solvable` — `c = ½`
+works for **every** multiplier `0 ≤ β < 2` — with the sharp characterization
+`onefloor_div2_crux_solvable_iff` (solvable for some `c` ⇔ `β < 2`; `β = 2` is the exact breakdown, by
+the two integer witnesses `x = 0`, `x = 1`) and rigidity `onefloor_div2_offset_unique` (`c = ½` forced
+for `0 < β < 2`).  Why the two-witness method scales for `selfref_crux_fails_of_three_le` but NOT here:
+there both the *division* (`/g`) and the *multiplier* (`√g`) grow together (self-referential); the
+"cubic single floor" keeps the division at base 2 while only the multiplier changes, so the
+range of `f(x) = {x} − β{x/2}` stays width-exactly-1 and fits the window for any `β < 2`.  **Upshot:**
+the genuine cubic obstruction is *entirely* in the multi-floor offset *schedule* (sub-questions (a)/(b),
+the `j ≈ 64` breakdown), not at any single-floor level — so a Tier-1 lemma was the wrong target, and the
+real Tier-2 (3-periodic schedule impossibility) is where the new math sits.
