@@ -191,4 +191,24 @@ theorem orbitF_realizeR (α : ℝ) (c t : ℕ → ℝ) (e : ℕ)
   rw [orbitF_eq_fract_arg, orbitArg_realizeR α c t e ht k hk]
   exact Int.fract_eq_self.mpr (ht k hk)
 
+/-- **`orbitF … k` depends only on the coordinates `r 0, …, r (k+1)`.** -/
+theorem orbitF_congr (α : ℝ) (c r r' : ℕ → ℝ) (k : ℕ) (h : ∀ i, i ≤ k + 1 → r i = r' i) :
+    orbitF α c r k = orbitF α c r' k := by
+  induction k using Nat.strong_induction_on with
+  | _ k IH =>
+    rw [orbitF_eq, orbitF_eq, h 0 (by omega), h (k + 1) le_rfl]
+    refine congrArg _ ?_
+    refine congrArg (· + α * c k) (congrArg (_ + ·) (Finset.sum_congr rfl (fun j hj => ?_)))
+    rw [Finset.mem_range] at hj
+    rw [IH j hj (fun i hi => h i (by omega))]
+
+/-- **`dGpd … e` depends only on the coordinates `r 0, …, r e`** (the largest `orbitF (e-1)` reads
+`r e`).  So for the `Tᵈ` orbit (`d = e+1`) it depends only on the `d` torus coordinates. -/
+theorem dGpd_congr (α : ℝ) (c r r' : ℕ → ℝ) (e : ℕ) (h : ∀ i, i ≤ e → r i = r' i) :
+    dGpd α c r e = dGpd α c r' e := by
+  unfold dGpd
+  refine Finset.sum_congr rfl (fun k hk => ?_)
+  rw [Finset.mem_range] at hk
+  rw [orbitF_congr α c r r' k (fun i hi => h i (by omega))]
+
 end Erdos482.General
