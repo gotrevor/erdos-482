@@ -1,5 +1,6 @@
 import Mathlib.Analysis.Fourier.AddCircle
 import Mathlib.Analysis.SpecificLimits.Basic
+import Mathlib.Analysis.PSeries
 
 /-!
 # Equidistribution framework + Weyl's criterion (toward the a.e.-`W` cubic frontier)
@@ -137,6 +138,18 @@ theorem fourier_doubling_eq (k : ℤ) (n : ℕ) (s : ℝ) :
   congr 1
   push_cast
   ring
+
+/-- **p-series finiteness for the DEL hypothesis**: `∑'_j ENNReal.ofReal((j²)⁻¹) ≠ ⊤`.  This is the
+`∑_j ∫₀¹‖g_j‖² < ∞` input the DEL engine needs once the L² bridge turns
+`doubling_weyl_L2_normalized` (`∫₀¹‖g_{j²}‖² = 1/j²`) into the `ℝ≥0∞` form. -/
+theorem tsum_ofReal_inv_sq_ne_top :
+    (∑' j : ℕ, ENNReal.ofReal (((j ^ 2 : ℕ) : ℝ)⁻¹)) ≠ ⊤ := by
+  have hsummable : Summable (fun j : ℕ => ((j ^ 2 : ℕ) : ℝ)⁻¹) :=
+    ((Real.summable_nat_pow_inv (p := 2)).mpr (by norm_num)).congr (fun j => by push_cast; ring)
+  have h := ENNReal.ofReal_tsum_of_nonneg (f := fun j : ℕ => ((j ^ 2 : ℕ) : ℝ)⁻¹)
+    (fun j => by positivity) hsummable
+  rw [← h]
+  exact ENNReal.ofReal_ne_top
 
 /-- **Cesàro averages are sup-norm bounded** (`N ≥ 1`): `‖(1/N)∑_{n<N} f(xₙ)‖ ≤ ‖f‖`.  The uniform
 bound that lets the equidistribution property pass from the dense Fourier span to all continuous `f`. -/
