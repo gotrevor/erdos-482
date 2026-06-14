@@ -34,6 +34,10 @@ theorem rrt_pow_self (d : ℕ) (hd : 1 ≤ d) : ((2 : ℝ) ^ ((1 : ℝ) / d)) ^ 
   rw [← Real.rpow_natCast ((2 : ℝ) ^ ((1 : ℝ) / d)) d,
     ← Real.rpow_mul (by norm_num : (0 : ℝ) ≤ 2), one_div, inv_mul_cancel₀ hdne, Real.rpow_one]
 
+/-- **`g^{1/d} > 0`** for `g > 0` — base-`g` analogue of `rrt_pos`. -/
+theorem rpow_inv_pos (g : ℝ) (hg : 0 < g) (d : ℕ) : 0 < (g : ℝ) ^ ((1 : ℝ) / d) :=
+  Real.rpow_pos_of_pos hg _
+
 /-- **`(g^{1/d})ᵈ = g`** for `g ≥ 0`, `d ≥ 1` — the `α^d = g` provider for the base-`g` chain
 (`dStep_defect_identity_base` etc.).  Base-`g` analogue of `rrt_pow_self`. -/
 theorem rpow_inv_pow_self (g : ℝ) (hg : 0 ≤ g) (d : ℕ) (hd : 1 ≤ d) :
