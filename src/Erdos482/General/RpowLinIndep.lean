@@ -4,6 +4,8 @@ import Mathlib.FieldTheory.Minpoly.Field
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.RingTheory.Ideal.Maximal
 import Mathlib.RingTheory.Int.Basic
+import Mathlib.FieldTheory.KummerPolynomial
+import Mathlib.RingTheory.Polynomial.RationalRoot
 
 /-!
 # General degree-`d` ℤ-linear independence of `{1, 2^{1/d}, …, 2^{(d-1)/d}}`
@@ -183,6 +185,89 @@ theorem rpow_lin_indep_int_base (g d : ℕ) (hd : 1 ≤ d) (p : ℕ) (hp : p.Pri
   have hirrQ : Irreducible ((X : ℚ[X]) ^ d - C (g : ℚ)) := by
     rw [← hmapeq]
     exact (hmonicZ.isPrimitive.irreducible_iff_irreducible_map_fraction_map (K := ℚ)).mp hirrZ
+  have haeval : (Polynomial.aeval α) ((X : ℚ[X]) ^ d - C (g : ℚ)) = 0 := by
+    rw [map_sub, map_pow, aeval_X, aeval_C]; simp [hαd]
+  have hmonicQ : ((X : ℚ[X]) ^ d - C (g : ℚ)).Monic := monic_X_pow_sub_C (g : ℚ) (by omega)
+  have hminpoly : minpoly ℚ α = (X : ℚ[X]) ^ d - C (g : ℚ) :=
+    (minpoly.eq_of_irreducible_of_monic hirrQ haeval hmonicQ).symm
+  have hdegmp : (minpoly ℚ α).degree = (d : WithBot ℕ) := by
+    rw [hminpoly, degree_X_pow_sub_C (by omega : 0 < d)]
+  set q : ℚ[X] := ∑ i : Fin d, C ((a i : ℚ)) * X ^ (i : ℕ) with hqdef
+  have haevalp : (Polynomial.aeval α) q = 0 := by
+    have hexp : (Polynomial.aeval α) q = ∑ i : Fin d, (a i : ℝ) * α ^ (i : ℕ) := by
+      rw [hqdef, map_sum]
+      refine Finset.sum_congr rfl (fun i _ => ?_)
+      simp only [map_mul, map_pow, aeval_X, map_intCast]
+    rw [hexp]; exact h
+  have hq0 : q = 0 := by
+    by_contra hqne
+    have hle := minpoly.degree_le_of_ne_zero (A := ℚ) (x := α) hqne haevalp
+    rw [hdegmp] at hle
+    have hlt : q.degree < (d : WithBot ℕ) := by rw [hqdef]; exact degree_sum_fin_lt _
+    exact absurd (lt_of_le_of_lt hle hlt) (lt_irrefl _)
+  intro j
+  have hcoeff : q.coeff (j : ℕ) = (a j : ℚ) := by
+    rw [hqdef, finset_sum_coeff, Finset.sum_eq_single j]
+    · rw [coeff_C_mul, coeff_X_pow, if_pos rfl, mul_one]
+    · intro i _ hij
+      rw [coeff_C_mul, coeff_X_pow, if_neg (fun hc => hij (Fin.val_injective hc.symm)), mul_zero]
+    · intro h'; exact absurd (Finset.mem_univ j) h'
+  have : (a j : ℚ) = 0 := by rw [← hcoeff, hq0, coeff_zero]
+  exact_mod_cast this
+
+/-- A non-perfect-`d`-th-power positive integer `g` has **no rational `d`-th root**: `∀ b : ℚ, bᵈ ≠ g`.
+A rational root of the monic `Xᵈ − g` is integral over ℤ, hence an integer (ℤ integrally closed in ℚ),
+whose `natAbs` would be a perfect-`d`-th-power witness. -/
+theorem no_rat_dth_root (g d : ℕ) (hd : 1 ≤ d) (hg : ∀ k : ℕ, k ^ d ≠ g) :
+    ∀ b : ℚ, b ^ d ≠ (g : ℚ) := by
+  intro b hb
+  have hint : IsIntegral ℤ b := by
+    refine ⟨X ^ d - C (g : ℤ), monic_X_pow_sub_C (g : ℤ) (by omega), ?_⟩
+    rw [Polynomial.eval₂_sub, Polynomial.eval₂_pow, Polynomial.eval₂_X, Polynomial.eval₂_C]
+    push_cast; rw [hb]; ring
+  rw [IsIntegrallyClosed.isIntegral_iff] at hint
+  obtain ⟨y, hy⟩ := hint
+  have hyQ : (y : ℚ) = b := by rw [← hy]; simp
+  have hyd : y ^ d = (g : ℤ) := by
+    have : (y : ℚ) ^ d = (g : ℚ) := by rw [hyQ]; exact hb
+    exact_mod_cast this
+  have hnat : (y.natAbs) ^ d = g := by
+    have := congrArg Int.natAbs hyd
+    rwa [Int.natAbs_pow, Int.natAbs_natCast] at this
+  exact hg y.natAbs hnat
+
+/-- A positive integer `g` with `2 ≤ g < 2ᵈ` is **not a perfect `d`-th power**: any `k` with `kᵈ = g ≥ 2`
+has `k ≥ 2`, so `kᵈ ≥ 2ᵈ > g`.  A convenient sufficient condition (the window-bound region uses large
+`d`, so `g < 2ᵈ` holds automatically). -/
+theorem not_perfect_pow_of_lt (g d : ℕ) (hg : 2 ≤ g) (hlt : g < 2 ^ d) :
+    ∀ k : ℕ, k ^ d ≠ g := by
+  intro k hk
+  rcases Nat.lt_or_ge k 2 with h | h
+  · have hle : k ^ d ≤ 1 := by
+      calc k ^ d ≤ 1 ^ d := Nat.pow_le_pow_left (by omega) d
+        _ = 1 := one_pow d
+    omega
+  · have : 2 ^ d ≤ k ^ d := Nat.pow_le_pow_left h d
+    omega
+
+/-- **Base-`g` ℤ-linear independence via the prime-degree Kummer criterion** — covers **all** bases,
+including perfect powers (`g = 4, 8, 9, …`) that the Eisenstein form `rpow_lin_indep_int_base` misses.
+For a **prime** `d`, `g` not a perfect `d`-th power (`∀ k, kᵈ ≠ g`), and integers `a : Fin d → ℤ`: if
+`∑_{i<d} aᵢ·(g^{1/d})ⁱ = 0` then every `aᵢ = 0`.  `Xᵈ − g` is irreducible over ℚ by
+`X_pow_sub_C_irreducible_of_prime` (via `no_rat_dth_root`), so `α = g^{1/d}` has degree `d`. -/
+theorem rpow_lin_indep_int_prime (g d : ℕ) (hd : d.Prime) (hg : ∀ k : ℕ, k ^ d ≠ g)
+    (a : Fin d → ℤ)
+    (h : ∑ i : Fin d, (a i : ℝ) * ((g : ℝ) ^ ((1 : ℝ) / d)) ^ (i : ℕ) = 0) :
+    ∀ i, a i = 0 := by
+  have hd1 : 1 ≤ d := hd.one_lt.le
+  set α : ℝ := (g : ℝ) ^ ((1 : ℝ) / d) with hα
+  have hd0 : (d : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
+  have hαd : α ^ d = (g : ℝ) := by
+    rw [hα, ← Real.rpow_natCast ((g : ℝ) ^ ((1 : ℝ) / d)) d,
+      ← Real.rpow_mul (by positivity), one_div, inv_mul_cancel₀ hd0, Real.rpow_one]
+  -- `Xᵈ − g` irreducible over ℚ (Kummer, prime exponent).
+  have hirrQ : Irreducible ((X : ℚ[X]) ^ d - C (g : ℚ)) :=
+    X_pow_sub_C_irreducible_of_prime hd (no_rat_dth_root g d hd1 hg)
   have haeval : (Polynomial.aeval α) ((X : ℚ[X]) ^ d - C (g : ℚ)) = 0 := by
     rw [map_sub, map_pow, aeval_X, aeval_C]; simp [hαd]
   have hmonicQ : ((X : ℚ[X]) ^ d - C (g : ℚ)).Monic := monic_X_pow_sub_C (g : ℚ) (by omega)

@@ -109,4 +109,22 @@ theorem ae_W_dTorusG_orbit_dense_eisenstein {g d : ℕ} (hg : 2 ≤ g) (hd : 1 �
     ∀ᵐ W ∂(volume : Measure ℝ), Dense (Set.range (dTorusOrbitG g d W)) :=
   ae_W_dTorusG_orbit_dense hg (fun m hm => dXiG_ne_zero hd hp hpg hpg2 hm)
 
+/-- **The prime-degree Kummer criterion discharges the lin-indep hypothesis — for ALL bases.**  If `d` is
+prime and `g` is not a perfect `d`-th power, then `Xᵈ − g` is irreducible (Kummer), so the powers of
+`α = g^{1/d}` are ℤ-linearly independent: `dXiG g d m = 0 ⟹ m = 0`.  Covers perfect-power bases
+(`g = 4, 8, 9, …`) that the Eisenstein form misses. -/
+theorem dXiG_ne_zero_prime {g d : ℕ} (hd : d.Prime) (hperf : ∀ k : ℕ, k ^ d ≠ g)
+    {m : Fin d → ℤ} (hm : m ≠ 0) : dXiG g d m ≠ 0 := by
+  intro h
+  have hlin := rpow_lin_indep_int_prime g d hd hperf m (by rw [dXiG] at h; exact h)
+  exact hm (funext hlin)
+
+/-- **The base-`g` `Tᵈ` orbit is dense for a.e. `W` — unconditionally for EVERY base `g ≥ 2`**, taking `d`
+prime with `g` not a perfect `d`-th power (e.g. `g < 2ᵈ`, `not_perfect_pow_of_lt`).  Combines
+`ae_W_dTorusG_orbit_dense` with `dXiG_ne_zero_prime`. -/
+theorem ae_W_dTorusG_orbit_dense_prime {g d : ℕ} (hg : 2 ≤ g) (hd : d.Prime)
+    (hperf : ∀ k : ℕ, k ^ d ≠ g) :
+    ∀ᵐ W ∂(volume : Measure ℝ), Dense (Set.range (dTorusOrbitG g d W)) :=
+  ae_W_dTorusG_orbit_dense hg (fun m hm => dXiG_ne_zero_prime hd hperf hm)
+
 end Erdos482.General

@@ -224,6 +224,56 @@ theorem ae_no_dStep_schedule_reads_base_three :
   exact ae_no_dStep_schedule_reads_base_g 3 3 (by norm_num) (by norm_num) hbound 3
     (by norm_num) (by norm_num) (by norm_num)
 
+/-- **The base-`g` impossibility for EVERY base `g ≥ 2`** (prime-`d` form).  Same conclusion as
+`ae_no_dStep_schedule_reads_base_g`, but the lin-indep input is the prime-degree Kummer criterion
+(`ae_W_dTorusG_orbit_dense_prime`): for `d` **prime** with `g` not a perfect `d`-th power, no Eisenstein
+prime is needed — so this covers **perfect-power bases** (`g = 4, 8, 9, …`) too.  For any `g ≥ 2` one may
+take `d` a large enough prime (`g < 2ᵈ` ⟹ not a perfect power, `not_perfect_pow_of_lt`; the window bound
+`α < 2g/(g+1)` also forces large `d`). -/
+theorem ae_no_dStep_schedule_reads_base_g_all (g d : ℕ) (hg : 2 ≤ g) (hd : d.Prime) (hd2 : 2 ≤ d)
+    (hbound : grt g d < 2 * (g : ℝ) / ((g : ℝ) + 1)) (hperf : ∀ k : ℕ, k ^ d ≠ g) :
+    ∀ᵐ W ∂(volume : Measure ℝ), ∀ c : ℕ → ℝ, ∃ n : ℕ,
+      ¬ (0 ≤ dStepV (grt g d) c (⌊W * (g : ℝ) ^ n⌋) d - (g : ℝ) * (⌊W * (g : ℝ) ^ n⌋ : ℝ)
+          ∧ dStepV (grt g d) c (⌊W * (g : ℝ) ^ n⌋) d - (g : ℝ) * (⌊W * (g : ℝ) ^ n⌋ : ℝ)
+              ≤ (g : ℝ) - 1) := by
+  obtain ⟨e, rfl⟩ : ∃ e, d = e + 1 := ⟨d - 1, by omega⟩
+  have hgpos : (0 : ℝ) < (g : ℝ) := by exact_mod_cast (by omega : 0 < g)
+  have hα : (grt g (e + 1)) ^ (e + 1) = (g : ℝ) :=
+    rpow_inv_pow_self (g : ℝ) hgpos.le (e + 1) (by omega)
+  filter_upwards [ae_W_dTorusG_orbit_dense_prime (g := g) (d := e + 1) hg hd hperf] with W hdense
+  intro c
+  obtain ⟨P, hne, harg, hexc⟩ := exists_exceeding_torus_point_base g (e + 1) hg (by omega) hbound c
+  have hcont : ContinuousAt (dGpdTorus (e + 1) (grt g (e + 1)) c) P :=
+    continuousAt_dGpdTorus (e + 1) (grt g (e + 1)) c P hne harg
+  by_contra hcon
+  simp only [not_exists, not_not] at hcon
+  have hwin : ∀ n : ℕ, dStepC (grt g (e + 1)) c (e + 1) - (g : ℝ)
+        < dGpdTorus (e + 1) (grt g (e + 1)) c (dTorusOrbitG g (e + 1) W n)
+      ∧ dGpdTorus (e + 1) (grt g (e + 1)) c (dTorusOrbitG g (e + 1) W n)
+        ≤ dStepC (grt g (e + 1)) c (e + 1) := by
+    intro n
+    rw [dGpdTorusG_orbit g (e + 1) (by omega)]
+    exact dStep_partial_mem_window_base (grt g (e + 1)) c (⌊W * (g : ℝ) ^ n⌋) e g hα
+      (hcon n).1 (hcon n).2
+  rcases hexc with hlt | hgt
+  · obtain ⟨n, hn⟩ := exists_gt_of_dense_continuousAt hdense hcont hlt
+    exact absurd (hwin n).1 (not_lt.mpr hn.le)
+  · obtain ⟨n, hn⟩ := exists_lt_of_dense_continuousAt hdense hcont hgt
+    exact absurd (hwin n).2 (not_le.mpr hn)
+
+/-- **Unconditional base-4 general-degree impossibility** (`g = 4`, `d = 5`, `α = 4^{1/5}`).  A perfect
+power base (`4 = 2²`) that the Eisenstein route cannot reach, discharged via the prime-degree form:
+`d = 5` prime, `4` not a 5-th power (`4 < 2⁵ = 32`), and `4^{1/5} < 8/5` (`4 < (8/5)⁵`). -/
+theorem ae_no_dStep_schedule_reads_base_four :
+    ∀ᵐ W ∂(volume : Measure ℝ), ∀ c : ℕ → ℝ, ∃ n : ℕ,
+      ¬ (0 ≤ dStepV (grt 4 5) c (⌊W * (4 : ℝ) ^ n⌋) 5 - (4 : ℝ) * (⌊W * (4 : ℝ) ^ n⌋ : ℝ)
+          ∧ dStepV (grt 4 5) c (⌊W * (4 : ℝ) ^ n⌋) 5 - (4 : ℝ) * (⌊W * (4 : ℝ) ^ n⌋ : ℝ)
+              ≤ (4 : ℝ) - 1) := by
+  have hbound : grt 4 5 < 2 * (4 : ℝ) / ((4 : ℝ) + 1) :=
+    grt_lt_bound 4 5 (by norm_num) (by norm_num) (by norm_num)
+  exact ae_no_dStep_schedule_reads_base_g_all 4 5 (by norm_num) (by norm_num) (by norm_num) hbound
+    (not_perfect_pow_of_lt 4 5 (by norm_num) (by norm_num))
+
 /-- `⌊g·x⌋ − g·⌊x⌋ ∈ {0,…,g-1}`: the base-`g` digit extracted by the doubling-to-`g` map.  Base-`g`
 analogue of `floor_two_mul_sub_mem`. -/
 theorem floor_g_mul_sub_mem (g : ℕ) (hg : 0 < g) (x : ℝ) :
