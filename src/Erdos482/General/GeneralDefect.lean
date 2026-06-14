@@ -198,4 +198,68 @@ theorem dStep_partial_mem_window (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (e : ℕ
   have hlt : C - g < (⌊C - g⌋ : ℤ) + 1 := Int.lt_floor_add_one _
   rcases hdig with h | h <;> rw [h] at hle hlt <;> constructor <;> linarith
 
+/-! ### Base-`b` versions of the digit-extraction chain (toward the base-`g` generalization)
+
+The base-2 chain above hardcodes the doubling `2u` (from `α^(e+1) = 2`).  Below are the same lemmas
+parametrized by an arbitrary base `b : ℕ` (`α^(e+1) = (b:ℝ)`), where the extracted base-`b` digit is
+`v_{e+1} − b·u`.  These are the algebraic core of the base-`b` impossibility; the base-2 ones are the
+`b = 2` instances.  Combined with `geom_window_gt_base` (window width `> b` for `b^{1/d} < 2b/(b+1)`),
+they give the base-`b` obstruction. -/
+
+/-- **The argument of the last floor is `(C − g) + b·u`** (base `b`).  Base-`b` analogue of
+`dStep_last_arg`. -/
+theorem dStep_last_arg_base (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (e : ℕ) (b : ℕ) (hα : α ^ (e + 1) = (b : ℝ)) :
+    α * (dStepV α c u e + c e)
+      = (dStepC α c (e + 1) - dStepPartial α c u (e + 1)) + (b : ℝ) * (u : ℝ) := by
+  have hid := dStep_defect_identity_base α c u (e + 1) (b : ℝ) hα
+  have hve1 : dStepV α c u (e + 1) = ((⌊α * (dStepV α c u e + c e)⌋ : ℤ) : ℝ) := by rw [dStepV]
+  have harg : α * (dStepV α c u e + c e) = dStepV α c u (e + 1) + dStepF α c u e := by
+    rw [dStepF, hve1]; exact (Int.floor_add_fract _).symm
+  have hdg : dStepDefect α c u (e + 1) = dStepPartial α c u (e + 1) + dStepF α c u e := by
+    rw [dStepPartial, Nat.add_sub_cancel]; ring
+  rw [harg, hid, hdg]; ring
+
+/-- **The last floor error is forced**: `f_e = {C − g}` (base `b`).  Independent of the base, since
+`b·u` is an integer.  Base-`b` analogue of `dStep_last_fract_forced`. -/
+theorem dStep_last_fract_forced_base (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (e : ℕ) (b : ℕ)
+    (hα : α ^ (e + 1) = (b : ℝ)) :
+    dStepF α c u e = Int.fract (dStepC α c (e + 1) - dStepPartial α c u (e + 1)) := by
+  rw [dStepF, dStep_last_arg_base α c u e b hα,
+    show (b : ℝ) * (u : ℝ) = (((b : ℤ) * u : ℤ) : ℝ) by push_cast; ring, Int.fract_add_intCast]
+
+/-- **The extracted base-`b` digit is a floor of the partial defect**: `v_{e+1} − b·u = ⌊C − g⌋`.
+Base-`b` analogue of `dStep_digit_eq_floor`. -/
+theorem dStep_digit_eq_floor_base (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (e : ℕ) (b : ℕ)
+    (hα : α ^ (e + 1) = (b : ℝ)) :
+    dStepV α c u (e + 1) - (b : ℝ) * (u : ℝ)
+      = ((⌊dStepC α c (e + 1) - dStepPartial α c u (e + 1)⌋ : ℤ) : ℝ) := by
+  have hid := dStep_defect_identity_base α c u (e + 1) (b : ℝ) hα
+  have hf := dStep_last_fract_forced_base α c u e b hα
+  have hdg : dStepDefect α c u (e + 1) = dStepPartial α c u (e + 1) + dStepF α c u e := by
+    rw [dStepPartial, Nat.add_sub_cancel]; ring
+  rw [hid, hdg, hf]
+  rw [show (b : ℝ) * (u : ℝ) + dStepC α c (e + 1)
+        - (dStepPartial α c u (e + 1)
+            + Int.fract (dStepC α c (e + 1) - dStepPartial α c u (e + 1))) - (b : ℝ) * (u : ℝ)
+      = (dStepC α c (e + 1) - dStepPartial α c u (e + 1))
+        - Int.fract (dStepC α c (e + 1) - dStepPartial α c u (e + 1)) by ring]
+  exact Int.self_sub_fract _
+
+/-- **A base-`b` digit confines the partial defect to a width-`b` window** `(C − b, C]`.  If the `d`-step
+map reads a valid base-`b` digit (`0 ≤ v_{e+1} − b·u ≤ b − 1`) then `g ∈ (C − b, C]`.  Combined with
+`geom_window_gt_base` (the partial-defect range `[0, S_d)` has width `> b`), a dense orbit must leave this
+window — the base-`b` obstruction.  Base-`b` analogue of `dStep_partial_mem_window`. -/
+theorem dStep_partial_mem_window_base (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (e : ℕ) (b : ℕ)
+    (hα : α ^ (e + 1) = (b : ℝ))
+    (hlo : 0 ≤ dStepV α c u (e + 1) - (b : ℝ) * (u : ℝ))
+    (hhi : dStepV α c u (e + 1) - (b : ℝ) * (u : ℝ) ≤ (b : ℝ) - 1) :
+    dStepC α c (e + 1) - (b : ℝ) < dStepPartial α c u (e + 1)
+      ∧ dStepPartial α c u (e + 1) ≤ dStepC α c (e + 1) := by
+  rw [dStep_digit_eq_floor_base α c u e b hα] at hlo hhi
+  set C := dStepC α c (e + 1)
+  set g := dStepPartial α c u (e + 1)
+  have hle : ((⌊C - g⌋ : ℤ) : ℝ) ≤ C - g := Int.floor_le _
+  have hlt : C - g < (⌊C - g⌋ : ℤ) + 1 := Int.lt_floor_add_one _
+  constructor <;> linarith
+
 end Erdos482.General
