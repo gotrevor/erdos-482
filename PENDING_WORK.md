@@ -41,10 +41,25 @@ the a.e.-`W` unconditional cubic. Corrects the prior handoff (which framed the w
   per `k≠0`, set `g_j=(1/j²)∑_{n<j²}e(k2ⁿ·)`, get `∫⁻‖g_j‖₊²=ofReal(1/j²)` [via (i)+`doubling_weyl_L2_normalized`],
   feed DEL ⇒ a.e.-`s` `(1/j²)S(j²)→0` ⇒ `cesaro_fill` ⇒ `(1/N)S(N)→0` all `N` ⇒ intersect over `k`
   (`ae_all_iff`) ⇒ `weyl_criterion`+`fourier_doubling_eq` ⇒ **a.e.-`s`: `{2ⁿs}` equidistributes.**
-- (c) lift to `T³` via brick #2 (`ξ=a+bα+cα²≠0`): a.e. `W`, `2ⁿ(W,αW,α²W)` equidistributes ⇒ joint
-  `(f₁,f₂,f₃)` dense in `[0,1)³` ⇒ escapes the two-plane confinement (#1) ⇒ no cubic schedule reads
-  a.e. `W`'s base-2 digits. **Unconditional a.e.-`W` cubic impossibility.** (Specific-`W` stays open.)
-  [The genuinely-remaining math after (b): the curve→`T³` skew-product equidistribution transfer.]
+- (b) ✅ **DONE 2026-06-14** — `DoublingEquidist.ae_doubling_orbit_equidistributed`: for a.e. `s∈[0,1]`,
+  `n↦↑(2ⁿs)` is `IsEquidistributed` on `ℝ/ℤ` (axiom-clean). Built from `ae_doubling_weyl_tendsto`
+  (per-`k` DEL chain) + `norm_doubling_exp`. This IS Borel base-2 normality, DEL-style, NOT in mathlib.
+- (c) **NEXT FRONTIER** — lift to `T³` via brick #2 (`ξ=a+bα+cα²≠0`). Decomposition (3 pieces):
+  1. **periodicity + scaling transfer** (TRACTABLE, do first): from (b)'s a.e.-`s∈[0,1]` get a.e.-`s∈ℝ`
+     (orbit on `ℝ/ℤ` depends only on `s mod 1`; `2ⁿ(s+m)≡2ⁿs`), then for fixed `ξ≠0`, a.e.-`W`:
+     `IsEquidistributed (orbit (ξW))` (bad `W`-set `= ξ⁻¹·`bad `s`-set, null — scaling preserves null).
+     mathlib: `MeasureTheory.measurePreserving_mul_left`/null-set scaling; small lemmas.
+  2. **multidimensional Weyl criterion** (BIG, mathlib-absent — main remaining brick): a sequence in
+     `T³` (= `Fin 3 → AddCircle 1` or the triple product) is equidistributed iff every nonzero
+     character `∏ fourier kᵢ` has vanishing Cesàro mean. Generalizes `weyl_criterion` via torus
+     Stone–Weierstrass (`ContinuousMap.starSubalgebra_topologicalClosure_eq_top_of_separatesPoints` +
+     product-character separation). THEN: combine pieces 1+2 with `cubic_lin_indep_int` ⇒ a.e.-`W`,
+     `2ⁿ(W,αW,α²W)` equidistributes in `T³` (the scalar Weyl sum `∑e(2ⁿξW)` is exactly piece 1's).
+  3. **defect link** (ties to `CubicDefect`): T³ equidistribution ⇒ joint `(f₁,f₂,f₃)` not confined to
+     the two planes `{α²x+αy+z∈{C,C−1}}` (`cubic_orbit_defect_confined`) ⇒ no cubic schedule reads
+     a.e. `W`'s base-2 digits. Needs: express `fᵢ` as (piecewise-continuous) functions of the `T³`
+     orbit point, and show the defect range on a dense orbit exceeds width 1 (`cubic_combined_defect_range_wide`).
+  **Result:** unconditional a.e.-`W` cubic impossibility. (Specific-`W` stays open math.)
 
 **The precise reduction (worked out this lap).** A digit-reading orbit forces the joint floor coords
 `(f₁,f₂,f₃)` — which are functions of `2ⁿ(W, αW, α²W) mod 1` — to stay on the two-plane set

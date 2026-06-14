@@ -1,6 +1,6 @@
 # STATUS — erdos-482 📊
 
-**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8279 jobs) · **Updated**: lap 2026-06-14 (`st06` branch, HEAD `0bdaa17`) (**#482 COMPLETE & axiom-clean on `main`; St06 fun-extension on `st06` ALL main theorems done. LIVE: cubic-frontier path #2 (a.e.-`W`) — DEL engine + Weyl equidistribution criterion + gap-filling now ALL built & axiom-clean; step (b) is finite assembly**)
+**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8280 jobs) · **Updated**: lap 2026-06-14 (`st06` branch, HEAD `8f26dcb`) (**#482 COMPLETE & axiom-clean on `main`; St06 fun-extension on `st06` ALL main theorems done. LIVE: cubic-frontier path #2 (a.e.-`W`) — steps (a)+(b) COMPLETE & axiom-clean: `ae_doubling_orbit_equidistributed` (a.e.-`s` Borel base-2 normality, DEL-built). Remaining: step (c) `T³` lift**)
 
 ## 🎁 St06 fun-extension (branch `st06`) — Tier 3 COMPLETE (2026-06-13)
 All axiom-clean (`[propext, Classical.choice, Quot.sound]`), build green (8273 jobs):
@@ -110,8 +110,14 @@ corrected 2026-06-13 from the swapped-recurrence false "obstruction" — see Thm
     `Summable (∫⁻‖g_j‖₊²)` hyp is vacuous over `ℝ≥0∞` ⇒ strengthened to total-sum `≠ ⊤`.
   • **`cesaro_fill_of_subseq_sq`** — gap-filling (Cesàro along squares `j²` ⇒ all `N`, `Nat.sqrt`
     squeeze) and **`fourier_doubling_eq`** (`fourier k(↑2ⁿs)=e^{2πi k2ⁿs}`, the seam to `WeylDoubling`).
-  Net: steps (a) + the hard half of (b) of `PENDING_WORK ★★` are DONE; the remainder is a finite
-  assembly (L² bridge — Aristotle `190d0b98` in flight — + p-series summability + the `T³` lift (c)).
+  • **`ae_doubling_orbit_equidistributed`** (`General/DoublingEquidist.lean`) — **step (b) COMPLETE**:
+    for a.e. `s∈[0,1]`, `n↦↑(2ⁿs)` is equidistributed on `ℝ/ℤ`. This is Borel's base-2 normality
+    theorem, built from scratch via DEL (mathlib has neither). Assembly: per-`k` chain
+    `ae_doubling_weyl_tendsto` (Weyl L² + `l2_bridge` + p-series ⇒ DEL engine ⇒ gap-fill) intersected
+    over `k≠0` ⇒ `weyl_criterion` via `fourier_doubling_eq`; `l2_bridge`+p-series harvested/proved.
+  Net: `PENDING_WORK ★★` steps (a)+(b) DONE & axiom-clean. **Remaining = step (c)**: `T³` lift
+  (periodicity+scaling transfer [Aristotle `10ed15fc` in flight] + multidim Weyl criterion + the
+  `CubicDefect` two-plane link) ⇒ unconditional a.e.-`W` cubic impossibility.
 - **2026-06-13 (correction lap — Thm 3.4 genuine full interval)**: Harvested ON-LINE findings that the
   prior lap's Thm 3.4 "obstruction" formalized a **swapped recurrence** (`ε` on the b-step = Thm 3.3's
   placement; Stoll's 3.4 has `ε` on the a-step). Proved the GENUINE full symmetric interval as a real
@@ -213,7 +219,7 @@ All headline theorems verified `#print axioms` this lap = trust base only; **0 m
 | `selfref_crux_solvable_iff` (+ `_fails_of_three_le`, `_offset_unique`) | NEW: self-ref digit crux solvable iff g=2, and then offset c=½ is forced | trust base | 🟢 clean |
 | `onefloor_div2_crux_solvable_iff` (+ `_crux_solvable`, `_crux_cbrt2`, `_offset_unique`) | NEW: single-floor /2 crux (mult β, free base 2) solvable ⇔ β<2 (c=½ forced); **refutes findings-doc "Tier-1" cubic impossibility** — cubic 2^{1/3} single floor IS solvable, obstruction is purely multi-floor | trust base | 🟢 clean |
 | `cubic_threestep_defect` (+ `cubic_combined_defect_range_wide{,_cbrt2}`, `cubicV3_sub_eq`, `cubic_threestep_digit_pair_fails`, `cubic_valid_digits_defects_close`, `cubic_block_orbit_base_two_bounds`, `irrational_cbrt_two`) | NEW (Tier-2): exact 3-step cubic defect identity `v₃=2u+C−(α²f₁+αf₂+f₃)`; combined two-floor defect spans width α²+α+1>1 ⇒ fits no width-1 window; **conditional impossibility** (orbit realises wide defect pair ⇒ digits not both in {0,1}); **block orbit is base 2** `uₙ=⌊W·2ⁿ⌋` ⇒ residual wall is **base-2 normality of αW** (doubling map), NOT geometric `{α^n ξ}` (corrected). Unconditional a.e.-W route needs Borel normality (not in mathlib) — see PENDING_WORK ★ | trust base | 🟢 clean |
-| **path #2 infra** `weyl_criterion`, `ae_tendsto_zero_of_summable_sq` (DEL engine), `cesaro_fill_of_subseq_sq`, `integral_fourier_eq`, `norm_cesaro_le`, `fourier_doubling_eq`, `doubling_weyl_L2_{mean,normalized}` | NEW (path #2, a.e.-`W` cubic): the **mathlib-absent** analytic bricks now built — Weyl equidistribution criterion (Stone–Weierstrass), the Davenport–Erdős–LeVeque a.e.-L² engine (Markov+Borel–Cantelli, ex-Aristotle `bd44d316`), Cesàro gap-fill, Weyl L² mean. These reduce the **unconditional a.e.-`W` cubic impossibility** to a finite assembly (L² bridge `190d0b98` in flight + p-series + `T³` lift). NOT yet assembled into an a.e.-`W` headline. | trust base | 🟢 clean (infra) |
+| **`ae_doubling_orbit_equidistributed`** (steps a+b) + infra `weyl_criterion`, `ae_tendsto_zero_of_summable_sq` (DEL engine), `cesaro_fill_of_subseq_sq`, `l2_bridge`, `tsum_ofReal_inv_sq_ne_top`, `integral_fourier_eq`, `fourier_doubling_eq`, `doubling_weyl_L2_{mean,normalized}` | NEW (path #2, a.e.-`W` cubic): **a.e.-`s∈[0,1]`, the doubling orbit `{2ⁿs}` is equidistributed on `ℝ/ℤ`** — Borel base-2 normality, built from scratch (Weyl criterion via Stone–Weierstrass + Davenport–Erdős–LeVeque L² engine + Cesàro gap-fill + Weyl L² mean); none of these are in mathlib. Steps (a)+(b) of the a.e.-`W` cubic route DONE. Remaining: step (c) `T³` lift (periodicity/scaling + multidim Weyl criterion + the `CubicDefect` two-plane link). | trust base | 🟢 clean |
 
 No 🟡/🟠/🔴 axioms anywhere: the whole development is elementary (floors, √2, π/e bounds, Rayleigh from
 mathlib). Thm 3.4's full k-dependent interval — once mis-formalized as a Diophantine "obstruction" — is
