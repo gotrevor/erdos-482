@@ -174,4 +174,32 @@ theorem irrational_cbrt_two : Irrational ((2 : ℝ) ^ ((1 : ℝ) / 3)) := by
   have : y < (2 : ℤ) := by exact_mod_cast h2
   omega
 
+/-- **The block orbit is a base-2 expansion** (`⌊W·2ⁿ⌋`), not geometric base-`α`.  If the three-step
+cubic map reads valid base-2 digits along an orbit — `orbit (n+1) = cubicV3 (orbit n)` with every digit
+`cubicV3 − 2·orbit ∈ {0,1}` — then `2ⁿ·orbit₀ ≤ orbit n ≤ 2ⁿ·orbit₀ + (2ⁿ − 1)`, i.e.
+`orbit n = ⌊W·2ⁿ⌋` for `W = orbit₀ + 0.d₀d₁… ∈ [orbit₀, orbit₀+1)`.
+
+**Why this matters (corrects an earlier mischaracterisation).**  The block recurrence is
+`u_{n+1} = 2u_n + dₙ`, so the orbit **doubles per block** — `uₙ ≍ W·2ⁿ`, NOT `W·α^n`.  Hence the first
+internal-floor error is `f₁ = {α(uₙ+c₀)} ≈ {(αW)·2ⁿ + …}` — a **doubling-map** orbit, so the residual
+obstruction is the **base-2 normality of `αW`** (Borel: a.e. real is normal), not the geometric
+`{α^n ξ}` equidistribution.  Base-2 normality is the standard, correct frame for attack-path #2
+(almost-all-`W`); mathlib does not yet have Borel's normal-number theorem, so that is the infrastructure
+to build/port.  (HOSTCHECK: the surviving schedule's `uₙ/2ⁿ → 1.24987 = W`, matching `cubic_recover.py`.) -/
+theorem cubic_block_orbit_base_two_bounds (α c0 c1 c2 : ℝ) (orbit : ℕ → ℤ)
+    (hstep : ∀ n, orbit (n + 1) = cubicV3 α c0 c1 c2 (orbit n))
+    (hbit : ∀ n, cubicV3 α c0 c1 c2 (orbit n) - 2 * orbit n = 0
+        ∨ cubicV3 α c0 c1 c2 (orbit n) - 2 * orbit n = 1) :
+    ∀ n, 2 ^ n * orbit 0 ≤ orbit n ∧ orbit n ≤ 2 ^ n * orbit 0 + (2 ^ n - 1) := by
+  intro n
+  induction n with
+  | zero => simp
+  | succ k ih =>
+    have h2 : (2 : ℤ) ^ (k + 1) = 2 * 2 ^ k := by ring
+    have h3 : (2 : ℤ) ^ (k + 1) * orbit 0 = 2 * (2 ^ k * orbit 0) := by rw [h2]; ring
+    have hval : cubicV3 α c0 c1 c2 (orbit k)
+        = 2 * orbit k + (cubicV3 α c0 c1 c2 (orbit k) - 2 * orbit k) := by ring
+    rw [hstep k, hval]
+    rcases hbit k with hd | hd <;> rw [hd] <;> omega
+
 end Erdos482.General

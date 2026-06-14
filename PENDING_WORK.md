@@ -12,15 +12,39 @@ The genuine cubic obstruction is now *localized* by `General/CubicDefect.lean`:
   `α²f₁+αf₂+f₃` ranges over width `α²+α+1 > 1`, so it fits **no** width-1 window `[C,C+1]`. Two internal
   floors ⇒ spread > 1 (vs the single floor's spread = exactly 1, which is why `√2` barely closes).
 
-**What remains for an UNCONDITIONAL impossibility — and an important caveat.** The missing link is:
-*the geometric orbit `u_n ≈ W·α^n` actually realises a pair of `(f₁,f₂,f₃)` configs whose combined
-defects differ by > 1* (then no fixed `C` keeps both digits in `{0,1}` — done, via the two lemmas above).
-This is an equidistribution statement about `{α^n ξ}` for `α=2^{1/3}`.  **CAVEAT (corrects the findings
-doc, which called this "guaranteed because α is non-Pisot"):** equidistribution of `{ξ·θ^n}` for a
-*fixed* base `θ>1` and a *fixed* `ξ` is a notoriously OPEN problem (cf. the unknown distribution of
-`{(3/2)^n}`). It holds for *almost all* `ξ` (Weyl/Koksma), but NOT known for the specific `ξ` our orbit
-forces. So the unconditional cubic impossibility is **genuinely open in current mathematics**, not merely
-unformalized — the doc over-claimed. *(Filed for cross-check: `ON-LINE-REQUEST.md`.)*
+**What remains for an UNCONDITIONAL impossibility — and the CORRECT frame.** The missing link is:
+*the orbit actually realises a pair of `(f₁,f₂,f₃)` configs whose combined defects differ by > 1* (then
+no fixed `C` keeps both digits in `{0,1}` — done, via the two lemmas above).
+
+**⚠️ CORRECTION 2026-06-14 (supersedes the `{α^n ξ}` framing below — it was WRONG):** the block orbit
+is **base 2, not base α**.  The block recurrence is `u_{n+1} = 2u_n + dₙ` (`dₙ∈{0,1}`), so
+`uₙ = ⌊W·2ⁿ⌋`, `W = u₀ + 0.d₀d₁…` — proved as `cubic_block_orbit_base_two_bounds`, and HOSTCHECK-confirmed
+(`uₙ/2ⁿ → 1.24987 = W`).  Hence `f₁ = {α(uₙ+c₀)} ≈ {(αW)·2ⁿ + …}` is a **DOUBLING-MAP** orbit, and the
+residual obstruction is the **base-2 normality of `αW`** (and `α²W`), NOT the geometric `{α^n ξ}`
+equidistribution.  This is the correct, far more standard frame: **Borel's theorem** says a.e. real is
+normal, so for a.e. `W` the digits of `αW` equidistribute and the defect can't stay in a width-1 window
+⇒ no fixed schedule reads base-2 digits for a.e. `W` (attack-path #2, now correctly framed).  For a
+*specific* `W` it is the open "is this specific number normal" question.
+
+**🔑 TRACTABILITY UPGRADE (2026-06-14, from harvesting `archive/findings/…equidistribution-xi-theta-n.md`):**
+that findings doc concluded the *geometric* `{ξ·(2^{1/3})ⁿ}` a.e.-equidistribution is NOT in mathlib
+(only integer-`×n` endomorphism ergodicity `AddCircle.ergodic_zsmul`/`ergodic_nsmul` and irrational
+rotation are).  **But my base-2 reframing changes the needed map from `×2^{1/3}` (geometric, absent) to
+`×2` (the doubling map, which `ergodic_nsmul` at `n=2` DOES cover).**  So the a.e.-`W` route reduces to:
+`×2` ergodicity (✅ in mathlib) + Birkhoff's ergodic theorem (check `Mathlib/Dynamics/Ergodic/...`) ⟹
+a.e. `x` is base-2 normal ⟹ `{αW·2ⁿ}` equidistributes for a.e. `W`.  The remaining subtlety is the
+**joint** spread of `(f₁,f₂,f₃)` (needs `({αW·2ⁿ},{α²W·2ⁿ})` to explore a width-`>1` region of `T²` —
+a 2-dim normality / joint-distribution statement, harder than 1-dim but no longer needs the missing
+geometric Koksma).  **Next-lap concrete step:** check whether mathlib has Birkhoff + whether 1-dim base-2
+normality of `αW` ALONE suffices for some weaker but still-unconditional impossibility (e.g. `f₁` alone
+forces a contradiction at certain `c`).  This is a genuinely buildable lane now, not a missing-theorem
+wall.  Specific-`W` remains open.  *(The earlier `{α^n ξ}` text below is retained struck-through for the record; the
+`ON-LINE-REQUEST.md` item should be re-aimed at base-2 normality of `αW`.)*
+
+~~This is an equidistribution statement about `{α^n ξ}` for `α=2^{1/3}`.  CAVEAT (corrects the findings
+doc, which called this "guaranteed because α is non-Pisot"): equidistribution of `{ξ·θ^n}` for a fixed
+base `θ>1` and a fixed `ξ` is a notoriously OPEN problem (cf. `{(3/2)^n}`). It holds for almost all `ξ`
+(Weyl/Koksma), but NOT known for the specific `ξ`.~~
 
 **Three attack paths (do real progress on one per lap):**
 1. **Conditional impossibility (TRACTABLE — do next).** Formalize: *if* ∃ two orbit indices `n,n'` whose
