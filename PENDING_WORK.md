@@ -19,7 +19,12 @@ the a.e.-`W` unconditional cubic. Corrects the prior handoff (which framed the w
 5. `WeylDoubling.doubling_weyl_L2_mean` — **the Weyl mean square** `∫₀¹|∑_{n<N} e(k2ⁿs)|² ds = N`
    (`k≠0`), via `char_int` (character orthogonality) + `two_pow_inj` (diagonal). The abstract
    `weyl_double_sum_integral` dodges a defeq/whnf elaboration wall on inline-arithmetic casts.
-   **This is the mean-square bound that feeds DEL.**
+6. `WeylDoubling.doubling_weyl_L2_mean_norm` — the **norm form** `∫₀¹‖∑_{n<N} e(k2ⁿs)‖² = N`
+   (`term_id` + `integral_ofReal` bridge), and `doubling_weyl_L2_normalized` — `∫₀¹‖(1/N)∑‖² = 1/N`.
+   **This is literally `∫‖g_N‖²` for the DEL engine; along `N_j=j²` it is `1/j²` (summable).**
+   So step (b) below now needs only: the engine (a) + the Weyl equidistribution *criterion* (NOT in
+   mathlib — must be built: `equidistributed ⟺ ∀k≠0, Weyl sum →0`, via Stone–Weierstrass) + gap-filling
+   (`|S_{N+1}−S_N|=1`).
 
 **Remaining for a.e.-`W` cubic (now a finite assembly, no open math):**
 - (a) `[in flight, Aristotle bd44d316]` abstract DEL engine: `∑_j ∫₀¹‖g_j‖² < ∞ ⇒ g_j → 0 a.e.`
