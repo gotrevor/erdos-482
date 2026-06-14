@@ -1,6 +1,6 @@
 # STATUS — erdos-482 📊
 
-**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8273 jobs) · **Updated**: lap 2026-06-13 (`st06` branch, HEAD `1f844c2`) (**#482 COMPLETE & axiom-clean on `main`; St06 fun-extension on `st06`: Tiers 1+2 done, Tier 3 = Thm 3.3 full + Thm 3.4 (ε=½) + Cor 3.5 CAPSTONE now done — ALL St06 main theorems formalized**)
+**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8279 jobs) · **Updated**: lap 2026-06-14 (`st06` branch, HEAD `0bdaa17`) (**#482 COMPLETE & axiom-clean on `main`; St06 fun-extension on `st06` ALL main theorems done. LIVE: cubic-frontier path #2 (a.e.-`W`) — DEL engine + Weyl equidistribution criterion + gap-filling now ALL built & axiom-clean; step (b) is finite assembly**)
 
 ## 🎁 St06 fun-extension (branch `st06`) — Tier 3 COMPLETE (2026-06-13)
 All axiom-clean (`[propext, Classical.choice, Quot.sound]`), build green (8273 jobs):
@@ -96,6 +96,22 @@ corrected 2026-06-13 from the swapped-recurrence false "obstruction" — see Thm
 "only ε=½" the prior lap reported. What's left is optional polish (top-level showcase wiring).
 
 ## What's happened (newest first)
+- **2026-06-14 (review+grind lap — cubic path #2 DEL chain landed)**: Built the three mathlib-absent
+  analytic bricks of the a.e.-`W` cubic route, all axiom-clean (`General/Equidistribution.lean`,
+  `General/DELEngine.lean`):
+  • **`weyl_criterion`** — Weyl's equidistribution criterion on `ℝ/ℤ` (vanishing nonzero Weyl sums ⇒
+    `IsEquidistributed`), via `Submodule.span_induction` over the dense Fourier span
+    (`span_fourier_closure_eq_top`, Stone–Weierstrass) + uniform `norm_cesaro_le` bound. THE key
+    mathlib-absent piece of step (b). Plus `integral_fourier_eq` (`∫ fourier k = δ_{k,0}`) and the
+    `IsEquidistributed` definition.
+  • **`ae_tendsto_zero_of_summable_sq`** — the Davenport–Erdős–LeVeque L² engine (`∑_j ∫₀¹‖g_j‖²<∞ ⇒
+    g_j→0 a.e.`), Markov + first Borel–Cantelli. Harvested from Aristotle `bd44d316`, verified
+    in-kernel + axiom-clean. Aristotle caught a real **faithfulness bug**: the original
+    `Summable (∫⁻‖g_j‖₊²)` hyp is vacuous over `ℝ≥0∞` ⇒ strengthened to total-sum `≠ ⊤`.
+  • **`cesaro_fill_of_subseq_sq`** — gap-filling (Cesàro along squares `j²` ⇒ all `N`, `Nat.sqrt`
+    squeeze) and **`fourier_doubling_eq`** (`fourier k(↑2ⁿs)=e^{2πi k2ⁿs}`, the seam to `WeylDoubling`).
+  Net: steps (a) + the hard half of (b) of `PENDING_WORK ★★` are DONE; the remainder is a finite
+  assembly (L² bridge — Aristotle `190d0b98` in flight — + p-series summability + the `T³` lift (c)).
 - **2026-06-13 (correction lap — Thm 3.4 genuine full interval)**: Harvested ON-LINE findings that the
   prior lap's Thm 3.4 "obstruction" formalized a **swapped recurrence** (`ε` on the b-step = Thm 3.3's
   placement; Stoll's 3.4 has `ε` on the a-step). Proved the GENUINE full symmetric interval as a real
@@ -163,9 +179,13 @@ corrected 2026-06-13 from the swapped-recurrence false "obstruction" — see Thm
 
 ## Outstanding
 ### Short-term (mirror PENDING_WORK top)
-- **No open mathematical items.** All St06 main theorems formalized & axiom-clean; **Thm 3.4's full
-  symmetric interval is now a genuine t-universal theorem** (`st06_thm34_digits_eps`, corrected this lap
-  from the swapped-recurrence false obstruction).
+- **LIVE: cubic frontier path #2 (a.e.-`W` unconditional impossibility).** Steps (a)+(b-hard) DONE this
+  lap (DEL engine + Weyl criterion + gap-fill + fourier bridge, all axiom-clean). Remaining finite
+  assembly: (1) L² bridge `∫⁻‖g‖₊²=ofReal∫‖g‖²` (Aristotle `190d0b98` in flight); (2) p-series
+  summability `∑'ofReal(1/j²)≠⊤`; (3) wire DEL+gap-fill+Weyl criterion ⇒ **a.e.-`s`: `{2ⁿs}`
+  equidistributes**; (4) step (c) `T³` lift via `cubic_lin_indep_int` ⇒ a.e.-`W` cubic impossibility.
+  Specific-`W` stays open math (Borel normality of a defined constant). See PENDING_WORK ★★.
+- **No open items in the COMPLETED layers.** All St05/St06 main theorems formalized & axiom-clean.
 - **Optional polish**: wire `st06_cor35`/`erdos482_resolution` into a single top-level St06 showcase;
   unified Thm 3.3/3.4/Cor 3.5 `isBit` master; concrete `r=2`→digits-of-`2√2` certificate for Cor 3.5;
   retire the swapped `_bstep_*` theorems entirely (currently kept as documented contrast).
@@ -193,6 +213,7 @@ All headline theorems verified `#print axioms` this lap = trust base only; **0 m
 | `selfref_crux_solvable_iff` (+ `_fails_of_three_le`, `_offset_unique`) | NEW: self-ref digit crux solvable iff g=2, and then offset c=½ is forced | trust base | 🟢 clean |
 | `onefloor_div2_crux_solvable_iff` (+ `_crux_solvable`, `_crux_cbrt2`, `_offset_unique`) | NEW: single-floor /2 crux (mult β, free base 2) solvable ⇔ β<2 (c=½ forced); **refutes findings-doc "Tier-1" cubic impossibility** — cubic 2^{1/3} single floor IS solvable, obstruction is purely multi-floor | trust base | 🟢 clean |
 | `cubic_threestep_defect` (+ `cubic_combined_defect_range_wide{,_cbrt2}`, `cubicV3_sub_eq`, `cubic_threestep_digit_pair_fails`, `cubic_valid_digits_defects_close`, `cubic_block_orbit_base_two_bounds`, `irrational_cbrt_two`) | NEW (Tier-2): exact 3-step cubic defect identity `v₃=2u+C−(α²f₁+αf₂+f₃)`; combined two-floor defect spans width α²+α+1>1 ⇒ fits no width-1 window; **conditional impossibility** (orbit realises wide defect pair ⇒ digits not both in {0,1}); **block orbit is base 2** `uₙ=⌊W·2ⁿ⌋` ⇒ residual wall is **base-2 normality of αW** (doubling map), NOT geometric `{α^n ξ}` (corrected). Unconditional a.e.-W route needs Borel normality (not in mathlib) — see PENDING_WORK ★ | trust base | 🟢 clean |
+| **path #2 infra** `weyl_criterion`, `ae_tendsto_zero_of_summable_sq` (DEL engine), `cesaro_fill_of_subseq_sq`, `integral_fourier_eq`, `norm_cesaro_le`, `fourier_doubling_eq`, `doubling_weyl_L2_{mean,normalized}` | NEW (path #2, a.e.-`W` cubic): the **mathlib-absent** analytic bricks now built — Weyl equidistribution criterion (Stone–Weierstrass), the Davenport–Erdős–LeVeque a.e.-L² engine (Markov+Borel–Cantelli, ex-Aristotle `bd44d316`), Cesàro gap-fill, Weyl L² mean. These reduce the **unconditional a.e.-`W` cubic impossibility** to a finite assembly (L² bridge `190d0b98` in flight + p-series + `T³` lift). NOT yet assembled into an a.e.-`W` headline. | trust base | 🟢 clean (infra) |
 
 No 🟡/🟠/🔴 axioms anywhere: the whole development is elementary (floors, √2, π/e bounds, Rayleigh from
 mathlib). Thm 3.4's full k-dependent interval — once mis-formalized as a Diophantine "obstruction" — is

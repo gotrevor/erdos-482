@@ -27,14 +27,24 @@ the a.e.-`W` unconditional cubic. Corrects the prior handoff (which framed the w
    (`|S_{N+1}−S_N|=1`).
 
 **Remaining for a.e.-`W` cubic (now a finite assembly, no open math):**
-- (a) `[in flight, Aristotle bd44d316]` abstract DEL engine: `∑_j ∫₀¹‖g_j‖² < ∞ ⇒ g_j → 0 a.e.`
-  (Markov + Borel–Cantelli — both in mathlib).
-- (b) apply (a) to `g_j = (1/j²)∑_{n<j²} e(k2ⁿ·)` (mean sq `1/j²` summable, from #5) ⇒
-  `(1/N_j)∑ e(k2ⁿs) → 0` a.e. along `N_j=j²`; fill gaps by `|S_{N+1}−S_N| = 1` ⇒ a.e. `{2ⁿs}`
-  equidistributes (Weyl criterion, all `k≠0`).
+- (a) ✅ **DONE 2026-06-14** — `DELEngine.ae_tendsto_zero_of_summable_sq`: `∑_j ∫₀¹‖g_j‖² < ∞ ⇒
+  g_j → 0 a.e.` (Markov + Borel–Cantelli). Harvested from Aristotle `bd44d316`, verified in-kernel +
+  axiom-clean. (Aristotle fixed a faithfulness bug: the `Summable (∫⁻‖g_j‖₊²)` hyp is vacuous over
+  `ℝ≥0∞` ⇒ strengthened to total-sum `≠ ⊤`.)
+- (b) **HARD HALF DONE 2026-06-14**, all axiom-clean in `Equidistribution.lean`:
+  • `weyl_criterion` (vanishing nonzero Weyl sums ⇒ `IsEquidistributed`, via Stone–Weierstrass
+    `span_fourier_closure_eq_top` + `norm_cesaro_le`) — the mathlib-absent piece;
+  • `cesaro_fill_of_subseq_sq` (gap-fill `j²`→all `N`); `integral_fourier_eq` (`∫ fourier k=δ`);
+  • `fourier_doubling_eq` (`fourier k(↑2ⁿs)=e^{2πi k2ⁿs}`, seam to `WeylDoubling`).
+  **REMAINING (finite glue):** (i) L² bridge `∫⁻ Icc01 ‖g‖₊² = ofReal(∫₀¹‖g‖²)` — Aristotle `190d0b98`
+  IN FLIGHT; (ii) p-series `∑'_j ofReal((j²)⁻¹) ≠ ⊤` (mathlib `summable_one_div_nat_pow`); (iii) wire:
+  per `k≠0`, set `g_j=(1/j²)∑_{n<j²}e(k2ⁿ·)`, get `∫⁻‖g_j‖₊²=ofReal(1/j²)` [via (i)+`doubling_weyl_L2_normalized`],
+  feed DEL ⇒ a.e.-`s` `(1/j²)S(j²)→0` ⇒ `cesaro_fill` ⇒ `(1/N)S(N)→0` all `N` ⇒ intersect over `k`
+  (`ae_all_iff`) ⇒ `weyl_criterion`+`fourier_doubling_eq` ⇒ **a.e.-`s`: `{2ⁿs}` equidistributes.**
 - (c) lift to `T³` via brick #2 (`ξ=a+bα+cα²≠0`): a.e. `W`, `2ⁿ(W,αW,α²W)` equidistributes ⇒ joint
   `(f₁,f₂,f₃)` dense in `[0,1)³` ⇒ escapes the two-plane confinement (#1) ⇒ no cubic schedule reads
   a.e. `W`'s base-2 digits. **Unconditional a.e.-`W` cubic impossibility.** (Specific-`W` stays open.)
+  [The genuinely-remaining math after (b): the curve→`T³` skew-product equidistribution transfer.]
 
 **The precise reduction (worked out this lap).** A digit-reading orbit forces the joint floor coords
 `(f₁,f₂,f₃)` — which are functions of `2ⁿ(W, αW, α²W) mod 1` — to stay on the two-plane set
