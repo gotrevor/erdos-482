@@ -27,6 +27,7 @@ import Erdos482.General.GeneralDefectCheck
 import Erdos482.General.GeneralOrbit
 import Erdos482.General.GeneralTorusEquidist
 import Erdos482.General.GeneralTorusFinish
+import Erdos482.General.GeneralSubsumes
 
 /-!
 # Erdős–Graham #482 — the general resolution (any `w > 0`, any base `g ≥ 2`)

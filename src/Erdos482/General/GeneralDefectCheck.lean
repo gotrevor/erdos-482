@@ -18,7 +18,7 @@ Axiom-clean (`[propext, Classical.choice, Quot.sound]`).
 namespace Erdos482.General
 
 /-- The schedule `ℕ → ℝ` extending the cubic offsets `(c₀,c₁,c₂)`. -/
-private def cubicSched (c0 c1 c2 : ℝ) : ℕ → ℝ := fun k => if k = 0 then c0 else if k = 1 then c1 else c2
+def cubicSched (c0 c1 c2 : ℝ) : ℕ → ℝ := fun k => if k = 0 then c0 else if k = 1 then c1 else c2
 
 /-- **The cubic three-step map is the `d = 3` instance of the general `dStepV`.** -/
 theorem cubicV3_eq_dStepV (α c0 c1 c2 : ℝ) (u : ℤ) :
@@ -55,7 +55,7 @@ theorem cubicV3_sub_eq_via_general (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) (u : �
   rw [cubicV3_eq_dStepV, hid, cubic_dStepC_eq α c0 c1 c2 hα, cubic_dStepDefect_eq]; ring
 
 /-- The schedule `ℕ → ℝ` extending the quartic offsets `(c₀,c₁,c₂,c₃)`. -/
-private def quarticSched (c0 c1 c2 c3 : ℝ) : ℕ → ℝ :=
+def quarticSched (c0 c1 c2 c3 : ℝ) : ℕ → ℝ :=
   fun k => if k = 0 then c0 else if k = 1 then c1 else if k = 2 then c2 else c3
 
 /-- **The quartic four-step map is the `d = 4` instance of the general `dStepV`.** -/
