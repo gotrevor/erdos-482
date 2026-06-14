@@ -56,7 +56,11 @@ unformalized — the doc over-claimed. *(Filed for cross-check: `ON-LINE-REQUEST
    local-search stall (discrete/non-convex landscape), not a true bound. **Verdict: leans toward
    `sup N = ∞` (path #3 likely dead → equidistribution genuinely required), but UNRESOLVED.** A proper
    test needs continuation / constraint-propagation (track the offset-polytope satisfying the first `k`
-   digit constraints; check if it stays nonempty as `k→∞`), not random hill-climbing.
+   digit constraints; check if it stays nonempty as `k→∞`), not random hill-climbing. **Multi-seed
+   aggressive exact hill-climbing (9 seeds, adaptive denominators) all converge to exactly 91** — a real
+   local plateau, but hill-climbing only lower-bounds `sup N`, so this is `sup N ≥ 91`, still undecided.
+   The constraint-propagation experiment is the way to settle it; until then the CONDITIONAL theorem
+   stands as the formalizable ceiling and the unconditional cubic is "open in mathematics."
 
 **⚠️ This file below is now largely historical — see [`STATUS.md`](STATUS.md) for the authoritative state.**
 The project is **COMPLETE and axiom-clean** (zero `sorry`, zero custom axioms): the headline
