@@ -1,6 +1,6 @@
 # STATUS — erdos-482 📊
 
-**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8297 jobs) · **Updated**: lap 2026-06-14 (`st06` branch, HEAD `0b9dffe`) (**#482 COMPLETE & axiom-clean on `main`; St06 fun-extension on `st06` ALL main theorems done; cubic AND quartic a.e.-`W` self-referential impossibilities COMPLETE & axiom-clean. LIVE: GENERAL degree-`d` (`α=2^{1/d}`) — the algebraic obstruction, faithfulness recovery (cubic & quartic), the full analytic bridge (`dGpd`+`continuousAt_dGpd`, `Tᵈ` density `ae_W_dTorus_orbit_dense`, realization `orbitF_realizeR`), the torus plumbing (`dGpdTorus_orbit`, `continuousAt_dGpdTorus`), AND the reduction made EXPLICIT in Lean (`ae_dStep_fails_of_exceeding`: density+continuity+window chained) are ALL COMPLETE & axiom-clean. ONLY the geometry-crux hypothesis (nonzero-coord realization) remains to make the uniform headline unconditional**)
+**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8304 jobs) · **Updated**: lap 2026-06-14 (deep-reflection lap, `st06` branch, HEAD `0fa6bb9`) (**Erdős #482 + Stoll St05/St06 COMPLETE & axiom-clean; the self-generated degree-`d` / base-`g` self-referential impossibility frontier ALSO COMPLETE & axiom-clean for every `d≥3`, every base `g≥2`. Whole 12,400-line repo is `sorry`-free, custom-axiom-free, 0 math axioms. REFLECTION CALL THIS LAP: the impossibility-generalization axis has SATURATED — STOP mechanical further-base/composite-degree mirroring; the highest-value remaining work is CONSOLIDATION: a single auditable `Statement.lean` trust surface + isolating the mathlib-absent Weyl/equidistribution/Borel-normality infrastructure as a reusable PR-ready layer. Fixed-`W` version = famous OPEN problem (Mahler 3/2), cite-not-grind. See `REFLECTION.md`.**)
 
 ## 🎁 St06 fun-extension (branch `st06`) — Tier 3 COMPLETE (2026-06-13)
 All axiom-clean (`[propext, Classical.choice, Quot.sound]`), build green (8273 jobs):
@@ -84,6 +84,20 @@ Aristotle independently confirmed the `𝒟₂⁻` and `𝒟₁⁻` cores (`tool
 Cor 3.5 (Beatty unification of the Borwein–Bailey examples). See `PENDING_WORK.md`.
 
 ## Where it stands
+**Post-completion, self-extending regime — direction recalibrated this lap.** The paper-faithful core
+(Erdős #482 + Stoll St05 `erdos482_resolution` + St06 Thm 3.1/3.3/3.4/Cor 3.5/Ex 1.1) is DONE &
+axiom-clean and has been since 2026-06-06/13. The self-generated *impossibility frontier* (a.e.-`W`, no
+degree-`d≥3` schedule reads base-`g` digits — the "GP trick is special to degree 2" result) is now ALSO
+COMPLETE & axiom-clean for **every `d≥3` and every base `g≥2`**. The entire repo has **zero `sorry`, zero
+custom `axiom`, zero `native_decide`** — nothing to discharge. The deep-reflection lap's call: the
+impossibility *generalization axis is saturated* (further bases / composite degrees ≈ 0 marginal value —
+STOP); the highest-value remaining work is **consolidation** — a single auditable `Statement.lean` trust
+surface and isolating the genuinely-mathlib-absent equidistribution/Weyl/Borel-normality infrastructure
+as a clean reusable layer (the project's most valuable un-packaged byproduct). The fixed-`W` impossibility
+is a *famous open problem* (Mahler's 3/2 / lacunary equidistribution at a fixed seed) — cite, don't grind.
+Full direction call in `REFLECTION.md`.
+
+### (legacy overview below — superseded framing, kept for the layer detail)
 **Four complete, axiom-clean layers + an in-progress fifth.** The first three layers (below) plus the
 **fourth**: the cubic AND quartic unconditional a.e.-`W` self-referential impossibilities
 (`ae_no_{cubic,quartic}_schedule_reads_base_two` and capstones) — the repo is fully sorry-free and
@@ -105,6 +119,25 @@ corrected 2026-06-13 from the swapped-recurrence false "obstruction" — see Thm
 "only ε=½" the prior lap reported. What's left is optional polish (top-level showcase wiring).
 
 ## What's happened (newest first)
+- **2026-06-14 (DEEP-REFLECTION lap — altitude pass, direction recalibrated)**: No new proofs; the
+  deliverable is the direction call (`REFLECTION.md`). Audited the whole edifice at altitude: re-ran
+  `#print axioms` on every headline (all = trust base, **0 math axioms**), verified the load-bearing
+  *definitions* against intent (`binDigit` = standard binary digit→`Real.digits`; `dStepV` = genuine
+  GP/Stoll floor recurrence; `grt g d = g^{1/d}`; `dTorusOrbitG` = genuine orbit) — **no vacuity, no
+  definitional drift, no stray 🔴**. Confirmed repo-wide: **zero `sorry`, zero custom `axiom`, zero
+  `native_decide`** across 12,400 lines. **Finding**: the impossibility-frontier *generalization axis*
+  (cubic→quartic→general-`d`→base-`g`→odd-composite) has **saturated** — the content is fully captured by
+  `ae_no_dStep_schedule_reads_base_{two, g_all}`; further bases/composite degrees ≈ 0 marginal value.
+  **Recalibration**: STOP the mechanical mirroring; START consolidation — (1) a top-level `Statement.lean`
+  audit surface citing every headline, (2) isolate the mathlib-absent Weyl/equidistribution/Borel-normality
+  layer as a reusable PR-ready module (ref `2026-06-14-mathlib-equidistribution-geometric-gap.md`; PR needs
+  Trevor per `2026-06-07-mathlib-ai-contribution-policy.md`). Fixed-`W` version = Mahler-3/2 open problem,
+  cite-don't-grind. Build re-confirmed 🟢 8304.
+- **2026-06-14 (base-`g` impossibility COMPLETE for every `g≥2`)**: Built the entire base-`g` generalization
+  (`α=g^{1/d}`, window width `g`, digits `{0,…,g-1}`) to full parity with base 2 — headline
+  `ae_no_dStep_schedule_reads_base_g(_all)` + three capstones, prime & odd degrees, perfect-power bases
+  (`g=4`) via prime-`d` Kummer + `IsIntegrallyClosed ℤ`. All `[propext, Classical.choice, Quot.sound]`,
+  build 🟢 8304. *(This is the last lap of the now-saturated generalization axis — see reflection above.)*
 - **2026-06-14 (review+grind lap — GENERAL degree-`d` algebraic skeleton)**: With cubic AND quartic
   both already COMPLETE & axiom-clean, took the next frontier (uniform general degree-`d`) and built
   its entire algebraic + abstract-geometric obstruction skeleton — the three per-degree obstacles the
@@ -264,14 +297,17 @@ All headline theorems verified `#print axioms` this lap = trust base only; **0 m
 | **`ae_no_cubic_schedule_reads_base_two`** + `ae_not_cubic{DigitRepresentable,ReadsBaseTwo,RecurrenceRepresentable}` + **`ae_no_quartic_schedule_reads_base_two`** + quartic capstones | uncond (a.e.-`W`): no 3-/4-periodic schedule makes the cubic/quartic floor map read `W`'s base-2 digits — the self-referential impossibility, uniform over schedules | trust base (verified this lap) | 🟢 clean — full a.e.-`W` impossibility, dense-orbit + width-2 window |
 | **GENERAL degree-`d` skeleton** — `rpow_lin_indep_int` (Eisenstein), `rrt_window_gt_two`/`rrt_lt_four_thirds`/`window_not_cover`, `affine_rec_closed`, `dStep_defect_identity`, `dStep_{last_arg,last_fract_forced,digit_eq_floor}`, `dStep_partial_mem_window`, `exists_partial_defect_outside_window` | NEW (uniform `d`): the algebraic + abstract-geometric obstruction for ALL `d` — `{1,…,α^{d-1}}` ℤ-indep, range width `>2` for `d≥3`, the `d`-step defect identity `v_d=2u+C−D` and its g-collapse (base-2 digit ⇒ `g∈(C-2,C]`), and the abstract crux (some reachable `g ∉` window). | trust base (verified this lap) | 🟢 clean |
 | **GENERAL degree-`d` analytic bridge** — `dStepF_orbit`, `orbitF`/`orbitF_eq`, `dStepF_eq_orbitF`, `dGpd`+`dStepPartial_eq_dGpd`, `continuousAt_dGpd`, `realizeR`+`orbitF_realizeR`, `ae_W_dTorus_orbit_dense`; faithfulness `cubicV3_sub_eq_via_general`/`quarticV4_sub_eq_via_general` | NEW: the full bridge expressing the partial defect as a continuous `Tᵈ`-orbit function `dGpd`, the a.e.-`W` `Tᵈ` density (via `rpow_lin_indep_int`), and `orbitF` realization — plus cross-checks that the general engine reproduces the verified cubic & quartic. ONLY the final headline geometric assembly remains. | trust base (verified this lap) | 🟢 clean |
+| **`ae_no_dStep_schedule_reads_base_two`** (uniform `d≥3`) + **`ae_no_dStep_schedule_reads_base_g`** / **`_g_all`** (every base `g≥2`, prime `d`, perfect powers incl.) + **`_base_three`** / **`_base_four`** concrete instances + three base-`g` capstones (`ae_not_DStep{DigitRepresentable,ReadsBaseG,Recurrence…}BaseG{,_all}`) | uncond (a.e.-`W`): for every `d≥3` and every base `g≥2`, **no** degree-`d` floor-recurrence schedule reads `W`'s base-`g` digits — the GP/Stoll digit-extraction trick is *special to degree 2*. `dStepV`/`grt`/`dTorusOrbitG` definitions audited faithful this lap; statement strong (arbitrary real schedule `c`) & non-vacuous (window bound met past degree-2 threshold). | trust base (**re-verified this lap**) | 🟢 clean — generalization axis now SATURATED (see REFLECTION.md) |
 
 No 🟡/🟠/🔴 axioms anywhere: the whole development is elementary (floors, √2, π/e bounds, Rayleigh from
 mathlib). Thm 3.4's full k-dependent interval — once mis-formalized as a Diophantine "obstruction" — is
 now proven as a genuine `t`-universal theorem (`st06_thm34_digits_eps`): `ε` sits on the a-step, whose
 floor bracket is uniform over `t`, so Stoll's printed symmetric interval holds for every `w`. No open
-axiom anywhere.
+axiom anywhere. **The only place a 🔴 would arise is the fixed-`W` impossibility (Mahler's 3/2 / lacunary
+equidistribution at a fixed seed — a famous open problem); it is correctly NOT assumed on any current
+theorem.** Every headline re-verified `#print axioms` = trust base this lap (deep-reflection audit).
 
 ## Pointers
-`HANDOFF.md` (completion pointer) · session batons archived in `archive/handoff/` ·
+**`REFLECTION.md` (2026-06-14 direction call — read first)** · `HANDOFF.md` (thin pointer) · session batons archived in `archive/handoff/` ·
 `NOTES-FOR-STOLL.md` (pair-5 errata + computations) · `PENDING_WORK.md` (historical) ·
 paper transcription: `archive/findings/ON-LINE-FINDINGS-2026-06-06-stoll-thm32-cor33.md`

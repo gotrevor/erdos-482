@@ -9,19 +9,26 @@ SWAPPED recurrence — corrected 2026-06-13, see newest baton), Cor 3.5 the Beat
 result `SelfRefWall.lean`: the self-referential digit recurrence `⌊√g(u+c)⌋` works **iff g=2, c=½**.
 **Open frontier**: cubic/higher-degree self-reference (research; `ON-LINE-REQUEST.md`).
 
-**Live frontier (2026-06-14): the UNIFORM general degree-`d` (`α=2^{1/d}`) self-referential
-impossibility.** Cubic AND quartic are COMPLETE & axiom-clean. The general-`d` **algebraic +
-abstract-geometric obstruction skeleton is now COMPLETE & axiom-clean** (`RpowLinIndep.lean`
-`rpow_lin_indep_int` via Eisenstein; `RpowWindow.lean` `rrt_window_gt_two`/`window_not_cover`;
-`GeneralDefect.lean` `dStep_defect_identity` → `dStep_partial_mem_window`). Build 🟢 8293. Remaining =
-the analytic `Tᵈ` assembly on the already-degree-agnostic engine (orbit-coordinate form +
-equidistribution + geometry crux + headline).
+**DIRECTION (2026-06-14 deep-reflection lap — `REFLECTION.md`): the impossibility frontier is COMPLETE
+and its generalization axis is SATURATED.** The uniform general degree-`d` + base-`g` self-referential
+impossibility is DONE & axiom-clean for every `d≥3`, every base `g≥2` (headline
+`ae_no_dStep_schedule_reads_base_{two, g, g_all}` + capstones). **The whole repo is `sorry`-free,
+custom-axiom-free, 0 math axioms — there is nothing to discharge.** Do **NOT** add further bases /
+composite-degree variants (≈ 0 marginal value). The **next grind target is CONSOLIDATION**, in order:
+1. a top-level **`Statement.lean`** audit surface stating/re-exporting every headline with a citation
+   docstring (#482 core, St05 `erdos482_resolution`, St06 Thm 3.1/3.3/3.4/Cor 3.5,
+   `ae_no_dStep_schedule_reads_base_{two,g_all}`);
+2. isolate the **mathlib-absent Weyl/equidistribution/Borel-normality** layer as a clean reusable
+   module + a `notes/UPSTREAM-EQUIDISTRIBUTION.md` PR-prep brief for Trevor.
+The **fixed-`W`** impossibility is a famous **open problem** (Mahler's 3/2) — cite, don't grind.
 
 This is a THIN POINTER. The durable state lives in:
+- **[`REFLECTION.md`](REFLECTION.md)** — the 2026-06-14 direction call (read first).
 - **[`STATUS.md`](STATUS.md)** — the living overview + axiom ledger (refreshed each review lap).
-- **Newest baton** — [`HANDOFF-2026-06-14-1145.md`](HANDOFF-2026-06-14-1145.md) (general-`d` algebraic
-  skeleton: the 4 bricks landed + the 4-step analytic-assembly next actions + gotchas).
-- **[`PENDING_WORK.md`](PENDING_WORK.md)** — ★★★★★ authoritative general-`d` frontier + roadmap.
+- **Newest baton** — [`HANDOFF-2026-06-14-1228.md`](HANDOFF-2026-06-14-1228.md) (base-`g` impossibility
+  complete for every `g≥2`; note: that baton's "Next actions #1" (`_odd` headline) is SUPERSEDED by the
+  reflection's STOP call — do consolidation instead).
+- **[`PENDING_WORK.md`](PENDING_WORK.md)** — ★★★★★ authoritative state + roadmap.
 
 ## Standing rules
 - **DO NOT push** — work stays on `st06`; Trevor reviews/merges/pushes. Commit every green build.

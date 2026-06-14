@@ -1,6 +1,24 @@
 # PENDING_WORK — Erdős #482 / Stoll
 
-## ★★★★★ STATE 2026-06-14 (build 🟢 8303) — **BASE-`g` GENERAL-DEGREE IMPOSSIBILITY: COMPLETE & AXIOM-CLEAN**
+## ◆◆◆ DIRECTION (2026-06-14 deep-reflection lap) — read `REFLECTION.md` first ◆◆◆
+**The impossibility-frontier generalization axis is SATURATED. STOP adding bases / composite-degree
+variants** (the `_odd` headline + capstones, even-composite-`d`, more concrete instances listed in
+"REMAINING / OPTIONAL" below are now **deprioritized to ≈0 marginal value** — the content is fully
+captured by `ae_no_dStep_schedule_reads_base_two` (every `d≥3`) and `ae_no_dStep_schedule_reads_base_g_all`
+(every base `g≥2`)). The repo is `sorry`-free, custom-axiom-free, 0 math axioms — nothing to discharge.
+
+**Highest-value next work = CONSOLIDATION** (the value the grind laps can't see from inside the trees):
+1. **`Statement.lean`** — a single top-level audit surface stating/re-exporting every headline with a
+   citation docstring. Cheap, high trust-value, doable now. ← **start here**
+2. **Isolate the mathlib-absent equidistribution/Weyl/Borel-normality layer** as a clean reusable module
+   + `notes/UPSTREAM-EQUIDISTRIBUTION.md` PR-prep brief (PR itself needs Trevor + networked session per the
+   AI-contribution policy).
+3. **Fixed-`W`** impossibility = famous OPEN problem (Mahler 3/2 / lacunary equidistribution at a fixed
+   seed). Cite, don't grind. Already documented below.
+
+---
+
+## ★★★★★ STATE 2026-06-14 (build 🟢 8304) — **BASE-`g` GENERAL-DEGREE IMPOSSIBILITY: COMPLETE & AXIOM-CLEAN**
 
 The base-`g` generalization is now **DONE with full parity to the base-2 story** — headline + all three
 self-referential capstones, all `[propext, Classical.choice, Quot.sound]`-only; build 🟢 8303.  This
