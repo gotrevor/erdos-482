@@ -6,6 +6,7 @@ import Erdos482.General.St06Thm33
 import Erdos482.General.St06Thm34
 import Erdos482.General.St06Cor35
 import Erdos482.General.SelfRefWall
+import Erdos482.General.CubicDefect
 
 /-!
 # Erdős–Graham #482 — the general resolution (any `w > 0`, any base `g ≥ 2`)

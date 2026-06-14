@@ -1,6 +1,44 @@
 # PENDING_WORK — Erdős #482 / Stoll
 
-**⚠️ This file is now largely historical — see [`STATUS.md`](STATUS.md) for the authoritative state.**
+## ★ ACTIVE FRONTIER (2026-06-14): cubic self-referential impossibility (Tier-2)
+
+**Where it stands.** The single-floor "Tier-1" the findings doc proposed is FALSE (refuted this lap:
+`SelfRefWall.onefloor_div2_crux_cbrt2` — the cubic single floor IS solvable, `c=½`, like every `β<2`).
+The genuine cubic obstruction is now *localized* by `General/CubicDefect.lean`:
+- `cubic_threestep_defect` (✅ axiom-clean): the 3-step map `v₃=⌊α(⌊α(⌊α(u+c₀)⌋+c₁)⌋+c₂)⌋` satisfies
+  `v₃ = 2u + (2c₀+α²c₁+αc₂) − (α²f₁+αf₂+f₃)`, `α³=2`, `fᵢ` the internal floor errors. So the extracted
+  "digit" is `v₃−2u = C − (α²f₁+αf₂+f₃)`, `C := 2c₀+α²c₁+αc₂` a fixed real.
+- `cubic_combined_defect_range_wide` (✅ axiom-clean): as `(f₁,f₂,f₃)∈[0,1)³`, the combined defect
+  `α²f₁+αf₂+f₃` ranges over width `α²+α+1 > 1`, so it fits **no** width-1 window `[C,C+1]`. Two internal
+  floors ⇒ spread > 1 (vs the single floor's spread = exactly 1, which is why `√2` barely closes).
+
+**What remains for an UNCONDITIONAL impossibility — and an important caveat.** The missing link is:
+*the geometric orbit `u_n ≈ W·α^n` actually realises a pair of `(f₁,f₂,f₃)` configs whose combined
+defects differ by > 1* (then no fixed `C` keeps both digits in `{0,1}` — done, via the two lemmas above).
+This is an equidistribution statement about `{α^n ξ}` for `α=2^{1/3}`.  **CAVEAT (corrects the findings
+doc, which called this "guaranteed because α is non-Pisot"):** equidistribution of `{ξ·θ^n}` for a
+*fixed* base `θ>1` and a *fixed* `ξ` is a notoriously OPEN problem (cf. the unknown distribution of
+`{(3/2)^n}`). It holds for *almost all* `ξ` (Weyl/Koksma), but NOT known for the specific `ξ` our orbit
+forces. So the unconditional cubic impossibility is **genuinely open in current mathematics**, not merely
+unformalized — the doc over-claimed. *(Filed for cross-check: `ON-LINE-REQUEST.md`.)*
+
+**Three attack paths (do real progress on one per lap):**
+1. **Conditional impossibility (TRACTABLE — do next).** Formalize: *if* ∃ two orbit indices `n,n'` whose
+   combined defects differ by `>1`, *then* the 3-step map fails to read base-2 digits. This is a clean
+   combination of `cubic_threestep_defect` + a "two-points-don't-fit-a-window" lemma (analogous to
+   `cubic_combined_defect_range_wide` but for two specific reachable points). Fully provable now; it
+   packages exactly "the cubic fails modulo equidistribution," the honest ceiling.
+2. **Almost-all-`W` version.** Use the a.e.-equidistribution of `{Wα^n}` (mathlib `AddCircle` ergodicity
+   is for `n·θ`, NOT `θ^n` — would need the measure-theoretic Weyl/Koksma `{Wθ^n}` result, likely not in
+   mathlib; check `Mathlib/Dynamics/`). Gives "for a.e. `W`, no fixed schedule reads `W`'s base-2 digits
+   via the cubic map" — a true unconditional theorem about the *family*, sidestepping the open specific-`ξ`
+   case. Higher infrastructure cost.
+3. **Finite/uniform escape (probably FALSE, but cheap to test).** Numerically probe whether, for *every*
+   schedule `(c₀,c₁,c₂)`, the defect escapes `[C,C+1]` within a uniformly bounded number of steps `N`.
+   If yes (uniform `N`), a finite decidable check gives an unconditional proof. Numerics so far (one
+   triple fails at `j=64`) suggest `N` is NOT uniform → path likely dead, but confirm before discarding.
+
+**⚠️ This file below is now largely historical — see [`STATUS.md`](STATUS.md) for the authoritative state.**
 The project is **COMPLETE and axiom-clean** (zero `sorry`, zero custom axioms): the headline
 (Graham–Pollak / √2), **Theorem 3.2 for all 7 non-special pairs (full ε-intervals)** + **Corollary 3.3**,
 **and Stoll [St05] in full generality** (any `w>0`, any base `g≥2`: Thms 1.1, 1.2 I/II, 1.3, Cors
