@@ -34,6 +34,14 @@ theorem rrt_pow_self (d : ℕ) (hd : 1 ≤ d) : ((2 : ℝ) ^ ((1 : ℝ) / d)) ^ 
   rw [← Real.rpow_natCast ((2 : ℝ) ^ ((1 : ℝ) / d)) d,
     ← Real.rpow_mul (by norm_num : (0 : ℝ) ≤ 2), one_div, inv_mul_cancel₀ hdne, Real.rpow_one]
 
+/-- **`(g^{1/d})ᵈ = g`** for `g ≥ 0`, `d ≥ 1` — the `α^d = g` provider for the base-`g` chain
+(`dStep_defect_identity_base` etc.).  Base-`g` analogue of `rrt_pow_self`. -/
+theorem rpow_inv_pow_self (g : ℝ) (hg : 0 ≤ g) (d : ℕ) (hd : 1 ≤ d) :
+    ((g : ℝ) ^ ((1 : ℝ) / d)) ^ d = g := by
+  have hdne : (d : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
+  rw [← Real.rpow_natCast ((g : ℝ) ^ ((1 : ℝ) / d)) d, ← Real.rpow_mul hg,
+    one_div, inv_mul_cancel₀ hdne, Real.rpow_one]
+
 /-- **`2^{1/d} < 4/3` for `d ≥ 3`.**  Equivalent to `2 < (4/3)^d`, which holds because `(4/3)³ = 64/27
 > 2` and `n ↦ (4/3)ⁿ` is increasing.  This is the analytic pivot for the width bound: the partial
 defect window has width `> 2` precisely when `α < 4/3`. -/
