@@ -152,8 +152,10 @@ theorem tsum_ofReal_inv_sq_ne_top :
   exact ENNReal.ofReal_ne_top
 
 /-- **Cesàro averages are sup-norm bounded** (`N ≥ 1`): `‖(1/N)∑_{n<N} f(xₙ)‖ ≤ ‖f‖`.  The uniform
-bound that lets the equidistribution property pass from the dense Fourier span to all continuous `f`. -/
-theorem norm_cesaro_le (x : ℕ → AddCircle (1:ℝ)) (f : C(AddCircle (1:ℝ), ℂ)) {N : ℕ} (hN : 1 ≤ N) :
+bound that lets the equidistribution property pass from the dense Fourier span to all continuous `f`.
+Stated over any compact domain `X` so it serves both the 1-D and the torus (`MultidimWeyl`) criteria. -/
+theorem norm_cesaro_le {X : Type*} [TopologicalSpace X] [CompactSpace X]
+    (x : ℕ → X) (f : C(X, ℂ)) {N : ℕ} (hN : 1 ≤ N) :
     ‖(N:ℂ)⁻¹ * ∑ n ∈ range N, f (x n)‖ ≤ ‖f‖ := by
   have hNR : (0:ℝ) < N := by exact_mod_cast hN
   rw [norm_mul, norm_inv, Complex.norm_natCast]
