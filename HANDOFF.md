@@ -9,16 +9,19 @@ SWAPPED recurrence — corrected 2026-06-13, see newest baton), Cor 3.5 the Beat
 result `SelfRefWall.lean`: the self-referential digit recurrence `⌊√g(u+c)⌋` works **iff g=2, c=½**.
 **Open frontier**: cubic/higher-degree self-reference (research; `ON-LINE-REQUEST.md`).
 
-**Live frontier (2026-06-14): the cubic self-referential a.e.-`W` impossibility (path #2).** This lap
-built the entire analytic backbone — DEL engine, 1-D + multidim Weyl equidistribution criteria, a.e.
-doubling equidistribution (`ae_doubling_orbit_equidistributed`), scaling transfer — all axiom-clean
-(build 🟢 8281). Remaining: periodicity bridge + final `T³` assembly + the `CubicDefect` two-plane link.
+**Live frontier (2026-06-14): the UNIFORM general degree-`d` (`α=2^{1/d}`) self-referential
+impossibility.** Cubic AND quartic are COMPLETE & axiom-clean. The general-`d` **algebraic +
+abstract-geometric obstruction skeleton is now COMPLETE & axiom-clean** (`RpowLinIndep.lean`
+`rpow_lin_indep_int` via Eisenstein; `RpowWindow.lean` `rrt_window_gt_two`/`window_not_cover`;
+`GeneralDefect.lean` `dStep_defect_identity` → `dStep_partial_mem_window`). Build 🟢 8293. Remaining =
+the analytic `Tᵈ` assembly on the already-degree-agnostic engine (orbit-coordinate form +
+equidistribution + geometry crux + headline).
 
 This is a THIN POINTER. The durable state lives in:
 - **[`STATUS.md`](STATUS.md)** — the living overview + axiom ledger (refreshed each review lap).
-- **Newest baton** — [`HANDOFF-2026-06-14-0719.md`](HANDOFF-2026-06-14-0719.md) (cubic path-#2 backbone
-  built: steps a+b+c.1+c.2 done; exact next steps + whnf/Fubini gotchas).
-- **[`PENDING_WORK.md`](PENDING_WORK.md)** — ★★ authoritative (a)→(b)→(c) roadmap, status-marked.
+- **Newest baton** — [`HANDOFF-2026-06-14-1145.md`](HANDOFF-2026-06-14-1145.md) (general-`d` algebraic
+  skeleton: the 4 bricks landed + the 4-step analytic-assembly next actions + gotchas).
+- **[`PENDING_WORK.md`](PENDING_WORK.md)** — ★★★★★ authoritative general-`d` frontier + roadmap.
 
 ## Standing rules
 - **DO NOT push** — work stays on `st06`; Trevor reviews/merges/pushes. Commit every green build.

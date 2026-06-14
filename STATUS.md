@@ -1,6 +1,6 @@
 # STATUS — erdos-482 📊
 
-**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8281 jobs) · **Updated**: lap 2026-06-14 (`st06` branch, HEAD `a812ebc`) (**#482 COMPLETE & axiom-clean on `main`; St06 fun-extension on `st06` ALL main theorems done. LIVE: cubic-frontier path #2 (a.e.-`W`) — steps (a)+(b) DONE (`ae_doubling_orbit_equidistributed`) + step (c) pieces 1+2 DONE (`weyl_criterion_torus`, `ae_comp_mul_left`); remaining = step (c) piece 3 = the `CubicDefect` two-plane link + final assembly**)
+**Stoll's binary-digits-of-759250125√2 (generalizes Graham–Pollak / Erdős #482), formalized in Lean 4.** · **Build**: 🟢 green (8293 jobs) · **Updated**: lap 2026-06-14 (`st06` branch, HEAD `2461395`) (**#482 COMPLETE & axiom-clean on `main`; St06 fun-extension on `st06` ALL main theorems done; cubic AND quartic a.e.-`W` self-referential impossibilities COMPLETE & axiom-clean. LIVE: GENERAL degree-`d` (`α=2^{1/d}`) — the algebraic + abstract-geometric obstruction SKELETON is now COMPLETE & axiom-clean (`RpowLinIndep`/`RpowWindow`/`GeneralDefect`); remaining = analytic `Tᵈ`-assembly (engine already degree-agnostic)**)
 
 ## 🎁 St06 fun-extension (branch `st06`) — Tier 3 COMPLETE (2026-06-13)
 All axiom-clean (`[propext, Classical.choice, Quot.sound]`), build green (8273 jobs):
@@ -84,6 +84,15 @@ Aristotle independently confirmed the `𝒟₂⁻` and `𝒟₁⁻` cores (`tool
 Cor 3.5 (Beatty unification of the Borwein–Bailey examples). See `PENDING_WORK.md`.
 
 ## Where it stands
+**Four complete, axiom-clean layers + an in-progress fifth.** The first three layers (below) plus the
+**fourth**: the cubic AND quartic unconditional a.e.-`W` self-referential impossibilities
+(`ae_no_{cubic,quartic}_schedule_reads_base_two` and capstones) — the repo is fully sorry-free and
+custom-axiom-free. The **fifth (LIVE)**: the *uniform* general degree-`d` (`α=2^{1/d}`) impossibility,
+whose algebraic + abstract-geometric obstruction **skeleton is now complete & axiom-clean**
+(`rpow_lin_indep_int` via Eisenstein; `rrt_window_gt_two`/`window_not_cover`; the `GeneralDefect`
+`dStep_defect_identity` → `dStep_partial_mem_window` g-collapse). What remains for the general headline
+is the analytic `Tᵈ` assembly on the already-degree-agnostic `MultidimWeyl`/`EquidistDense`/`DELEngine`
+engine (orbit-coordinate form + equidistribution + geometry crux + assembly). The original three layers:
 **Three complete, axiom-clean layers** (every `#print axioms` = trust base `[propext, Classical.choice,
 Quot.sound]`, zero custom axioms, zero `sorry`): (1) the **headline** (Graham–Pollak / √2) + the
 **bonus** (Stoll [0902.4168] Thm 3.2's 7 pairs + Cor 3.3, with pair 5 resolved to its honest ε=½
@@ -96,6 +105,30 @@ corrected 2026-06-13 from the swapped-recurrence false "obstruction" — see Thm
 "only ε=½" the prior lap reported. What's left is optional polish (top-level showcase wiring).
 
 ## What's happened (newest first)
+- **2026-06-14 (review+grind lap — GENERAL degree-`d` algebraic skeleton)**: With cubic AND quartic
+  both already COMPLETE & axiom-clean, took the next frontier (uniform general degree-`d`) and built
+  its entire algebraic + abstract-geometric obstruction skeleton — the three per-degree obstacles the
+  hand-rolled cubic/quartic proofs don't generalize past. All `[propext, Classical.choice, Quot.sound]`,
+  build 🟢 8293:
+  • **`RpowLinIndep.lean` `rpow_lin_indep_int`** — `{1,2^{1/d},…,2^{(d-1)/d}}` ℤ-indep for ALL `d`,
+    via **Eisenstein at 2** (`Xᵈ−2` irreducible /ℤ ⇒ Gauss ⇒ /ℚ ⇒ `=minpoly` deg `d`). Mathlib's Kummer
+    is prime-exponent only; Eisenstein covers `d=4,6,8,9,…` too. (The hard brick — beats the per-degree
+    cubic-elimination / quartic 2-adic descent with one uniform proof.)
+  • **`RpowWindow.lean`** — `rrt_window_gt_two` (partial-defect range width `α+…+α^{d-1}>2` for `d≥3`,
+    via `αᵈ=2` collapse to `(2-α)/(α-1)>2 ⟺ α<4/3 ⟺ 2<(4/3)ᵈ`), `rrt_lt_four_thirds`, and
+    `window_not_cover` (width-2 window can't cover a width-`>2` interval — the abstract escape). `d=2`
+    gives `√2<2`: the obstruction begins exactly at `d=3`.
+  • **`GeneralDefect.lean`** — the degree-agnostic defect engine replacing the hand-rolled
+    `linear_combination`s: `affine_rec_closed` (recurrence closed form), `dStep_defect_identity`
+    (`v_d=2u+C−D`), the g-collapse (`dStep_last_fract_forced` `f_e={C−g}`, `dStep_digit_eq_floor`
+    `digit=⌊C−g⌋`), and **`dStep_partial_mem_window`** (a base-2 digit ⇒ `g∈(C-2,C]`).
+  Net: general-`d` obstruction is now a closed algebraic skeleton; remaining = analytic `Tᵈ` assembly
+  (orbit-coordinate form + `Tᵈ` equidistribution via `rpow_lin_indep_int` + geometry crux + headline),
+  all on the already-degree-agnostic `MultidimWeyl`/`EquidistDense`/`DELEngine` engine. See PENDING_WORK ★★★★★.
+- **2026-06-14 (cubic+quartic COMPLETE lap)**: Finished the entire cubic thread and generalized it to
+  the quartic: `ae_no_{cubic,quartic}_schedule_reads_base_two` (+ digit/reads-base-two/recurrence
+  capstones), all axiom-clean. Quartic's `quartic_lin_indep_int` via infinite 2-adic descent. Repo
+  became fully sorry-free and custom-axiom-free.
 - **2026-06-14 (review+grind lap — cubic path #2 DEL chain landed)**: Built the three mathlib-absent
   analytic bricks of the a.e.-`W` cubic route, all axiom-clean (`General/Equidistribution.lean`,
   `General/DELEngine.lean`):
@@ -183,21 +216,23 @@ corrected 2026-06-13 from the swapped-recurrence false "obstruction" — see Thm
     `tᵢ`-form restatements `stoll_pair{1,2,3,4,7,8}_t` + `cor33_unconditional_t` (digits of `tᵢ`, not
     just `αᵢ√2`). • `stoll_endpoints_strictMono` + `stoll_intervals_cover` (disjoint-and-cover). All
     axiom-clean. Characterized pair 5's invariant `P5/Q5` numerically (next thread).
-- **2026-06-06 (prior lap)**: Took the bonus from "paper-blocked" to complete & axiom-clean —
-  `stoll_pair`/`stoll_digit` general core, pairs 1–4,7,8, `cor33_unconditional` (title result),
-  `binDigit_div_pow` (tᵢ bridge), via the cleaner α√2-only invariant + interior-ε trick for Cor 3.3.
 - **earlier**: Headline `graham_pollak` + digit-bridge to mathlib `Real.digits`, irrationality /
-  non-termination corollaries, `u_pos`/`u_strictMono`.
+  non-termination corollaries, `u_pos`/`u_strictMono`; the bonus (Stoll Thm 3.2 7 pairs +
+  `cor33_unconditional`) taken from paper-blocked to complete & axiom-clean.
 
 ## Outstanding
 ### Short-term (mirror PENDING_WORK top)
-- **LIVE: cubic frontier path #2 (a.e.-`W` unconditional impossibility).** Steps (a)+(b-hard) DONE this
-  lap (DEL engine + Weyl criterion + gap-fill + fourier bridge, all axiom-clean). Remaining finite
-  assembly: (1) L² bridge `∫⁻‖g‖₊²=ofReal∫‖g‖²` (Aristotle `190d0b98` in flight); (2) p-series
-  summability `∑'ofReal(1/j²)≠⊤`; (3) wire DEL+gap-fill+Weyl criterion ⇒ **a.e.-`s`: `{2ⁿs}`
-  equidistributes**; (4) step (c) `T³` lift via `cubic_lin_indep_int` ⇒ a.e.-`W` cubic impossibility.
-  Specific-`W` stays open math (Borel normality of a defined constant). See PENDING_WORK ★★.
-- **No open items in the COMPLETED layers.** All St05/St06 main theorems formalized & axiom-clean.
+- **LIVE: general degree-`d` (`α=2^{1/d}`) uniform impossibility.** Cubic + quartic are DONE &
+  axiom-clean. The general-`d` **algebraic + abstract-geometric obstruction skeleton is COMPLETE &
+  axiom-clean this lap** (`rpow_lin_indep_int`, `rrt_window_gt_two`, `window_not_cover`,
+  `dStep_defect_identity` → `dStep_partial_mem_window`). Remaining for the uniform headline (mirror of
+  the cubic/quartic finish, engine already degree-agnostic): (1) orbit-coordinate form of
+  `dStepPartial` on `Tᵈ`; (2) general `Tᵈ` equidistribution/density a.e.-`W` via `rpow_lin_indep_int`
+  (`MultidimWeyl`+`ae_comp_mul_left`); (3) general geometry crux (realize `g` outside the window via
+  `window_not_cover`+`rrt_window_gt_two`); (4) `ae_no_dStep_schedule_reads_base_two` for all `d ≥ 3`.
+  See PENDING_WORK ★★★★★. *(Fixed-`W` stays OPEN MATH — Borel normality, not in mathlib.)*
+- **No open items in the COMPLETED layers.** All St05/St06 main theorems + cubic + quartic a.e.-`W`
+  impossibilities formalized & axiom-clean.
 - **Optional polish**: wire `st06_cor35`/`erdos482_resolution` into a single top-level St06 showcase;
   unified Thm 3.3/3.4/Cor 3.5 `isBit` master; concrete `r=2`→digits-of-`2√2` certificate for Cor 3.5;
   retire the swapped `_bstep_*` theorems entirely (currently kept as documented contrast).
@@ -226,6 +261,8 @@ All headline theorems verified `#print axioms` this lap = trust base only; **0 m
 | `onefloor_div2_crux_solvable_iff` (+ `_crux_solvable`, `_crux_cbrt2`, `_offset_unique`) | NEW: single-floor /2 crux (mult β, free base 2) solvable ⇔ β<2 (c=½ forced); **refutes findings-doc "Tier-1" cubic impossibility** — cubic 2^{1/3} single floor IS solvable, obstruction is purely multi-floor | trust base | 🟢 clean |
 | `cubic_threestep_defect` (+ `cubic_combined_defect_range_wide{,_cbrt2}`, `cubicV3_sub_eq`, `cubic_threestep_digit_pair_fails`, `cubic_valid_digits_defects_close`, `cubic_block_orbit_base_two_bounds`, `irrational_cbrt_two`) | NEW (Tier-2): exact 3-step cubic defect identity `v₃=2u+C−(α²f₁+αf₂+f₃)`; combined two-floor defect spans width α²+α+1>1 ⇒ fits no width-1 window; **conditional impossibility** (orbit realises wide defect pair ⇒ digits not both in {0,1}); **block orbit is base 2** `uₙ=⌊W·2ⁿ⌋` ⇒ residual wall is **base-2 normality of αW** (doubling map), NOT geometric `{α^n ξ}` (corrected). Unconditional a.e.-W route needs Borel normality (not in mathlib) — see PENDING_WORK ★ | trust base | 🟢 clean |
 | **`ae_doubling_orbit_equidistributed`** (steps a+b) + **`weyl_criterion_torus`** (step c.2) + infra `weyl_criterion`, `ae_tendsto_zero_of_summable_sq` (DEL engine), `cesaro_fill_of_subseq_sq`, `l2_bridge`, `tsum_ofReal_inv_sq_ne_top`, `integral_{fourier,mFourier}_eq`, `fourier_doubling_eq`, `ae_comp_mul_left` (step c.1), `doubling_weyl_L2_{mean,normalized}` | NEW (path #2, a.e.-`W` cubic): **a.e.-`s`, `{2ⁿs}` equidistributes on `ℝ/ℤ`** (Borel base-2 normality, DEL-built) + **multidim Weyl criterion on `Tᵈ`** (`weyl_criterion_torus`, via mathlib `mFourier`) + a.e.-scaling transfer. None in mathlib. Steps (a)+(b)+(c).1+(c).2 of the a.e.-`W` cubic route DONE. Remaining: step (c) piece 3 = `CubicDefect` two-plane link (`equidistributed⇒Dense` + `(f₁,f₂,f₃)` as `T³`-orbit fns) + final assembly. | trust base | 🟢 clean |
+| **`ae_no_cubic_schedule_reads_base_two`** + `ae_not_cubic{DigitRepresentable,ReadsBaseTwo,RecurrenceRepresentable}` + **`ae_no_quartic_schedule_reads_base_two`** + quartic capstones | uncond (a.e.-`W`): no 3-/4-periodic schedule makes the cubic/quartic floor map read `W`'s base-2 digits — the self-referential impossibility, uniform over schedules | trust base (verified this lap) | 🟢 clean — full a.e.-`W` impossibility, dense-orbit + width-2 window |
+| **GENERAL degree-`d` skeleton** — `rpow_lin_indep_int` (Eisenstein), `rrt_window_gt_two`/`rrt_lt_four_thirds`/`window_not_cover`, `affine_rec_closed`, `dStep_defect_identity`, `dStep_{last_arg,last_fract_forced,digit_eq_floor}`, `dStep_partial_mem_window` | NEW (uniform `d`): the algebraic + abstract-geometric obstruction for ALL `d` — `{1,…,α^{d-1}}` ℤ-indep, range width `>2` for `d≥3`, the `d`-step defect identity `v_d=2u+C−D` and its g-collapse (base-2 digit ⇒ `g∈(C-2,C]`). Skeleton complete; remaining = analytic `Tᵈ` assembly. | trust base (verified this lap) | 🟢 clean |
 
 No 🟡/🟠/🔴 axioms anywhere: the whole development is elementary (floors, √2, π/e bounds, Rayleigh from
 mathlib). Thm 3.4's full k-dependent interval — once mis-formalized as a Diophantine "obstruction" — is

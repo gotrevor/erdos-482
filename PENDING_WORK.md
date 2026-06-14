@@ -1,5 +1,46 @@
 # PENDING_WORK — Erdős #482 / Stoll
 
+## ★★★★★ STATE 2026-06-14 (build 🟢 8293) — **GENERAL degree-`d`: algebraic + abstract-geometric obstruction SKELETON COMPLETE & axiom-clean**
+
+Cubic + quartic were both already DONE & axiom-clean (see ★★★★ below).  **This lap built the
+uniform, degree-agnostic skeleton of the general degree-`d` (`α = 2^{1/d}`) impossibility** — the
+three pieces the handoff flagged as the per-degree obstacles that don't generalize from the hand-rolled
+cubic/quartic proofs.  All `[propext, Classical.choice, Quot.sound]`-only; full build green (8293 jobs).
+
+**New files (all axiom-clean):**
+- **`RpowLinIndep.lean`** — `rpow_lin_indep_int`: for **every** `d ≥ 1`, `{1, 2^{1/d}, …, 2^{(d-1)/d}}`
+  are ℤ-linearly independent.  THE genuinely-hard brick that does NOT generalize from the cubic
+  elimination / quartic 2-adic descent.  Route: **Eisenstein at 2** ⇒ `Xᵈ−2` irreducible over ℤ ⇒
+  (Gauss for GCD domains) over ℚ ⇒ `= minpoly ℚ (2^{1/d})` (degree `d`) ⇒ no nonzero degree-`<d`
+  rational poly vanishes at the root.  Mathlib's Kummer `X_pow_sub_C_irreducible_of_prime` is
+  prime-exponent only (misses `d=4,6,8,9,…`); Eisenstein covers all `d` at once.
+- **`RpowWindow.lean`** — `rrt_lt_four_thirds` (`2^{1/d} < 4/3` for `d ≥ 3`), `rrt_window_gt_two`
+  (the partial-defect range width `α+α²+…+α^{d-1} > 2` for `d ≥ 3`; collapses via `αᵈ=2` to
+  `(2-α)/(α-1) > 2 ⟺ α < 4/3 ⟺ 2 < (4/3)ᵈ`, true since `(4/3)³=64/27`), and `window_not_cover`
+  (a width-2 window `(C-2,C]` can't cover a width-`>2` interval `[0,W)` — the abstract escape).
+  (`d=2` gives `√2 < 2` — the original solvable Graham–Pollak; obstruction begins exactly at `d=3`.)
+- **`GeneralDefect.lean`** — the degree-agnostic defect engine, replacing the hand-rolled
+  `linear_combination`s: `affine_rec_closed` (closed form of `v(k+1)=αv(k)+b(k)`), `dStepV`/`dStepF`/
+  `dStepC`/`dStepDefect` defs, **`dStep_defect_identity`** (`v_d = 2u + C − D`, `C=∑α^{d-k}cₖ`,
+  `D=∑α^{d-1-k}fₖ`), `dStepPartial` + `dStep_last_arg`/`dStep_last_fract_forced` (last floor forced
+  `f_e={C−g}`), `dStep_digit_eq_floor` (`digit = ⌊C−g⌋`), **`dStep_partial_mem_window`** (a base-2
+  digit confines `g ∈ (C-2,C]`).
+
+### ▶▶ NEXT (general-`d` headline — analytic assembly; the engine is already degree-agnostic)
+The algebraic+abstract-geometric obstruction is now a closed skeleton.  Remaining to the uniform
+headline (mirror of the cubic/quartic finish, using the already-degree-agnostic
+`MultidimWeyl`/`EquidistDense`/`DELEngine`):
+1. **Orbit-coordinate form of `dStepPartial`** — express `g(⌊W2ⁿ⌋)` as a continuous function of the
+   `Tᵈ`-orbit coords `(\{2ⁿW\}, \{2ⁿαW\}, …, \{2ⁿα^{d-1}W\})` (general `cubicGpd`/`cubicPartialDefect_eq_Gpd`).
+2. **General `Tᵈ` equidistribution/density** for a.e. `W` via `rpow_lin_indep_int` (⇒ `ξ=∑nᵢαⁱ≠0` ⇒
+   Weyl reduction) — the `MultidimWeyl.weyl_criterion_torus` + `ae_comp_mul_left` engine is degree-free.
+3. **General geometry crux** — realize a `g`-value outside `(C-2,C]` via `fract` coords (general
+   `fract_shift_realize`/`gpd_exceeds_window`), combining `window_not_cover` + `rrt_window_gt_two`.
+   *(Aristotle candidate once the `dGpd` orbit-coordinate def + statement are inlined.)*
+4. **Headline assembly** — `ae_no_dStep_schedule_reads_base_two` for all `d ≥ 3`, uniform over schedules.
+
+---
+
 ## ★★★★ STATE 2026-06-14 (build 🟢 8285) — **UNCONDITIONAL a.e.-`W` CUBIC IMPOSSIBILITY: COMPLETE & AXIOM-CLEAN**
 
 The "for-fun" frontier (attack-path #2) is **DONE**.  The entire repo is now **sorry-free AND
