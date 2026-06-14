@@ -1,6 +1,7 @@
 import Erdos482.General.CubicDefectLink
 import Erdos482.General.CubicTorusEquidist
 import Erdos482.General.EquidistDense
+import Erdos482.General.BinaryExpansion
 
 /-!
 # Piece 2 of the cubic finish: the partial defect as a *continuous* function on `T³`
@@ -375,5 +376,39 @@ theorem ae_not_cubicReadsBaseTwo :
   rcases this with h | h
   · left; omega
   · right; omega
+
+/-- **`W` is cubic-recurrence-representable** if some schedule `(c₀,c₁,c₂)` admits a genuine
+*self-referential recurrence* orbit `orbit : ℕ → ℤ` — `orbit (n+1) = cubicV3(orbit n)` — that emits a
+valid base-2 digit `cubicV3(orbit n) − 2·orbit n ∈ {0,1}` at every step, is not eventually all-`1`s
+(`htail`, excluding the degenerate dyadic tail), and whose recovered binary value is `W`
+(`W = orbit 0 + ∑ₖ dₖ·2^(−(k+1))`).  This is the impossibility phrased on the *actual recurrence* of the
+cubic self-referential map, not on the externally-supplied floor orbit. -/
+def CubicRecurrenceRepresentable (W : ℝ) : Prop :=
+  ∃ (c0 c1 c2 : ℝ) (orbit : ℕ → ℤ),
+    (∀ n, orbit (n + 1) = cubicV3 cbrt2 c0 c1 c2 (orbit n)) ∧
+    (∀ n, cubicV3 cbrt2 c0 c1 c2 (orbit n) - 2 * orbit n = 0
+        ∨ cubicV3 cbrt2 c0 c1 c2 (orbit n) - 2 * orbit n = 1) ∧
+    (∀ N, ∃ k, N ≤ k ∧ cubicV3 cbrt2 c0 c1 c2 (orbit k) - 2 * orbit k = 0) ∧
+    W = (orbit 0 : ℝ) + ∑' k : ℕ,
+        ((cubicV3 cbrt2 c0 c1 c2 (orbit k) - 2 * orbit k : ℤ) : ℝ) * (1 / 2) ^ (k + 1)
+
+/-- **Almost no real is cubic-recurrence-representable.**  The self-referential capstone on the genuine
+recurrence: the set of `W` whose base-2 digits some cubic schedule reads along its *own* orbit
+(`orbit(n+1)=cubicV3(orbit n)`) is Lebesgue-null.  The `binary_floor_eq` bridge identifies the recurrence
+orbit with the floor orbit of its value (`orbit n = ⌊W·2ⁿ⌋`), reducing to `ae_not_cubicDigitRepresentable`. -/
+theorem ae_not_cubicRecurrenceRepresentable :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ CubicRecurrenceRepresentable W := by
+  filter_upwards [ae_not_cubicDigitRepresentable] with W hW
+  rintro ⟨c0, c1, c2, orbit, hstep, hdig, htail, hWval⟩
+  set d : ℕ → ℤ := fun k => cubicV3 cbrt2 c0 c1 c2 (orbit k) - 2 * orbit k with hd
+  -- the recurrence orbit is a binary block orbit with digits `d`
+  have hostep : ∀ n, orbit (n + 1) = 2 * orbit n + d n := by
+    intro n; rw [hd]; simp only; rw [hstep n]; ring
+  have hfloor : ∀ n, ⌊W * 2 ^ n⌋ = orbit n :=
+    binary_floor_eq (orbit 0) d orbit hdig rfl hostep htail W hWval
+  -- hence the floor orbit reads valid digits → cubic-digit-representable, a.e. false
+  refine hW ⟨c0, c1, c2, fun n => ?_⟩
+  rw [hfloor n]
+  exact hdig n
 
 end Erdos482.General
