@@ -76,6 +76,27 @@ theorem isEquidistributed_dense {X : Type*} [TopologicalSpace X] [CompactSpace X
   have : (∫ y, f y ∂μ : ℝ) = 0 := by exact_mod_cast hInt0
   linarith [hReal]
 
+/-- **A dense orbit realizes values above any threshold strictly below a continuity-point value.**
+If `Set.range x` is dense, `f` is continuous at `p`, and `c < f p`, then some orbit point `x n` has
+`c < f (x n)`.  (The superlevel set `{y | c < f y}` is a neighborhood of `p`; density meets it.)  The
+threshold tool for the cubic finish: at a continuity point of the defect where the value exceeds the
+digit window, the dense orbit realizes a defect outside the window — contradicting confinement. -/
+theorem exists_lt_of_dense_continuousAt {X : Type*} [TopologicalSpace X] {x : ℕ → X}
+    (hx : Dense (Set.range x)) {f : X → ℝ} {p : X} (hf : ContinuousAt f p) {c : ℝ} (hc : c < f p) :
+    ∃ n, c < f (x n) := by
+  have hnhd : f ⁻¹' Set.Ioi c ∈ nhds p := hf (Ioi_mem_nhds hc)
+  obtain ⟨y, hy_pre, m, rfl⟩ := mem_closure_iff_nhds.mp (hx p) _ hnhd
+  exact ⟨m, hy_pre⟩
+
+/-- Symmetric form: a dense orbit realizes values strictly below any threshold above a continuity-point
+value.  (`{y | f y < c}` is a neighborhood of `p`.) -/
+theorem exists_gt_of_dense_continuousAt {X : Type*} [TopologicalSpace X] {x : ℕ → X}
+    (hx : Dense (Set.range x)) {f : X → ℝ} {p : X} (hf : ContinuousAt f p) {c : ℝ} (hc : f p < c) :
+    ∃ n, f (x n) < c := by
+  have hnhd : f ⁻¹' Set.Iio c ∈ nhds p := hf (Iio_mem_nhds hc)
+  obtain ⟨y, hy_pre, m, rfl⟩ := mem_closure_iff_nhds.mp (hx p) _ hnhd
+  exact ⟨m, hy_pre⟩
+
 /-- **`IsEquidistributedTorus` ⇒ dense orbit on `Tᵈ`.**  Specializes `isEquidistributed_dense` to the
 torus `d → ℝ/ℤ` with the product Haar (`volume`), which is a finite open-positive measure.  Step (c)
 piece 3 of the cubic frontier: the a.e.-`W` `T³` equidistribution yields a dense orbit, contradicting
