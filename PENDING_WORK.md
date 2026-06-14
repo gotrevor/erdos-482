@@ -286,3 +286,12 @@ now the active **§0 NEXT TRACK** above, not out of scope.
   **script-generated** (Python loop), don't hand-edit the 62 steps.
 - mathlib v4.29.1: `lt_or_ge` (not `lt_or_le`); `pow_le_pow_left₀`; `Real.pi_gt_d6`/`pi_lt_d6`;
   `Real.exp_one_gt_d9`/`lt_d9`.
+
+### ▶ NEXT-LAP FIRST MOVE (added 2026-06-14, baton ~271k)
+Start here: `aristotle list` → harvest `blockorbit` (8a6effc3); then attempt the **1-D sufficiency
+probe** — does base-2 normality of `αW` ALONE force a contradiction at some offset `c`? Concretely:
+test numerically whether, restricting attention to `f₁={αW·2ⁿ}` spanning `[0,1)` while `f₂,f₃` are
+left free, the constraint `α²f₁+αf₂+f₃ ∈ [C,C+1] ∀n` is already unsatisfiable for all `C` (it likely
+is NOT — `f₂,f₃` can compensate — confirming the joint 2-D statement is needed). If 1-D fails, the
+honest unconditional route is the a.e.-`W` lane requiring a Birkhoff port (large). Keep the CONDITIONAL
+theorem as the formalized ceiling either way.
