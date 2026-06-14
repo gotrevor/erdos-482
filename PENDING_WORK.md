@@ -36,18 +36,24 @@ The algebraic + abstract-geometric obstruction is now a **fully closed skeleton*
 `exists_partial_defect_outside_window` + range bounds are done).  The ONLY remaining gap is showing the
 *orbit* `⌊W2ⁿ⌋` actually *reaches* a bad fract-config (i.e. `Tᵈ` density a.e.-`W`).
 
-**Bridge started (`GeneralOrbit.lean`):** `dStepF_orbit` expresses each floor error `fₖ` at
-`u=⌊W2ⁿ⌋` via the doubling-orbit coordinates `{αⁱW2ⁿ}` and the previous errors — one uniform lemma
-(via `affine_rec_closed`) replacing the cubic's two hand-rolled `cubic_f{1,2}_orbit`.  Remaining (mirror
-of the cubic/quartic finish, using the already-degree-agnostic `MultidimWeyl`/`EquidistDense`/`DELEngine`):
-1. **Orbit-coordinate form of `dStepPartial`** — express `g(⌊W2ⁿ⌋)` as a continuous function of the
-   `Tᵈ`-orbit coords `(\{2ⁿW\}, \{2ⁿαW\}, …, \{2ⁿα^{d-1}W\})` (general `cubicGpd`/`cubicPartialDefect_eq_Gpd`).
+**Bridge LARGELY BUILT (`GeneralOrbit.lean`):** `dStepF_orbit` (floor errors via orbit coords),
+`orbitF`/`orbitF_eq` (the errors as a strong-recursion in the coordinate vector `r`),
+`dStepF_eq_orbitF` (the orbit error IS `orbitF` at `r i = {αⁱW2ⁿ}`), and **`dGpd` +
+`dStepPartial_eq_dGpd`** — the partial defect along the base-2 orbit equals `dGpd` at the
+`Tᵈ`-orbit-coordinate vector (the general `cubicPartialDefect_eq_Gpd`).  So **step 1 below is DONE
+except continuity**.  Remaining (mirror of the cubic/quartic finish, using the already-degree-agnostic
+`MultidimWeyl`/`EquidistDense`/`DELEngine`):
+1. **Orbit-coordinate form of `dStepPartial`** — ✅ DONE (`dStepPartial_eq_dGpd`).  TODO: `ContinuousAt`
+   of `dGpd` in `r` (product topology on `ℕ→ℝ`, `continuous_apply`) off the fract-jump set — by induction
+   on `k` via `continuousAt_fract` (mirror `continuousAt_cubicGpd`; the inner-arg-non-integer hypotheses
+   bundle over `k`).
 2. **General `Tᵈ` equidistribution/density** for a.e. `W` via `rpow_lin_indep_int` (⇒ `ξ=∑nᵢαⁱ≠0` ⇒
    Weyl reduction) — the `MultidimWeyl.weyl_criterion_torus` + `ae_comp_mul_left` engine is degree-free.
-3. **General geometry crux** — realize a `g`-value outside `(C-2,C]` via `fract` coords (general
-   `fract_shift_realize`/`gpd_exceeds_window`), combining `window_not_cover` + `rrt_window_gt_two`.
-   *(Aristotle candidate once the `dGpd` orbit-coordinate def + statement are inlined.)*
-4. **Headline assembly** — `ae_no_dStep_schedule_reads_base_two` for all `d ≥ 3`, uniform over schedules.
+3. **General geometry crux** — ✅ DONE abstractly (`exists_partial_defect_outside_window`); just connect
+   `dGpd`'s value-range to it at a continuity point.
+4. **Headline assembly** — `ae_no_dStep_schedule_reads_base_two` for all `d ≥ 3`, uniform over schedules:
+   chain density (step 2) + continuity (step 1) against `dStep_partial_mem_window` +
+   `exists_partial_defect_outside_window`.
 
 ---
 
