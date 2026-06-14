@@ -88,4 +88,51 @@ theorem cubic_combined_defect_range_wide_cbrt2 :
     Real.rpow_lt_rpow_of_exponent_lt (by norm_num) (by norm_num)
   rwa [Real.rpow_zero] at h
 
+/-- The three-step cubic orbit value `v₃ = ⌊α(⌊α(⌊α(u+c₀)⌋+c₁)⌋+c₂)⌋` from an integer start `u`. -/
+noncomputable def cubicV3 (α c0 c1 c2 : ℝ) (u : ℤ) : ℤ :=
+  ⌊α * (((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ) + c2)⌋
+
+/-- The combined internal-floor defect `α²·f₁ + α·f₂ + f₃` of the three-step cubic map at start `u`. -/
+noncomputable def cubicDefect (α c0 c1 c2 : ℝ) (u : ℤ) : ℝ :=
+  α ^ 2 * Int.fract (α * ((u : ℝ) + c0))
+    + α * Int.fract (α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1))
+    + Int.fract (α * (((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ) + c2))
+
+/-- Bridge: the extracted "digit" `cubicV3 − 2u` equals the schedule constant minus the combined
+defect, `(2c₀+α²c₁+αc₂) − cubicDefect`.  Restatement of `cubic_threestep_defect` on integer starts. -/
+theorem cubicV3_sub_eq (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) (u : ℤ) :
+    ((cubicV3 α c0 c1 c2 u : ℤ) : ℝ) - 2 * (u : ℝ)
+      = (2 * c0 + α ^ 2 * c1 + α * c2) - cubicDefect α c0 c1 c2 u := by
+  have hd := cubic_threestep_defect α (u : ℝ) c0 c1 c2 hα
+  simp only [cubicV3, cubicDefect]
+  linarith [hd]
+
+/-- **Conditional cubic impossibility (the honest ceiling).**  Fix `α` with `α³ = 2` and any offset
+schedule `(c₀,c₁,c₂)`.  *If* the orbit realises two starts `u, u'` whose combined internal-floor
+defects differ by more than `1`, *then* the two extracted digits `cubicV3 − 2u` and `cubicV3' − 2u'`
+cannot both be base-2 digits (`∈ {0,1}`) — so no such schedule reads base-2 digits along an orbit that
+explores a wide defect pair.  This packages exactly "the cubic three-step map fails *modulo* the orbit
+realising the wide defect spread of `cubic_combined_defect_range_wide`"; whether the geometric orbit
+`u_n ≈ W·α^n` does realise such a pair is the residual equidistribution question (OPEN for fixed `ξ`;
+see `PENDING_WORK.md` ★).  Proof: the two digits differ (as reals) by exactly the defect difference,
+`> 1`, but two elements of `{0,1}` differ by at most `1`. -/
+theorem cubic_threestep_digit_pair_fails (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) (u u' : ℤ)
+    (hwide : 1 < |cubicDefect α c0 c1 c2 u - cubicDefect α c0 c1 c2 u'|) :
+    ¬ ((cubicV3 α c0 c1 c2 u - 2 * u = 0 ∨ cubicV3 α c0 c1 c2 u - 2 * u = 1)
+        ∧ (cubicV3 α c0 c1 c2 u' - 2 * u' = 0 ∨ cubicV3 α c0 c1 c2 u' - 2 * u' = 1)) := by
+  rintro ⟨hb, hb'⟩
+  -- the two real digit-values differ by exactly the defect difference
+  have e := cubicV3_sub_eq α c0 c1 c2 hα u
+  have e' := cubicV3_sub_eq α c0 c1 c2 hα u'
+  have hreal : 1 < |((cubicV3 α c0 c1 c2 u : ℝ) - 2 * u) - ((cubicV3 α c0 c1 c2 u' : ℝ) - 2 * u')| := by
+    have : ((cubicV3 α c0 c1 c2 u : ℝ) - 2 * u) - ((cubicV3 α c0 c1 c2 u' : ℝ) - 2 * u')
+        = cubicDefect α c0 c1 c2 u' - cubicDefect α c0 c1 c2 u := by rw [e, e']; ring
+    rw [this, abs_sub_comm]; exact hwide
+  -- but both integer digits are in {0,1}, so the real gap is ≤ 1
+  have hcast : ((cubicV3 α c0 c1 c2 u : ℝ) - 2 * u) - ((cubicV3 α c0 c1 c2 u' : ℝ) - 2 * u')
+      = (((cubicV3 α c0 c1 c2 u - 2 * u) - (cubicV3 α c0 c1 c2 u' - 2 * u') : ℤ) : ℝ) := by
+    push_cast; ring
+  rw [hcast] at hreal
+  rcases hb with h | h <;> rcases hb' with h' | h' <;> rw [h, h'] at hreal <;> norm_num at hreal
+
 end Erdos482.General
