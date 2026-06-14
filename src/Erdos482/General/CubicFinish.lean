@@ -342,4 +342,38 @@ theorem ae_not_cubicDigitRepresentable :
   obtain ⟨n, hn⟩ := hW c0 c1 c2
   exact hn (hall n)
 
+/-- The doubling-digit `⌊2x⌋ − 2⌊x⌋` of any real is a base-2 digit `∈ {0,1}`. -/
+theorem floor_two_mul_sub_mem (x : ℝ) : ⌊2 * x⌋ - 2 * ⌊x⌋ = 0 ∨ ⌊2 * x⌋ - 2 * ⌊x⌋ = 1 := by
+  have hlo : 2 * ⌊x⌋ ≤ ⌊2 * x⌋ := by
+    rw [Int.le_floor]; push_cast; linarith [Int.floor_le x]
+  have hhi : ⌊2 * x⌋ < 2 * ⌊x⌋ + 2 := by
+    rw [Int.floor_lt]; push_cast; linarith [Int.lt_floor_add_one x]
+  omega
+
+/-- **The cubic map correctly reads `W`'s base-2 digits** if some 3-periodic schedule `(c₀,c₁,c₂)`
+makes the three-step cubic floor map send each binary block `uₙ = ⌊W·2ⁿ⌋` to the next, `uₙ₊₁ =
+⌊W·2ⁿ⁺¹⌋`: i.e. `cubicV3(⌊W·2ⁿ⌋) = ⌊W·2ⁿ⁺¹⌋` for all `n`.  (This is the genuine self-referential
+condition — the map *computes* `W`'s base-2 doubling — and is strictly stronger than merely emitting
+valid digits.) -/
+def CubicReadsBaseTwo (W : ℝ) : Prop :=
+  ∃ c0 c1 c2 : ℝ, ∀ n : ℕ, cubicV3 cbrt2 c0 c1 c2 ⌊W * 2 ^ n⌋ = ⌊W * 2 ^ (n + 1)⌋
+
+/-- **The cubic three-step map computes no real's base-2 doubling, for almost every `W`.**  The
+self-referential capstone: the set of `W` whose base-2 digits some fixed cubic schedule correctly reads
+(`cubicV3(⌊W·2ⁿ⌋) = ⌊W·2ⁿ⁺¹⌋` ∀n) is Lebesgue-null.  Correct reading forces every emitted digit
+`cubicV3(uₙ) − 2uₙ = ⌊W·2ⁿ⁺¹⌋ − 2⌊W·2ⁿ⌋ ∈ {0,1}` (`floor_two_mul_sub_mem`), i.e.
+`CubicDigitRepresentable W`, which is a.e. false. -/
+theorem ae_not_cubicReadsBaseTwo :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ CubicReadsBaseTwo W := by
+  filter_upwards [ae_not_cubicDigitRepresentable] with W hW
+  rintro ⟨c0, c1, c2, hread⟩
+  refine hW ⟨c0, c1, c2, fun n => ?_⟩
+  have hpow : (2 : ℝ) ^ (n + 1) = 2 * 2 ^ n := by ring
+  have hdouble : ⌊W * 2 ^ (n + 1)⌋ = ⌊2 * (W * 2 ^ n)⌋ := by rw [hpow]; ring_nf
+  rw [hread n, hdouble]
+  have := floor_two_mul_sub_mem (W * 2 ^ n)
+  rcases this with h | h
+  · left; omega
+  · right; omega
+
 end Erdos482.General
