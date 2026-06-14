@@ -179,6 +179,94 @@ theorem quartic_partial_defect_mem_window (α c0 c1 c2 c3 : ℝ) (hα : α ^ 4 =
       < (⌊C - quarticPartialDefect α c0 c1 c2 c3 u⌋ : ℤ) + 1 := Int.lt_floor_add_one _
   rcases hdig with h | h <;> rw [h] at hle hlt <;> push_cast at hle hlt <;> constructor <;> linarith
 
+/-! ### ℤ-linear independence of `{1, 2^{1/4}, 2^{2/4}, 2^{3/4}}` (the quartic algebraic backbone). -/
+
+/-- **Infinite 2-adic descent.**  The only integer solution of the "norm" system
+`4be = a²+2c²`, `b²+2e² = 2ac` is the trivial one.  (These are exactly the conditions forced by squaring
+an integer relation `α(b+e√2) = −(a+c√2)`; their only solution being trivial is `2^{1/4} ∉ ℚ(√2)`.)
+Proof by descent: `(a,b,c,e)` all even, and `(a/2,b/2,c/2,e/2)` satisfy the same system. -/
+private theorem quartic_norm_descent : ∀ n : ℕ, ∀ a b c e : ℤ,
+    a.natAbs + b.natAbs + c.natAbs + e.natAbs = n →
+    4 * b * e = a ^ 2 + 2 * c ^ 2 → b ^ 2 + 2 * e ^ 2 = 2 * a * c →
+    a = 0 ∧ b = 0 ∧ c = 0 ∧ e = 0 := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro a b c e hn hI hII
+    have hEb : Even b := by
+      have h2 : Even (b ^ 2) := ⟨a * c - e ^ 2, by linarith [hII]⟩
+      exact (Int.even_pow.mp h2).1
+    have hEa : Even a := by
+      have h2 : Even (a ^ 2) := ⟨2 * b * e - c ^ 2, by linarith [hI]⟩
+      exact (Int.even_pow.mp h2).1
+    obtain ⟨a1, rfl⟩ := hEa
+    obtain ⟨b1, rfl⟩ := hEb
+    have hEe : Even e := by
+      have h2 : Even (e ^ 2) := ⟨a1 * c - b1 ^ 2, by nlinarith [hII]⟩
+      exact (Int.even_pow.mp h2).1
+    have hEc : Even c := by
+      have h2 : Even (c ^ 2) := ⟨2 * b1 * e - a1 ^ 2, by nlinarith [hI]⟩
+      exact (Int.even_pow.mp h2).1
+    obtain ⟨e1, rfl⟩ := hEe
+    obtain ⟨c1, rfl⟩ := hEc
+    have hI1 : 4 * b1 * e1 = a1 ^ 2 + 2 * c1 ^ 2 := by nlinarith [hI]
+    have hII1 : b1 ^ 2 + 2 * e1 ^ 2 = 2 * a1 * c1 := by nlinarith [hII]
+    -- the halved tuple has half the size; descend
+    have hsum : a1.natAbs + b1.natAbs + c1.natAbs + e1.natAbs
+        + (a1.natAbs + b1.natAbs + c1.natAbs + e1.natAbs) = n := by
+      have e2 : ∀ x : ℤ, (x + x).natAbs = x.natAbs + x.natAbs := by
+        intro x; rw [← two_mul, Int.natAbs_mul]; simp [Nat.two_mul]
+      rw [e2, e2, e2, e2] at hn; omega
+    by_cases hz : a1.natAbs + b1.natAbs + c1.natAbs + e1.natAbs = 0
+    · have ha0 : a1 = 0 := Int.natAbs_eq_zero.mp (by omega)
+      have hb0 : b1 = 0 := Int.natAbs_eq_zero.mp (by omega)
+      have hc0 : c1 = 0 := Int.natAbs_eq_zero.mp (by omega)
+      have he0 : e1 = 0 := Int.natAbs_eq_zero.mp (by omega)
+      subst ha0; subst hb0; subst hc0; subst he0
+      refine ⟨by ring, by ring, by ring, by ring⟩
+    · have hlt : a1.natAbs + b1.natAbs + c1.natAbs + e1.natAbs < n := by omega
+      obtain ⟨ha, hb, hc, he⟩ := ih _ hlt a1 b1 c1 e1 rfl hI1 hII1
+      subst ha; subst hb; subst hc; subst he; refine ⟨by ring, by ring, by ring, by ring⟩
+
+/-- **`{1, α, α², α³}` with `α = 2^{1/4}` are ℤ-linearly independent.**  The only integer relation
+`a + b·α + c·α² + e·α³ = 0` is the trivial one — the degree-4 analogue of `cubic_lin_indep_int`, and the
+algebraic backbone for the quartic self-referential impossibility.  (Group as `(a+c√2) + α(b+e√2) = 0`;
+square and split off `√2` (irrational) to get the norm system `quartic_norm_descent` kills.) -/
+theorem quartic_lin_indep_int (a b c e : ℤ)
+    (h : (a : ℝ) + (b : ℝ) * qrt2 + (c : ℝ) * qrt2 ^ 2 + (e : ℝ) * qrt2 ^ 3 = 0) :
+    a = 0 ∧ b = 0 ∧ c = 0 ∧ e = 0 := by
+  -- `t = α² = √2` is irrational and `t² = 2`.
+  have ht : qrt2 ^ 2 = Real.sqrt 2 := by
+    rw [Real.sqrt_eq_rpow, qrt2, ← Real.rpow_natCast ((2 : ℝ) ^ ((1 : ℝ) / 4)) 2,
+      ← Real.rpow_mul (by norm_num)]
+    norm_num
+  have hirr : Irrational (qrt2 ^ 2) := ht ▸ irrational_sqrt_two
+  have e4 : qrt2 ^ 2 * qrt2 ^ 2 = 2 := by rw [← pow_add]; exact_mod_cast qrt2_quartic
+  -- regroup `a + b α + c α² + e α³ = 0` as `α (b + e α²) = −(a + c α²)`
+  have h3 : qrt2 ^ 3 = qrt2 * qrt2 ^ 2 := by ring
+  rw [h3] at h
+  have hg : qrt2 * ((b : ℝ) + (e : ℝ) * qrt2 ^ 2) = -((a : ℝ) + (c : ℝ) * qrt2 ^ 2) := by
+    linear_combination h
+  -- square and use `α⁴ = 2`: `(4be − (a²+2c²)) + (b²+2e² − 2ac)·α² = 0`
+  have hsq : qrt2 ^ 2 * ((b : ℝ) + (e : ℝ) * qrt2 ^ 2) ^ 2 = ((a : ℝ) + (c : ℝ) * qrt2 ^ 2) ^ 2 := by
+    rw [← mul_pow, hg]; ring
+  have hPQ : (((4 * b * e - (a ^ 2 + 2 * c ^ 2) : ℤ)) : ℝ)
+      + (((b ^ 2 + 2 * e ^ 2 - 2 * a * c : ℤ)) : ℝ) * qrt2 ^ 2 = 0 := by
+    push_cast
+    linear_combination hsq + ((c : ℝ) ^ 2 - 2 * (b : ℝ) * (e : ℝ) - (e : ℝ) ^ 2 * qrt2 ^ 2) * e4
+  -- `α²` irrational ⇒ the integer coefficient of `α²` vanishes, hence so does the constant
+  have hQ : (b ^ 2 + 2 * e ^ 2 - 2 * a * c : ℤ) = 0 := by
+    by_contra hQne
+    have hIrr2 := hirr.intCast_mul hQne
+    have hIrr3 := hIrr2.intCast_add (4 * b * e - (a ^ 2 + 2 * c ^ 2))
+    rw [hPQ] at hIrr3
+    exact not_irrational_zero hIrr3
+  have hP : (4 * b * e - (a ^ 2 + 2 * c ^ 2) : ℤ) = 0 := by
+    have hQ0 : (((b ^ 2 + 2 * e ^ 2 - 2 * a * c : ℤ)) : ℝ) = 0 := by exact_mod_cast hQ
+    rw [hQ0, zero_mul, add_zero] at hPQ
+    exact_mod_cast hPQ
+  exact quartic_norm_descent _ a b c e rfl (by linarith [hP]) (by linarith [hQ])
+
 end
 
 end Erdos482.General
