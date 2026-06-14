@@ -1,0 +1,130 @@
+import Erdos482.General.QuarticDefectLink
+import Erdos482.General.CubicFinish
+
+/-!
+# The quartic geometric crux: the partial defect leaves every digit window
+
+Degree-4 analogue of `CubicFinish.cubicGpd_exceeds_window`.  For any schedule `(c₀,c₁,c₂)` and any
+constant `C`, there is an interior non-jump point `(r₁,r₂,r₃,r₄) ∈ (0,1)⁴` where the three-floor partial
+defect `quarticGpd = α³fA + α²fB + α·fC` (with `fA,fB,fC ∈ (0,1)`) leaves the width-2 window `(C−2, C]`.
+The range `(0, α³+α²+α)` has width `α³+α²+α > 3 > 2` (as `α = 2^{1/4} > 1`), so no window of length 2
+contains it.  Realization reuses `CubicFinish.fract_shift_realize`: fix `r₁ = 1/2`, solve `r₂,r₃,r₄` for
+the three prescribed fractional parts.
+-/
+
+namespace Erdos482.General
+
+open Real
+
+/-- **The quartic partial defect leaves every window (general `α`).**  For `1 < α`, `α⁴ = 2`, any
+schedule `(c₀,c₁,c₂)` and any `C`, there is `(r₁,r₂,r₃,r₄) ∈ (0,1)⁴` with the three inner `fract`
+arguments non-integers and `quarticGpd α c0 c1 c2 r1 r2 r3 r4 ∉ (C−2, C]`. -/
+theorem quarticGpd_exceeds_window_general (α c0 c1 c2 : ℝ) (hα : 1 < α) (hα4 : α ^ 4 = 2) (C : ℝ) :
+    ∃ r1 r2 r3 r4 : ℝ, 0 < r1 ∧ r1 < 1 ∧ 0 < r2 ∧ r2 < 1 ∧ 0 < r3 ∧ r3 < 1 ∧ 0 < r4 ∧ r4 < 1
+      ∧ (r2 - α * r1 + α * c0 ≠ (⌊r2 - α * r1 + α * c0⌋ : ℤ))
+      ∧ (r3 - α ^ 2 * r1 - α * Int.fract (r2 - α * r1 + α * c0) + α ^ 2 * c0 + α * c1
+          ≠ (⌊r3 - α ^ 2 * r1 - α * Int.fract (r2 - α * r1 + α * c0) + α ^ 2 * c0 + α * c1⌋ : ℤ))
+      ∧ (r4 - α ^ 3 * r1 - α ^ 2 * Int.fract (r2 - α * r1 + α * c0)
+            - α * Int.fract (r3 - α ^ 2 * r1 - α * Int.fract (r2 - α * r1 + α * c0)
+                + α ^ 2 * c0 + α * c1) + α ^ 3 * c0 + α ^ 2 * c1 + α * c2
+          ≠ (⌊r4 - α ^ 3 * r1 - α ^ 2 * Int.fract (r2 - α * r1 + α * c0)
+                - α * Int.fract (r3 - α ^ 2 * r1 - α * Int.fract (r2 - α * r1 + α * c0)
+                    + α ^ 2 * c0 + α * c1) + α ^ 3 * c0 + α ^ 2 * c1 + α * c2⌋ : ℤ))
+      ∧ (quarticGpd α c0 c1 c2 r1 r2 r3 r4 < C - 2 ∨ C < quarticGpd α c0 c1 c2 r1 r2 r3 r4) := by
+  have hαpos : 0 < α := by linarith
+  have hα2 : 1 < α ^ 2 := by nlinarith
+  have hα3 : 1 < α ^ 3 := by nlinarith
+  have hsum : 3 < α ^ 3 + α ^ 2 + α := by nlinarith
+  have hsumpos : 0 < α ^ 3 + α ^ 2 + α := by linarith
+  have fne : ∀ x : ℝ, Int.fract x ≠ 0 → x ≠ ((⌊x⌋ : ℤ) : ℝ) := by
+    intro x hx h; apply hx; have hsf := Int.self_sub_floor x; linarith
+  set K1 := α * c0 - α * (1 / 2) with hK1
+  by_cases hC : C < α ^ 3 + α ^ 2 + α
+  · -- value > C; choose fA, fB, fC near 1
+    set lo := max 0 (C / (α ^ 3 + α ^ 2 + α)) with hlodef
+    have hlo0 : 0 ≤ lo := le_max_left _ _
+    have hlolt : lo < 1 := by
+      apply max_lt
+      · norm_num
+      · rw [div_lt_one hsumpos]; exact hC
+    have hloge : C / (α ^ 3 + α ^ 2 + α) ≤ lo := le_max_right _ _
+    have hmul : C ≤ lo * (α ^ 3 + α ^ 2 + α) := (div_le_iff₀ hsumpos).mp hloge
+    obtain ⟨r2, hr2pos, hr2lt, hfAlo, hfAhi⟩ := fract_shift_realize K1 lo 1 hlo0 (le_refl 1) hlolt
+    set fA := Int.fract (r2 + K1) with hfA
+    set K2 := α ^ 2 * c0 + α * c1 - α ^ 2 * (1 / 2) - α * fA with hK2
+    obtain ⟨r3, hr3pos, hr3lt, hfBlo, hfBhi⟩ := fract_shift_realize K2 lo 1 hlo0 (le_refl 1) hlolt
+    set fB := Int.fract (r3 + K2) with hfB
+    set K3 := α ^ 3 * c0 + α ^ 2 * c1 + α * c2 - α ^ 3 * (1 / 2) - α ^ 2 * fA - α * fB with hK3
+    obtain ⟨r4, hr4pos, hr4lt, hfClo, hfChi⟩ := fract_shift_realize K3 lo 1 hlo0 (le_refl 1) hlolt
+    set fC := Int.fract (r4 + K3) with hfC
+    have e1 : Int.fract (r2 - α * (1 / 2) + α * c0) = fA := by rw [hfA, hK1]; congr 1; ring
+    have hval : quarticGpd α c0 c1 c2 (1 / 2) r2 r3 r4 = α ^ 3 * fA + α ^ 2 * fB + α * fC := by
+      unfold quarticGpd
+      rw [e1, show r3 - α ^ 2 * (1 / 2 : ℝ) - α * fA + α ^ 2 * c0 + α * c1 = r3 + K2 by rw [hK2]; ring,
+        ← hfB, show r4 - α ^ 3 * (1 / 2 : ℝ) - α ^ 2 * fA - α * fB + α ^ 3 * c0 + α ^ 2 * c1 + α * c2
+          = r4 + K3 by rw [hK3]; ring, ← hfC]
+    refine ⟨1 / 2, r2, r3, r4, by norm_num, by norm_num, hr2pos, hr2lt, hr3pos, hr3lt, hr4pos, hr4lt,
+      ?_, ?_, ?_, ?_⟩
+    · apply fne; rw [e1]; linarith
+    · apply fne
+      rw [show r3 - α ^ 2 * (1 / 2 : ℝ) - α * Int.fract (r2 - α * (1 / 2) + α * c0) + α ^ 2 * c0
+            + α * c1 = r3 + K2 by rw [e1, hK2]; ring, ← hfB]
+      linarith
+    · apply fne
+      rw [e1, show r4 - α ^ 3 * (1 / 2 : ℝ) - α ^ 2 * fA
+            - α * Int.fract (r3 - α ^ 2 * (1 / 2) - α * fA + α ^ 2 * c0 + α * c1)
+            + α ^ 3 * c0 + α ^ 2 * c1 + α * c2 = r4 + K3 by
+          rw [show r3 - α ^ 2 * (1 / 2 : ℝ) - α * fA + α ^ 2 * c0 + α * c1 = r3 + K2 by rw [hK2]; ring,
+            ← hfB, hK3]; ring, ← hfC]
+      linarith
+    · right
+      rw [hval]
+      nlinarith [mul_pos (show (0:ℝ) < α ^ 3 by positivity) (sub_pos.mpr hfAlo),
+        mul_pos (show (0:ℝ) < α ^ 2 by positivity) (sub_pos.mpr hfBlo),
+        mul_pos hαpos (sub_pos.mpr hfClo), hmul]
+  · -- value < C - 2; choose fA, fB, fC near 0
+    push_neg at hC
+    have hC2 : 0 < C - 2 := by linarith
+    set hi := min (1 / 2) ((C - 2) / (α ^ 3 + α ^ 2 + α)) with hidef
+    have hipos : 0 < hi := by
+      apply lt_min
+      · norm_num
+      · positivity
+    have hile : hi ≤ 1 := le_trans (min_le_left _ _) (by norm_num)
+    have hile2 : hi ≤ (C - 2) / (α ^ 3 + α ^ 2 + α) := min_le_right _ _
+    have hmul2 : hi * (α ^ 3 + α ^ 2 + α) ≤ C - 2 := (le_div_iff₀ hsumpos).mp hile2
+    obtain ⟨r2, hr2pos, hr2lt, hfAlo, hfAhi⟩ := fract_shift_realize K1 0 hi (le_refl 0) hile hipos
+    set fA := Int.fract (r2 + K1) with hfA
+    set K2 := α ^ 2 * c0 + α * c1 - α ^ 2 * (1 / 2) - α * fA with hK2
+    obtain ⟨r3, hr3pos, hr3lt, hfBlo, hfBhi⟩ := fract_shift_realize K2 0 hi (le_refl 0) hile hipos
+    set fB := Int.fract (r3 + K2) with hfB
+    set K3 := α ^ 3 * c0 + α ^ 2 * c1 + α * c2 - α ^ 3 * (1 / 2) - α ^ 2 * fA - α * fB with hK3
+    obtain ⟨r4, hr4pos, hr4lt, hfClo, hfChi⟩ := fract_shift_realize K3 0 hi (le_refl 0) hile hipos
+    set fC := Int.fract (r4 + K3) with hfC
+    have e1 : Int.fract (r2 - α * (1 / 2) + α * c0) = fA := by rw [hfA, hK1]; congr 1; ring
+    have hval : quarticGpd α c0 c1 c2 (1 / 2) r2 r3 r4 = α ^ 3 * fA + α ^ 2 * fB + α * fC := by
+      unfold quarticGpd
+      rw [e1, show r3 - α ^ 2 * (1 / 2 : ℝ) - α * fA + α ^ 2 * c0 + α * c1 = r3 + K2 by rw [hK2]; ring,
+        ← hfB, show r4 - α ^ 3 * (1 / 2 : ℝ) - α ^ 2 * fA - α * fB + α ^ 3 * c0 + α ^ 2 * c1 + α * c2
+          = r4 + K3 by rw [hK3]; ring, ← hfC]
+    refine ⟨1 / 2, r2, r3, r4, by norm_num, by norm_num, hr2pos, hr2lt, hr3pos, hr3lt, hr4pos, hr4lt,
+      ?_, ?_, ?_, ?_⟩
+    · apply fne; rw [e1]; linarith
+    · apply fne
+      rw [show r3 - α ^ 2 * (1 / 2 : ℝ) - α * Int.fract (r2 - α * (1 / 2) + α * c0) + α ^ 2 * c0
+            + α * c1 = r3 + K2 by rw [e1, hK2]; ring, ← hfB]
+      linarith
+    · apply fne
+      rw [e1, show r4 - α ^ 3 * (1 / 2 : ℝ) - α ^ 2 * fA
+            - α * Int.fract (r3 - α ^ 2 * (1 / 2) - α * fA + α ^ 2 * c0 + α * c1)
+            + α ^ 3 * c0 + α ^ 2 * c1 + α * c2 = r4 + K3 by
+          rw [show r3 - α ^ 2 * (1 / 2 : ℝ) - α * fA + α ^ 2 * c0 + α * c1 = r3 + K2 by rw [hK2]; ring,
+            ← hfB, hK3]; ring, ← hfC]
+      linarith
+    · left
+      rw [hval]
+      nlinarith [mul_pos (show (0:ℝ) < α ^ 3 by positivity) (sub_pos.mpr hfAhi),
+        mul_pos (show (0:ℝ) < α ^ 2 by positivity) (sub_pos.mpr hfBhi),
+        mul_pos hαpos (sub_pos.mpr hfChi), hmul2]
+
+end Erdos482.General
