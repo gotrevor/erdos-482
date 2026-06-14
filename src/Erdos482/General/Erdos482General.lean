@@ -15,6 +15,7 @@ import Erdos482.General.DoublingEquidist
 import Erdos482.General.MultidimWeyl
 import Erdos482.General.EquidistDense
 import Erdos482.General.CubicTorusEquidist
+import Erdos482.General.CubicDefectLink
 
 /-!
 # Erdős–Graham #482 — the general resolution (any `w > 0`, any base `g ≥ 2`)
