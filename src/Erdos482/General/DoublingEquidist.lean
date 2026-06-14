@@ -87,4 +87,74 @@ theorem ae_doubling_orbit_equidistributed :
     congr 1
     exact Finset.sum_congr rfl (fun n _ => (fourier_doubling_eq k n s).symm))
 
+/-- **Periodicity bridge: a.e.-`[0,1]` ⟹ a.e.-`ℝ` for a unit-periodic predicate.**  If `P` is invariant
+under the unit shift (`P (s+1) ↔ P s`) and holds for a.e. `s ∈ [0,1]`, then it holds for a.e. `s ∈ ℝ`
+(full Lebesgue `volume`).  The bad set `{¬P}` is `ℤ`-invariant, hence a countable union of integer
+translates of `{¬P} ∩ [0,1]`, each null by translation-invariance of `volume` (`measure_preimage_add_right`).
+This lifts the `[0,1]`-restricted a.e. doubling equidistribution to all of `ℝ`, as `DELEngine.ae_comp_mul_left`
+(the scaling transfer `s = ξW`) requires the unrestricted `volume`. -/
+theorem ae_of_ae_restrict_Icc01_of_periodic {P : ℝ → Prop}
+    (hper : ∀ s : ℝ, P (s + 1) ↔ P s)
+    (h : ∀ᵐ s ∂(volume.restrict (Set.Icc (0:ℝ) 1)), P s) :
+    ∀ᵐ s ∂(volume : Measure ℝ), P s := by
+  -- `P` is invariant under all natural, hence all integer, shifts.
+  have hPn : ∀ (n : ℕ) (s : ℝ), P (s + n) ↔ P s := by
+    intro n
+    induction n with
+    | zero => simp
+    | succ m ih => intro s
+                   have e : (s + ((m + 1 : ℕ) : ℝ)) = (s + (m:ℝ)) + 1 := by push_cast; ring
+                   rw [e, hper, ih]
+  have hPnegn : ∀ (n : ℕ) (s : ℝ), P (s - n) ↔ P s := by
+    intro n s
+    rw [← hPn n (s - n), show (s - (n:ℝ)) + n = s by ring]
+  have hinv : ∀ (k : ℤ) (s : ℝ), P (s + (k:ℝ)) ↔ P s := by
+    intro k s
+    obtain ⟨n, rfl | rfl⟩ := k.eq_nat_or_neg
+    · rw [Int.cast_natCast]; exact hPn n s
+    · rw [Int.cast_neg, Int.cast_natCast, ← sub_eq_add_neg]; exact hPnegn n s
+  rw [ae_iff]
+  have h0 : volume ({s : ℝ | ¬ P s} ∩ Set.Icc (0:ℝ) 1) = 0 := by
+    have := ae_iff.mp h
+    rwa [Measure.restrict_apply' measurableSet_Icc] at this
+  have cover : {s : ℝ | ¬ P s} ⊆ ⋃ k : ℤ, ({s : ℝ | ¬ P s} ∩ Set.Icc (k:ℝ) ((k:ℝ) + 1)) := by
+    intro x hx
+    rw [Set.mem_iUnion]
+    refine ⟨⌊x⌋, hx, Int.floor_le x, ?_⟩
+    have := Int.lt_floor_add_one x; linarith
+  have hpiece : ∀ k : ℤ,
+      volume ({s : ℝ | ¬ P s} ∩ Set.Icc (k:ℝ) ((k:ℝ) + 1)) = 0 := by
+    intro k
+    have hset : ({s : ℝ | ¬ P s} ∩ Set.Icc (k:ℝ) ((k:ℝ) + 1))
+        = (fun x => x + (-(k:ℝ))) ⁻¹' ({s : ℝ | ¬ P s} ∩ Set.Icc (0:ℝ) 1) := by
+      ext x
+      simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_setOf_eq, Set.mem_Icc]
+      constructor
+      · rintro ⟨hx, hl, hr⟩
+        refine ⟨?_, by linarith, by linarith⟩
+        rw [show (x + -(k:ℝ)) = x + ((-k : ℤ):ℝ) by push_cast; ring, hinv]; exact hx
+      · rintro ⟨hx, hl, hr⟩
+        rw [show (x + -(k:ℝ)) = x + ((-k : ℤ):ℝ) by push_cast; ring, hinv] at hx
+        exact ⟨hx, by linarith, by linarith⟩
+    rw [hset, measure_preimage_add_right]; exact h0
+  exact measure_mono_null cover (measure_iUnion_null hpiece)
+
+/-- **Step (b) over all of `ℝ`.**  For almost every real `s` (full Lebesgue `volume`), the doubling orbit
+`n ↦ ↑(2ⁿ·s)` is equidistributed on `ℝ/ℤ`.  Lifts `ae_doubling_orbit_equidistributed` (a.e.-`[0,1]`) to
+`ℝ` via the periodicity bridge: the orbit `↑(2ⁿ·s)` is `1`-periodic in `s` (`2ⁿ ∈ ℤ` is killed mod 1).
+This is the form `DELEngine.ae_comp_mul_left` consumes for the `s = ξW` scaling toward a.e.-`W`. -/
+theorem ae_doubling_orbit_equidistributed_real :
+    ∀ᵐ (s : ℝ) ∂(volume : Measure ℝ),
+      IsEquidistributed (fun n => (((2:ℝ) ^ n * s : ℝ) : AddCircle (1:ℝ))) := by
+  refine ae_of_ae_restrict_Icc01_of_periodic (fun s => ?_) ae_doubling_orbit_equidistributed
+  have hfun : (fun n => (((2:ℝ) ^ n * (s + 1) : ℝ) : AddCircle (1:ℝ)))
+      = (fun n => (((2:ℝ) ^ n * s : ℝ) : AddCircle (1:ℝ))) := by
+    funext n
+    rw [show (2:ℝ) ^ n * (s + 1) = (2:ℝ) ^ n * s + ((2 ^ n : ℕ) : ℝ) by push_cast; ring,
+      ← AddCircle.coe_fract ((2:ℝ) ^ n * s + ((2 ^ n : ℕ) : ℝ)),
+      ← AddCircle.coe_fract ((2:ℝ) ^ n * s)]
+    congr 1
+    exact Int.fract_add_natCast ((2:ℝ) ^ n * s) (2 ^ n)
+  rw [hfun]
+
 end Erdos482.General

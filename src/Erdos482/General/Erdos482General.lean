@@ -13,6 +13,7 @@ import Erdos482.General.Equidistribution
 import Erdos482.General.DELEngine
 import Erdos482.General.DoublingEquidist
 import Erdos482.General.MultidimWeyl
+import Erdos482.General.EquidistDense
 
 /-!
 # Erdős–Graham #482 — the general resolution (any `w > 0`, any base `g ≥ 2`)
