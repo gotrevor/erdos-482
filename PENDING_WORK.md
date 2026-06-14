@@ -45,14 +45,21 @@ covered** via the prime-degree Kummer route (all axiom-clean):
 **The base-`g` story is now complete for all `g ≥ 2`.**  Remaining open items are genuinely harder or
 out of scope (below).
 
-### ▶▶ REMAINING / OPTIONAL
-- **Prime-`d` capstones**: the three self-referential capstones (`ae_not_DStep…BaseG`) are stated via the
-  Eisenstein hypotheses; add `…_all` variants threading the prime-`d` density so the capstones also hold
-  for perfect-power bases.  Mechanical (swap `ae_not_DStepDigitRepresentableBaseG`'s density source).
-- **g=2 subsumption cross-check** (below) — kernel consistency anchor, optional.
+### ✅ ALSO DONE THIS LAP
+- **Prime-`d` capstones**: `ae_not_DStep{DigitRepresentable,ReadsBaseG,Recurrence…}BaseG_all` — the three
+  self-referential capstones for **every** base `g ≥ 2` (perfect powers included), via shared pointwise
+  helpers `not_DStepReadsBaseG_of_not_digit` / `not_DStepRecurrenceRepresentableBaseG_of_not_digit`.
+- **g=2 subsumption cross-check** (`BaseGSubsumes`): `grt_two_eq_rrt`, `baseG_two_digit_iff` (interval
+  `0≤x≤1` ⟺ two-point `x∈{0,1}` since the digit is an integer), `DStepDigitRepresentableBaseG_two_iff`,
+  `ae_not_DStepDigitRepresentableBaseG_two_via_base_two` (re-derives the base-`g` `g=2` impossibility from
+  the independently-built base-2 `ae_not_dStepDigitRepresentable`).
+
+### ▶▶ REMAINING / OPTIONAL (genuinely harder or out of scope)
 - **Composite-`d` for perfect-power `g`**: dropping the "`d` prime" restriction needs the full Kummer
   criterion (`X_pow_sub_C_irreducible_iff_of_odd` / `_of_prime_pow`) — not needed for the headline (a prime
-  `d` always exists above the window threshold) but would generalize the *degree*.
+  `d` always exists above the window threshold) but would generalize the *degree* at perfect-power bases.
+- **Fixed-`W` version** — OPEN MATH (Borel normality of a specific number; cf. `{(3/2)ⁿ}` not even known
+  dense).  Not attemptable in mathlib.
 
 ### (cross-check, optional) g=2 subsumption
 `DStepDigitRepresentableBaseG 2 d W ↔ DStepDigitRepresentable d W`: the digit `x = dStepV − 2u` is an
