@@ -84,16 +84,16 @@ theorem dStepV_succ (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (k : ℕ) :
     rw [dStepF]; rw [dStepV]; rw [Int.self_sub_fract]
   rw [h]; ring
 
-/-- **The general degree-`d` defect identity.**  For any `α` with `αᵈ = 2`, schedule `c` and integer
-start `u`, the `d`-step floor map satisfies
-`v_d = 2u + C − D`,  `C = ∑_{k<d} α^{d-k} cₖ`,  `D = ∑_{k<d} α^{d-1-k} fₖ`.
-The degree-agnostic version of `cubic_threestep_defect`. -/
-theorem dStep_defect_identity (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (d : ℕ) (hα : α ^ d = 2) :
-    dStepV α c u d = 2 * (u : ℝ) + dStepC α c d - dStepDefect α c u d := by
+/-- **The base-`g` defect identity.**  For any `α` with `αᵈ = g`, schedule `c` and integer start `u`,
+the `d`-step floor map satisfies `v_d = g·u + C − D`.  Base-2 (`dStep_defect_identity`) is the `g = 2`
+instance; the base-`g` brick for the base-`g` generalization of the impossibility (a base-`g` digit is
+`v_d − g·u`, confined to a width-`g` window).  Same proof — the `g` enters only through `hα`. -/
+theorem dStep_defect_identity_base (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (d : ℕ) (g : ℝ) (hα : α ^ d = g) :
+    dStepV α c u d = g * (u : ℝ) + dStepC α c d - dStepDefect α c u d := by
   have hclosed := affine_rec_closed α (dStepV α c u) (fun k => α * c k - dStepF α c u k)
     (dStepV_succ α c u) d
   rw [hclosed]
-  -- v 0 = u, and α^d = 2.
+  -- v 0 = u, and α^d = g.
   have hv0 : dStepV α c u 0 = (u : ℝ) := by rw [dStepV]
   rw [hv0, hα, dStepC, dStepDefect]
   -- split `∑ α^{d-1-k}(α cₖ − fₖ) = ∑ α^{d-k} cₖ − ∑ α^{d-1-k} fₖ`.
@@ -106,6 +106,12 @@ theorem dStep_defect_identity (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (d : ℕ) (
     rw [Finset.mem_range] at hk
     have he : d - k = (d - 1 - k) + 1 := by omega
     rw [he, pow_succ]; ring
+
+/-- The base-2 defect identity `v_d = 2u + C − D` — the `g = 2` instance of `dStep_defect_identity_base`,
+the degree-agnostic version of `cubic_threestep_defect`. -/
+theorem dStep_defect_identity (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (d : ℕ) (hα : α ^ d = 2) :
+    dStepV α c u d = 2 * (u : ℝ) + dStepC α c d - dStepDefect α c u d :=
+  dStep_defect_identity_base α c u d 2 hα
 
 /-- The **partial defect** `g = ∑_{k<d-1} α^{d-1-k} fₖ` — the combined defect minus its last
 (forced) term `f_{d-1}`.  (`d = e+1`: `g = D − f_e`.)  The general analogue of `cubicPartialDefect`. -/
