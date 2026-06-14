@@ -303,4 +303,42 @@ theorem ae_not_dStepReadsBaseTwo (d : ℕ) (hd : 3 ≤ d) :
     have h' : ((⌊2 * (W * 2 ^ n)⌋ - 2 * ⌊W * 2 ^ n⌋ : ℤ) : ℝ) = 1 := by exact_mod_cast h
     push_cast at h'; linarith
 
+/-- **`W` is `d`-step-recurrence-representable** if some schedule `c` admits a genuine *self-referential
+recurrence* orbit `orbit : ℕ → ℤ` — `orbit(n+1) = dStepZ(orbit n)` — that emits a valid base-2 digit
+`dStepZ(orbit n) − 2·orbit n ∈ {0,1}` at every step, is not eventually all-`1`s (excluding the
+degenerate dyadic tail), and whose recovered binary value is `W`.  This is the impossibility phrased on
+the *actual recurrence* of the `d`-step self-referential map.  General analogue of
+`CubicFinish.CubicRecurrenceRepresentable`. -/
+def DStepRecurrenceRepresentable (d : ℕ) (W : ℝ) : Prop :=
+  ∃ (c : ℕ → ℝ) (orbit : ℕ → ℤ),
+    (∀ n, orbit (n + 1) = dStepZ (rrt d) c (orbit n) d) ∧
+    (∀ n, dStepZ (rrt d) c (orbit n) d - 2 * orbit n = 0
+        ∨ dStepZ (rrt d) c (orbit n) d - 2 * orbit n = 1) ∧
+    (∀ N, ∃ k, N ≤ k ∧ dStepZ (rrt d) c (orbit k) d - 2 * orbit k = 0) ∧
+    W = (orbit 0 : ℝ) + ∑' k : ℕ,
+        ((dStepZ (rrt d) c (orbit k) d - 2 * orbit k : ℤ) : ℝ) * (1 / 2) ^ (k + 1)
+
+/-- **Almost no real is `d`-step-recurrence-representable** (`d ≥ 3`).  The self-referential capstone on
+the genuine recurrence: the set of `W` whose base-2 digits some degree-`d` schedule reads along its
+*own* orbit (`orbit(n+1) = dStepZ(orbit n)`) is Lebesgue-null.  The `binary_floor_eq` bridge identifies
+the recurrence orbit with the floor orbit of its value (`orbit n = ⌊W·2ⁿ⌋`), reducing to
+`ae_not_dStepDigitRepresentable`. -/
+theorem ae_not_dStepRecurrenceRepresentable (d : ℕ) (hd : 3 ≤ d) :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ DStepRecurrenceRepresentable d W := by
+  filter_upwards [ae_not_dStepDigitRepresentable d hd] with W hW
+  rintro ⟨c, orbit, hstep, hdig, htail, hWval⟩
+  set dig : ℕ → ℤ := fun k => dStepZ (rrt d) c (orbit k) d - 2 * orbit k with hdigdef
+  have hostep : ∀ n, orbit (n + 1) = 2 * orbit n + dig n := by
+    intro n; rw [hdigdef]; simp only; rw [hstep n]; ring
+  have hfloor : ∀ n, ⌊W * 2 ^ n⌋ = orbit n :=
+    binary_floor_eq (orbit 0) dig orbit hdig rfl hostep htail W hWval
+  refine hW ⟨c, fun n => ?_⟩
+  have hcast : dStepV (rrt d) c (orbit n) d - 2 * (orbit n : ℝ)
+      = ((dStepZ (rrt d) c (orbit n) d - 2 * orbit n : ℤ) : ℝ) := by
+    rw [← dStepZ_cast (rrt d) c (orbit n) d (by omega)]; push_cast; ring
+  rw [hfloor n, hcast]
+  rcases hdig n with h | h
+  · left; rw [h]; norm_num
+  · right; rw [h]; norm_num
+
 end Erdos482.General

@@ -57,6 +57,18 @@ noncomputable def dStepV (α : ℝ) (c : ℕ → ℝ) (u : ℤ) : ℕ → ℝ
 noncomputable def dStepF (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (k : ℕ) : ℝ :=
   Int.fract (α * (dStepV α c u k + c k))
 
+/-- **The integer output of the `d`-step floor map** `⌊α(v_{d-1} + c_{d-1})⌋` (`= v_d` for `d ≥ 1`).
+The final step is a floor, so `v_d` is an integer; `dStepZ` names that integer.  Used for the genuine
+self-referential recurrence `orbit(n+1) = dStepZ(orbit n)`. -/
+noncomputable def dStepZ (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (d : ℕ) : ℤ :=
+  ⌊α * (dStepV α c u (d - 1) + c (d - 1))⌋
+
+/-- `dStepZ` casts back to `dStepV` (for `d ≥ 1`): the last step of `dStepV` *is* the floor `dStepZ`. -/
+theorem dStepZ_cast (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (d : ℕ) (hd : 1 ≤ d) :
+    ((dStepZ α c u d : ℤ) : ℝ) = dStepV α c u d := by
+  obtain ⟨e, rfl⟩ : ∃ e, d = e + 1 := ⟨d - 1, by omega⟩
+  rw [dStepZ, Nat.add_sub_cancel, dStepV]
+
 /-- The schedule constant `C = ∑_{k<d} α^{d-k}·cₖ`. -/
 noncomputable def dStepC (α : ℝ) (c : ℕ → ℝ) (d : ℕ) : ℝ :=
   ∑ k ∈ Finset.range d, α ^ (d - k) * c k
