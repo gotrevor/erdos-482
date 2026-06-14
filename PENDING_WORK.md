@@ -36,24 +36,26 @@ The algebraic + abstract-geometric obstruction is now a **fully closed skeleton*
 `exists_partial_defect_outside_window` + range bounds are done).  The ONLY remaining gap is showing the
 *orbit* `⌊W2ⁿ⌋` actually *reaches* a bad fract-config (i.e. `Tᵈ` density a.e.-`W`).
 
-**Bridge LARGELY BUILT (`GeneralOrbit.lean`):** `dStepF_orbit` (floor errors via orbit coords),
-`orbitF`/`orbitF_eq` (the errors as a strong-recursion in the coordinate vector `r`),
-`dStepF_eq_orbitF` (the orbit error IS `orbitF` at `r i = {αⁱW2ⁿ}`), and **`dGpd` +
-`dStepPartial_eq_dGpd`** — the partial defect along the base-2 orbit equals `dGpd` at the
-`Tᵈ`-orbit-coordinate vector (the general `cubicPartialDefect_eq_Gpd`).  So **step 1 below is DONE
-except continuity**.  Remaining (mirror of the cubic/quartic finish, using the already-degree-agnostic
-`MultidimWeyl`/`EquidistDense`/`DELEngine`):
-1. **Orbit-coordinate form of `dStepPartial`** — ✅ DONE (`dStepPartial_eq_dGpd`).  TODO: `ContinuousAt`
-   of `dGpd` in `r` (product topology on `ℕ→ℝ`, `continuous_apply`) off the fract-jump set — by induction
-   on `k` via `continuousAt_fract` (mirror `continuousAt_cubicGpd`; the inner-arg-non-integer hypotheses
-   bundle over `k`).
-2. **General `Tᵈ` equidistribution/density** for a.e. `W` via `rpow_lin_indep_int` (⇒ `ξ=∑nᵢαⁱ≠0` ⇒
-   Weyl reduction) — the `MultidimWeyl.weyl_criterion_torus` + `ae_comp_mul_left` engine is degree-free.
-3. **General geometry crux** — ✅ DONE abstractly (`exists_partial_defect_outside_window`); just connect
-   `dGpd`'s value-range to it at a continuity point.
-4. **Headline assembly** — `ae_no_dStep_schedule_reads_base_two` for all `d ≥ 3`, uniform over schedules:
-   chain density (step 2) + continuity (step 1) against `dStep_partial_mem_window` +
-   `exists_partial_defect_outside_window`.
+**Bridge ESSENTIALLY COMPLETE (`GeneralOrbit.lean` + `GeneralTorusEquidist.lean`):**
+1. **Orbit-coordinate form + continuity — ✅ DONE.** `dStepF_orbit`, `orbitF`/`orbitF_eq` (strong
+   recursion in the coordinate vector `r`), `dStepF_eq_orbitF`, **`dGpd` + `dStepPartial_eq_dGpd`** (the
+   partial defect = `dGpd` at the `Tᵈ`-orbit coords; general `cubicPartialDefect_eq_Gpd`), and
+   **`continuousAt_dGpd`** (continuous off the fract-jump set; general `continuousAt_cubicGpd`).
+2. **General `Tᵈ` density — ✅ DONE.** `ae_W_dTorus_orbit_dense` (a.e.-`W`, `n↦(2ⁿαⁱW mod 1)_{i<d}` dense
+   in `Tᵈ`), via `dXi_ne_zero` (from `rpow_lin_indep_int`) + the degree-agnostic Weyl engine.
+3. **Geometry crux — ✅ DONE abstractly** (`exists_partial_defect_outside_window`) and **realization
+   ✅ DONE** (`realizeR`/`orbitArg_realizeR`/`orbitF_realizeR`: `orbitF` hits any interior target config).
+
+**ONLY the final geometric assembly remains** (`ae_no_dStep_schedule_reads_base_two`, `d ≥ 3`, uniform
+over schedules): construct a `Tᵈ` point `P` with **nonzero coords** (so `torusRep` is `ContinuousAt`
+each `P i`) whose `dGpd` value leaves the window `(C-2, C]`, then chain density (step 2) + continuity
+(step 1) via `EquidistDense.exists_{lt,gt}_of_dense_continuousAt` against `dStep_partial_mem_window`.
+The delicate part is the **nonzero-coordinate** realization (the cubic's `fract_shift_realize` +
+`cubicGpd_exceeds_window` spent ~125 lines on `d=3`): `realizeR` sets `r 0 = 0`, so the first torus coord
+is `0` — needs a variant landing all coords in `(0,1)` and non-integer (so the `orbitArg`s stay off `ℤ`),
+or a perturbation within the open super-window set. Define `dGpdTorus d α c (a : Fin d → AddCircle)
+:= dGpd α c (fun i => if h:i<d then torusRep (a ⟨i,h⟩) else 0) (d-1)` and `dGpdTorus_orbit`
+(= `dStepPartial … d` via `dStepPartial_eq_dGpd` + `torusRep_coe`), then mirror `CubicFinish` lines 268+.
 
 ---
 
