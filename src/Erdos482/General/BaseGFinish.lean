@@ -1,5 +1,6 @@
 import Erdos482.General.GeneralTorusFinish
 import Erdos482.General.BaseGTorusEquidist
+import Erdos482.General.GaryExpansion
 
 /-!
 # The base-`g` general-degree impossibility (uniform over schedules)
@@ -222,5 +223,103 @@ theorem ae_no_dStep_schedule_reads_base_three :
     grt_lt_bound 3 3 (by norm_num) (by norm_num) (by norm_num)
   exact ae_no_dStep_schedule_reads_base_g 3 3 (by norm_num) (by norm_num) hbound 3
     (by norm_num) (by norm_num) (by norm_num)
+
+/-- `⌊g·x⌋ − g·⌊x⌋ ∈ {0,…,g-1}`: the base-`g` digit extracted by the doubling-to-`g` map.  Base-`g`
+analogue of `floor_two_mul_sub_mem`. -/
+theorem floor_g_mul_sub_mem (g : ℕ) (hg : 0 < g) (x : ℝ) :
+    0 ≤ ⌊(g : ℝ) * x⌋ - (g : ℤ) * ⌊x⌋ ∧ ⌊(g : ℝ) * x⌋ - (g : ℤ) * ⌊x⌋ ≤ (g : ℤ) - 1 := by
+  have hg0 : (0 : ℝ) ≤ (g : ℝ) := by positivity
+  have hg0' : (0 : ℝ) < (g : ℝ) := by exact_mod_cast hg
+  have hlo : (g : ℤ) * ⌊x⌋ ≤ ⌊(g : ℝ) * x⌋ := by
+    rw [Int.le_floor]; push_cast; nlinarith [Int.floor_le x]
+  have hhi : ⌊(g : ℝ) * x⌋ < (g : ℤ) * ⌊x⌋ + (g : ℤ) := by
+    rw [Int.floor_lt]; push_cast; nlinarith [Int.lt_floor_add_one x]
+  omega
+
+/-- **`W` is base-`g` `d`-step-digit-representable** if some degree-`d` schedule emits a valid base-`g`
+digit `dStepV(uₙ) − g·uₙ ∈ {0,…,g-1}` at every step of the block orbit `uₙ = ⌊W·gⁿ⌋`. -/
+def DStepDigitRepresentableBaseG (g d : ℕ) (W : ℝ) : Prop :=
+  ∃ c : ℕ → ℝ, ∀ n : ℕ,
+    0 ≤ dStepV (grt g d) c ⌊W * (g : ℝ) ^ n⌋ d - (g : ℝ) * (⌊W * (g : ℝ) ^ n⌋ : ℝ)
+      ∧ dStepV (grt g d) c ⌊W * (g : ℝ) ^ n⌋ d - (g : ℝ) * (⌊W * (g : ℝ) ^ n⌋ : ℝ) ≤ (g : ℝ) - 1
+
+/-- **Almost no real is base-`g` `d`-step-digit-representable.**  Immediate from
+`ae_no_dStep_schedule_reads_base_g`. -/
+theorem ae_not_DStepDigitRepresentableBaseG (g d : ℕ) (hg : 2 ≤ g) (hd : 2 ≤ d)
+    (hbound : grt g d < 2 * (g : ℝ) / ((g : ℝ) + 1))
+    (p : ℕ) (hp : p.Prime) (hpg : p ∣ g) (hpg2 : ¬ (p ^ 2 ∣ g)) :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ DStepDigitRepresentableBaseG g d W := by
+  filter_upwards [ae_no_dStep_schedule_reads_base_g g d hg hd hbound p hp hpg hpg2] with W hW
+  rintro ⟨c, hall⟩
+  obtain ⟨n, hn⟩ := hW c
+  exact hn (hall n)
+
+/-- **The `d`-step map computes `W`'s base-`g` shift** if some schedule sends each block `uₙ = ⌊W·gⁿ⌋`
+to the next, `dStepV(uₙ) = ⌊W·gⁿ⁺¹⌋` for all `n`. -/
+def DStepReadsBaseG (g d : ℕ) (W : ℝ) : Prop :=
+  ∃ c : ℕ → ℝ, ∀ n : ℕ, dStepV (grt g d) c ⌊W * (g : ℝ) ^ n⌋ d = (⌊W * (g : ℝ) ^ (n + 1)⌋ : ℝ)
+
+/-- **The `d`-step map computes no real's base-`g` shift, for almost every `W`.**  Correct reading forces
+every emitted digit `dStepV(uₙ) − g·uₙ = ⌊W·gⁿ⁺¹⌋ − g·⌊W·gⁿ⌋ ∈ {0,…,g-1}` (`floor_g_mul_sub_mem`), i.e.
+`DStepDigitRepresentableBaseG`, which is a.e. false. -/
+theorem ae_not_DStepReadsBaseG (g d : ℕ) (hg : 2 ≤ g) (hd : 2 ≤ d)
+    (hbound : grt g d < 2 * (g : ℝ) / ((g : ℝ) + 1))
+    (p : ℕ) (hp : p.Prime) (hpg : p ∣ g) (hpg2 : ¬ (p ^ 2 ∣ g)) :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ DStepReadsBaseG g d W := by
+  have hgpos : 0 < g := by omega
+  filter_upwards [ae_not_DStepDigitRepresentableBaseG g d hg hd hbound p hp hpg hpg2] with W hW
+  rintro ⟨c, hread⟩
+  refine hW ⟨c, fun n => ?_⟩
+  have hdouble : ⌊W * (g : ℝ) ^ (n + 1)⌋ = ⌊(g : ℝ) * (W * (g : ℝ) ^ n)⌋ := by
+    congr 1; rw [show (g : ℝ) ^ (n + 1) = (g : ℝ) * (g : ℝ) ^ n by ring]; ring
+  rw [hread n, hdouble]
+  obtain ⟨hlo, hhi⟩ := floor_g_mul_sub_mem g hgpos (W * (g : ℝ) ^ n)
+  have hcast : (⌊(g : ℝ) * (W * (g : ℝ) ^ n)⌋ : ℝ) - (g : ℝ) * (⌊W * (g : ℝ) ^ n⌋ : ℝ)
+      = ((⌊(g : ℝ) * (W * (g : ℝ) ^ n)⌋ - (g : ℤ) * ⌊W * (g : ℝ) ^ n⌋ : ℤ) : ℝ) := by
+    push_cast; ring
+  rw [hcast]
+  constructor
+  · exact_mod_cast hlo
+  · have : ((⌊(g : ℝ) * (W * (g : ℝ) ^ n)⌋ - (g : ℤ) * ⌊W * (g : ℝ) ^ n⌋ : ℤ) : ℝ)
+        ≤ (((g : ℤ) - 1 : ℤ) : ℝ) := by exact_mod_cast hhi
+    push_cast at this; linarith
+
+/-- **`W` is base-`g` `d`-step-recurrence-representable** if some schedule admits a self-referential
+recurrence orbit `orbit(n+1) = dStepZ(orbit n)` emitting a valid base-`g` digit at every step, not
+eventually all `g-1`, whose recovered base-`g` value is `W`.  Base-`g` analogue of
+`DStepRecurrenceRepresentable`. -/
+def DStepRecurrenceRepresentableBaseG (g d : ℕ) (W : ℝ) : Prop :=
+  ∃ (c : ℕ → ℝ) (orbit : ℕ → ℤ),
+    (∀ n, orbit (n + 1) = dStepZ (grt g d) c (orbit n) d) ∧
+    (∀ n, 0 ≤ dStepZ (grt g d) c (orbit n) d - (g : ℤ) * orbit n
+        ∧ dStepZ (grt g d) c (orbit n) d - (g : ℤ) * orbit n ≤ (g : ℤ) - 1) ∧
+    (∀ N, ∃ k, N ≤ k ∧ dStepZ (grt g d) c (orbit k) d - (g : ℤ) * orbit k ≤ (g : ℤ) - 2) ∧
+    W = (orbit 0 : ℝ) + ∑' k : ℕ,
+        ((dStepZ (grt g d) c (orbit k) d - (g : ℤ) * orbit k : ℤ) : ℝ) * (1 / (g : ℝ)) ^ (k + 1)
+
+/-- **Almost no real is base-`g` `d`-step-recurrence-representable.**  The base-`g` self-referential
+capstone: the set of `W` whose base-`g` digits some degree-`d` schedule reads along its *own* orbit is
+Lebesgue-null.  The `gary_floor_eq` bridge identifies the recurrence orbit with the floor orbit of its
+value (`orbit n = ⌊W·gⁿ⌋`), reducing to `ae_not_DStepDigitRepresentableBaseG`. -/
+theorem ae_not_DStepRecurrenceRepresentableBaseG (g d : ℕ) (hg : 2 ≤ g) (hd : 2 ≤ d)
+    (hbound : grt g d < 2 * (g : ℝ) / ((g : ℝ) + 1))
+    (p : ℕ) (hp : p.Prime) (hpg : p ∣ g) (hpg2 : ¬ (p ^ 2 ∣ g)) :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ DStepRecurrenceRepresentableBaseG g d W := by
+  filter_upwards [ae_not_DStepDigitRepresentableBaseG g d hg hd hbound p hp hpg hpg2] with W hW
+  rintro ⟨c, orbit, hstep, hdig, htail, hWval⟩
+  set dig : ℕ → ℤ := fun k => dStepZ (grt g d) c (orbit k) d - (g : ℤ) * orbit k with hdigdef
+  have hostep : ∀ n, orbit (n + 1) = (g : ℤ) * orbit n + dig n := by
+    intro n; rw [hdigdef]; simp only; rw [hstep n]; ring
+  have hfloor : ∀ n, ⌊W * (g : ℝ) ^ n⌋ = orbit n :=
+    gary_floor_eq hg (orbit 0) dig orbit hdig rfl hostep htail W hWval
+  refine hW ⟨c, fun n => ?_⟩
+  have hcast : dStepV (grt g d) c (orbit n) d - (g : ℝ) * (orbit n : ℝ)
+      = ((dStepZ (grt g d) c (orbit n) d - (g : ℤ) * orbit n : ℤ) : ℝ) := by
+    rw [← dStepZ_cast (grt g d) c (orbit n) d (by omega)]; push_cast; ring
+  rw [hfloor n, hcast]
+  obtain ⟨hlo, hhi⟩ := hdig n
+  refine ⟨by exact_mod_cast hlo, ?_⟩
+  have hcast2 : (((g : ℤ) - 1 : ℤ) : ℝ) = (g : ℝ) - 1 := by push_cast; ring
+  rw [← hcast2]; exact_mod_cast hhi
 
 end Erdos482.General
