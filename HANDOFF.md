@@ -25,9 +25,9 @@ The **fixed-`W`** impossibility is a famous **open problem** (Mahler's 3/2) — 
 This is a THIN POINTER. The durable state lives in:
 - **[`REFLECTION.md`](REFLECTION.md)** — the 2026-06-14 direction call (read first).
 - **[`STATUS.md`](STATUS.md)** — the living overview + axiom ledger (refreshed each review lap).
-- **Newest baton** — [`HANDOFF-2026-06-14-1228.md`](HANDOFF-2026-06-14-1228.md) (base-`g` impossibility
-  complete for every `g≥2`; note: that baton's "Next actions #1" (`_odd` headline) is SUPERSEDED by the
-  reflection's STOP call — do consolidation instead).
+- **Newest baton** — [`HANDOFF-2026-06-14-1247.md`](HANDOFF-2026-06-14-1247.md) (reflection lap:
+  impossibility axis saturated → consolidation delivered: `Statement.lean` audit surface +
+  `UPSTREAM-EQUIDISTRIBUTION.md` brief + deprecation sweep; next = upstream-prep, NOT another base).
 - **[`PENDING_WORK.md`](PENDING_WORK.md)** — ★★★★★ authoritative state + roadmap.
 
 ## Standing rules
