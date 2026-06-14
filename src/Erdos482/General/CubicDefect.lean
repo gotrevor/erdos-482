@@ -135,4 +135,19 @@ theorem cubic_threestep_digit_pair_fails (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) 
   rw [hcast] at hreal
   rcases hb with h | h <;> rcases hb' with h' | h' <;> rw [h, h'] at hreal <;> norm_num at hreal
 
+/-- **The precise reduction to equidistribution (positive form).**  If the three-step cubic map reads
+base-2 digits at two starts `u, u'` — i.e. both digits `cubicV3 − 2u`, `cubicV3' − 2u'` are in `{0,1}`
+— then the two combined defects differ by at most `1`.  Equivalently: a schedule that reads base-2
+digits along an orbit forces *all* the orbit's combined defects into a single width-1 window.  Since the
+defect *range* is `α²+α+1 > 1` (`cubic_combined_defect_range_wide`), the obstruction is exactly that the
+orbit must avoid exploring that full range — the (open, for fixed `ξ`) `{α^n ξ}` equidistribution
+question.  This is the clean statement to chain a future equidistribution lemma against. -/
+theorem cubic_valid_digits_defects_close (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) (u u' : ℤ)
+    (hu : cubicV3 α c0 c1 c2 u - 2 * u = 0 ∨ cubicV3 α c0 c1 c2 u - 2 * u = 1)
+    (hu' : cubicV3 α c0 c1 c2 u' - 2 * u' = 0 ∨ cubicV3 α c0 c1 c2 u' - 2 * u' = 1) :
+    |cubicDefect α c0 c1 c2 u - cubicDefect α c0 c1 c2 u'| ≤ 1 := by
+  by_contra hgt
+  push_neg at hgt
+  exact cubic_threestep_digit_pair_fails α c0 c1 c2 hα u u' hgt ⟨hu, hu'⟩
+
 end Erdos482.General
