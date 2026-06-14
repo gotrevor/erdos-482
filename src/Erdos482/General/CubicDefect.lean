@@ -219,7 +219,7 @@ theorem cubic_valid_digits_defects_close (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) 
     (hu' : cubicV3 α c0 c1 c2 u' - 2 * u' = 0 ∨ cubicV3 α c0 c1 c2 u' - 2 * u' = 1) :
     |cubicDefect α c0 c1 c2 u - cubicDefect α c0 c1 c2 u'| ≤ 1 := by
   by_contra hgt
-  push_neg at hgt
+  push Not at hgt
   exact cubic_threestep_digit_pair_fails α c0 c1 c2 hα u u' hgt ⟨hu, hu'⟩
 
 /-- `2^{1/3}` is irrational — the base prerequisite for any equidistribution argument on this frontier

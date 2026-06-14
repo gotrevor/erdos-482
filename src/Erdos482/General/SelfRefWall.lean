@@ -46,7 +46,7 @@ theorem selfref_crux_fails_of_three_le (g : ℕ) (hg : 3 ≤ g) (c : ℝ) :
   have hs_gt1 : 1 < s := by nlinarith [hs2, hgR3, hspos]
   have hs_lt_g : s < (g : ℝ) := by nlinarith [hs2, mul_pos hspos (show (0 : ℝ) < s - 1 by linarith)]
   by_contra h
-  push_neg at h
+  push Not at h
   -- witness A : x = g − 1  ⇒  lower bound forces  s·(g−1) ≤ c·s·g
   have hA := h ((g : ℝ) - 1)
   have hfA1 : Int.fract ((g : ℝ) - 1) = 0 := by
@@ -80,7 +80,7 @@ theorem selfref_crux_fails_of_three_le (g : ℕ) (hg : 3 ≤ g) (c : ℝ) :
   have hlin : 2 * (s * g) - 3 * s - (g : ℝ) < 0 := by nlinarith [hAg, hB']
   have hkey : 2 * (g : ℝ) - s - 3 < 0 := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     have hmul : 0 ≤ s * (2 * (g : ℝ) - s - 3) := mul_nonneg (le_of_lt hspos) hcon
     nlinarith [hmul, hlin, hs2]
   nlinarith [hkey, hs_lt_g, hgR3]
@@ -246,7 +246,7 @@ theorem onefloor_div2_crux_solvable_iff (β : ℝ) (hβ0 : 0 ≤ β) :
   constructor
   · rintro ⟨c, hc⟩
     by_contra hge
-    push_neg at hge   -- `2 ≤ β`
+    push Not at hge   -- `2 ≤ β`
     have hf1 : Int.fract (1 : ℝ) = 0 := by
       rw [show (1 : ℝ) = ((1 : ℤ) : ℝ) by norm_num, Int.fract_intCast]
     have hf12 : Int.fract ((1 : ℝ) / 2) = 1 / 2 := Int.fract_eq_self.mpr (by constructor <;> norm_num)

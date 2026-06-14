@@ -146,7 +146,7 @@ theorem exists_exceeding_torus_point (d : ℕ) (hd : 3 ≤ d) (c : ℕ → ℝ) 
   have huncount : ¬ (Set.Ioo (0 : ℝ) 1).Countable := by
     rw [Cardinal.Real.Ioo_countable_iff]; norm_num
   obtain ⟨σ, hσio, hσB⟩ : ∃ σ, σ ∈ Set.Ioo (0 : ℝ) 1 ∧ σ ∉ B := by
-    by_contra hcon; push_neg at hcon
+    by_contra hcon; push Not at hcon
     exact huncount (hBcount.mono (fun x hx => hcon x hx))
   -- the realizer and its coordinate properties
   set r : ℕ → ℝ := realizeR0 α c τ σ with hrdef

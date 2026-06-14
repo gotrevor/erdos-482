@@ -84,7 +84,7 @@ theorem quarticGpd_exceeds_window_general (α c0 c1 c2 : ℝ) (hα : 1 < α) (h�
         mul_pos (show (0:ℝ) < α ^ 2 by positivity) (sub_pos.mpr hfBlo),
         mul_pos hαpos (sub_pos.mpr hfClo), hmul]
   · -- value < C - 2; choose fA, fB, fC near 0
-    push_neg at hC
+    push Not at hC
     have hC2 : 0 < C - 2 := by linarith
     set hi := min (1 / 2) ((C - 2) / (α ^ 3 + α ^ 2 + α)) with hidef
     have hipos : 0 < hi := by
@@ -224,7 +224,7 @@ theorem ae_no_quartic_schedule_reads_base_two :
   filter_upwards [ae_W_quartic_torus_orbit_dense] with W hdense
   intro c0 c1 c2 c3
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   set C : ℝ := 2 * c0 + qrt2 ^ 3 * c1 + qrt2 ^ 2 * c2 + qrt2 * c3 with hC
   have hwin : ∀ n : ℕ, C - 2 < quarticGpdTorus qrt2 c0 c1 c2 (quarticTorusOrbit W n)
       ∧ quarticGpdTorus qrt2 c0 c1 c2 (quarticTorusOrbit W n) ≤ C := by

@@ -45,7 +45,7 @@ theorem isEquidistributed_dense {X : Type*} [TopologicalSpace X] [CompactSpace X
     Dense (Set.range x) := by
   rw [dense_iff_inter_open]
   by_contra h
-  push_neg at h
+  push Not at h
   obtain ⟨U, hUopen, ⟨p, hpU⟩, hUempty⟩ := h
   have hrange : ∀ n, x n ∉ U := by
     intro n hn

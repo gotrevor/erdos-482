@@ -207,7 +207,7 @@ theorem cubicGpd_exceeds_window_general (α c0 c1 : ℝ) (hα : 1 < α) (hα3 : 
       nlinarith [mul_pos (show (0:ℝ)<α^2 by positivity) (sub_pos.mpr hfAlo),
                  mul_pos hαpos (sub_pos.mpr hfBlo), hmul]
   · -- value < C - 2; choose fA, fB near 0
-    push_neg at hC
+    push Not at hC
     have hC2 : 0 < C - 2 := by linarith
     set hi := min (1/2) ((C-2)/(α^2+α)) with hidef
     have hipos : 0 < hi := by
@@ -273,7 +273,7 @@ theorem ae_no_cubic_schedule_reads_base_two :
   filter_upwards [ae_W_cubic_torus_orbit_dense] with W hdense
   intro c0 c1 c2
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   -- `hcon : ∀ n, digitₙ = 0 ∨ digitₙ = 1`.  Window confinement of the partial defect along the orbit.
   set C : ℝ := 2 * c0 + cbrt2 ^ 2 * c1 + cbrt2 * c2 with hC
   have hwin : ∀ n : ℕ, C - 2 < cubicGpdTorus cbrt2 c0 c1 (cubicTorusOrbit W n)
