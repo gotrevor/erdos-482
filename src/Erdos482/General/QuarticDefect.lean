@@ -101,6 +101,84 @@ theorem quartic_combined_defect_range_wide_qrt2 :
       qrt2 ^ 3 * f1 + qrt2 ^ 2 * f2 + qrt2 * f3 + f4 ∈ Set.Icc C (C + 2) :=
   quartic_combined_defect_range_wide qrt2 one_lt_qrt2
 
+/-! ### The defect collapse: the fourth floor error is forced, and the digit is `⌊C − g⌋`.
+
+Mirrors the cubic `g`-collapse (`CubicDefect.cubic_f3_eq` … `cubic_partial_defect_mem_window`).  The
+*three*-floor partial defect `g = α³f₁ + α²f₂ + αf₃` (the first three internal errors) governs the whole
+quartic readout: the fourth error is forced `f₄ = {C − g}`, the extracted digit is `⌊C − g⌋`, and a
+base-2 digit confines `g` to the width-2 window `(C−2, C]`.  Since `g` ranges over `[0, α³+α²+α)` with
+width `α³+α²+α ≈ 4.28 > 2`, an orbit exploring that range leaves the window. -/
+
+/-- The **three-floor partial defect** `g = α³f₁ + α²f₂ + αf₃` of the four-step map. -/
+noncomputable def quarticPartialDefect (α c0 c1 c2 c3 : ℝ) (u : ℤ) : ℝ :=
+  α ^ 3 * Int.fract (α * ((u : ℝ) + c0))
+    + α ^ 2 * Int.fract (α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1))
+    + α * Int.fract (α * (((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ) + c2))
+
+/-- **The fourth floor error is forced**: `f₄ = {C − g}`, `C = 2c₀+α³c₁+α²c₂+αc₃`, `g` the partial
+defect.  (Because `α(v₃+c₃) = 2u + C − g` with `2u ∈ ℤ`.)  Pure algebra from `α⁴ = 2`. -/
+theorem quartic_f4_eq (α c0 c1 c2 c3 : ℝ) (hα : α ^ 4 = 2) (u : ℤ) :
+    Int.fract (α * (((⌊α * (((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ) + c2)⌋ : ℤ) : ℝ) + c3))
+      = Int.fract ((2 * c0 + α ^ 3 * c1 + α ^ 2 * c2 + α * c3)
+          - quarticPartialDefect α c0 c1 c2 c3 u) := by
+  have harg : α * (((⌊α * (((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ) + c2)⌋ : ℤ) : ℝ) + c3)
+      = ((2 * c0 + α ^ 3 * c1 + α ^ 2 * c2 + α * c3) - quarticPartialDefect α c0 c1 c2 c3 u)
+        + 2 * (u : ℝ) := by
+    simp only [quarticPartialDefect]
+    have hv1 : ((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ)
+        = α * ((u : ℝ) + c0) - Int.fract (α * ((u : ℝ) + c0)) := (Int.self_sub_fract _).symm
+    have hv2 : ((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ)
+        = α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)
+            - Int.fract (α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)) := (Int.self_sub_fract _).symm
+    have hv3 : ((⌊α * (((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ) + c2)⌋ : ℤ) : ℝ)
+        = α * (((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ) + c2)
+            - Int.fract (α * (((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ) + c2)) :=
+      (Int.self_sub_fract _).symm
+    linear_combination α * hv3 + α ^ 2 * hv2 + α ^ 3 * hv1 + (u + c0) * hα
+  rw [harg, show (2 * (u : ℝ)) = ((2 * u : ℤ) : ℝ) by push_cast; ring, Int.fract_add_intCast]
+
+/-- **The combined defect collapses to a floor of the partial defect**: `quarticDefect = C − ⌊C − g⌋`. -/
+theorem quarticDefect_eq_C_sub_floor (α c0 c1 c2 c3 : ℝ) (hα : α ^ 4 = 2) (u : ℤ) :
+    quarticDefect α c0 c1 c2 c3 u
+      = (2 * c0 + α ^ 3 * c1 + α ^ 2 * c2 + α * c3)
+        - (⌊(2 * c0 + α ^ 3 * c1 + α ^ 2 * c2 + α * c3)
+            - quarticPartialDefect α c0 c1 c2 c3 u⌋ : ℤ) := by
+  have hsplit : quarticDefect α c0 c1 c2 c3 u
+      = quarticPartialDefect α c0 c1 c2 c3 u
+        + Int.fract (α * (((⌊α * (((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ)
+            + c2)⌋ : ℤ) : ℝ) + c3)) := by
+    simp only [quarticDefect, quarticPartialDefect]
+  rw [hsplit, quartic_f4_eq α c0 c1 c2 c3 hα u]
+  simp only [Int.fract]; ring_nf
+
+/-- **The extracted digit is a floor of the partial defect**: `quarticV4 − 2u = ⌊C − g⌋`. -/
+theorem quartic_digit_eq_floor (α c0 c1 c2 c3 : ℝ) (hα : α ^ 4 = 2) (u : ℤ) :
+    quarticV4 α c0 c1 c2 c3 u - 2 * u
+      = ⌊(2 * c0 + α ^ 3 * c1 + α ^ 2 * c2 + α * c3) - quarticPartialDefect α c0 c1 c2 c3 u⌋ := by
+  have h1 := quarticV4_sub_eq α c0 c1 c2 c3 hα u
+  rw [quarticDefect_eq_C_sub_floor α c0 c1 c2 c3 hα u] at h1
+  have hr : ((quarticV4 α c0 c1 c2 c3 u - 2 * u : ℤ) : ℝ)
+      = ((⌊(2 * c0 + α ^ 3 * c1 + α ^ 2 * c2 + α * c3)
+          - quarticPartialDefect α c0 c1 c2 c3 u⌋ : ℤ) : ℝ) := by
+    push_cast; push_cast at h1; linarith
+  exact_mod_cast hr
+
+/-- **A base-2 digit confines the partial defect to a width-2 window**: if `quarticV4 − 2u ∈ {0,1}` then
+`g = α³f₁+α²f₂+αf₃ ∈ (C−2, C]`.  Since the partial-defect range `[0, α³+α²+α)` has width `> 2`, an orbit
+that explored it would leave this window — the quartic analogue of `cubic_partial_defect_mem_window`. -/
+theorem quartic_partial_defect_mem_window (α c0 c1 c2 c3 : ℝ) (hα : α ^ 4 = 2) (u : ℤ)
+    (hdig : quarticV4 α c0 c1 c2 c3 u - 2 * u = 0 ∨ quarticV4 α c0 c1 c2 c3 u - 2 * u = 1) :
+    (2 * c0 + α ^ 3 * c1 + α ^ 2 * c2 + α * c3) - 2 < quarticPartialDefect α c0 c1 c2 c3 u
+      ∧ quarticPartialDefect α c0 c1 c2 c3 u ≤ (2 * c0 + α ^ 3 * c1 + α ^ 2 * c2 + α * c3) := by
+  have hfloor := quartic_digit_eq_floor α c0 c1 c2 c3 hα u
+  set C := 2 * c0 + α ^ 3 * c1 + α ^ 2 * c2 + α * c3 with hC
+  rw [hfloor] at hdig
+  have hle : ((⌊C - quarticPartialDefect α c0 c1 c2 c3 u⌋ : ℤ) : ℝ)
+      ≤ C - quarticPartialDefect α c0 c1 c2 c3 u := Int.floor_le _
+  have hlt : C - quarticPartialDefect α c0 c1 c2 c3 u
+      < (⌊C - quarticPartialDefect α c0 c1 c2 c3 u⌋ : ℤ) + 1 := Int.lt_floor_add_one _
+  rcases hdig with h | h <;> rw [h] at hle hlt <;> push_cast at hle hlt <;> constructor <;> linarith
+
 end
 
 end Erdos482.General
