@@ -44,25 +44,23 @@ the a.e.-`W` unconditional cubic. Corrects the prior handoff (which framed the w
 - (b) ✅ **DONE 2026-06-14** — `DoublingEquidist.ae_doubling_orbit_equidistributed`: for a.e. `s∈[0,1]`,
   `n↦↑(2ⁿs)` is `IsEquidistributed` on `ℝ/ℤ` (axiom-clean). Built from `ae_doubling_weyl_tendsto`
   (per-`k` DEL chain) + `norm_doubling_exp`. This IS Borel base-2 normality, DEL-style, NOT in mathlib.
-- (c) **NEXT FRONTIER** — lift to `T³` via brick #2 (`ξ=a+bα+cα²≠0`). Decomposition (3 pieces):
-  1. **periodicity + scaling transfer** (TRACTABLE, do first): from (b)'s a.e.-`s∈[0,1]` get a.e.-`s∈ℝ`
-     (orbit on `ℝ/ℤ` depends only on `s mod 1`; `2ⁿ(s+m)≡2ⁿs`), then for fixed `ξ≠0`, a.e.-`W`:
-     `IsEquidistributed (orbit (ξW))` (bad `W`-set `= ξ⁻¹·`bad `s`-set, null — scaling preserves null).
-     mathlib: `MeasureTheory.measurePreserving_mul_left`/null-set scaling; small lemmas.
-  2. **multidimensional Weyl criterion** (DE-RISKED 2026-06-14 — `mFourier` IS in mathlib): a sequence
-     in `UnitAddTorus d = d → AddCircle 1` is equidistributed iff every nonzero character `mFourier n`
-     (`n : d→ℤ`, `= ∏ᵢ fourier (nᵢ)`) has vanishing Cesàro mean. **This is a near-MIRROR of the 1-D
-     `weyl_criterion`** using `Mathlib.Analysis.Fourier.AddCircleMulti`: `mFourier`, `mFourier_zero`
-     (`=1`), `mFourier_norm` (`=1` ⇒ the uniform `norm_cesaro_le` bound carries over),
-     `span_mFourier_closure_eq_top` (torus Stone–Weierstrass — the density step). Integral fact
-     `∫ mFourier n = δ_{n,0}` via the product/`orthonormal_mFourier` API. `UnitAddTorus d` volume is the
-     product probability Haar. THEN: combine pieces 1+2 with `cubic_lin_indep_int` ⇒ a.e.-`W`,
-     `2ⁿ(W,αW,α²W)` equidistributes in `T³` (`d=Fin 3`); the `n`-character Cesàro mean is
-     `(1/N)∑e(2πi·2ⁿ·ξW)` with `ξ=∑nᵢαⁱ⁻¹≠0`, exactly piece 1's scalar sum at `s=ξW`.
-  3. **defect link** (ties to `CubicDefect`): T³ equidistribution ⇒ joint `(f₁,f₂,f₃)` not confined to
-     the two planes `{α²x+αy+z∈{C,C−1}}` (`cubic_orbit_defect_confined`) ⇒ no cubic schedule reads
-     a.e. `W`'s base-2 digits. Needs: express `fᵢ` as (piecewise-continuous) functions of the `T³`
-     orbit point, and show the defect range on a dense orbit exceeds width 1 (`cubic_combined_defect_range_wide`).
+- (c) **IN PROGRESS** — lift to `T³` via brick #2 (`ξ=a+bα+cα²≠0`). Decomposition (3 pieces):
+  1. ✅ **scaling transfer DONE 2026-06-14** — `DELEngine.ae_comp_mul_left` (Aristotle `10ed15fc`):
+     `P a.e. ⇒ P(c·W) a.e.` for `c≠0` (via `addHaar_preimage_smul`). [Still TODO: the small periodicity
+     step a.e.-`s∈[0,1]` → a.e.-`s∈ℝ` for the doubling Weyl sum, which is 1-periodic in `s`; or restate
+     step (b) over full `ℝ` volume directly.]
+  2. ✅ **multidimensional Weyl criterion DONE 2026-06-14** — `MultidimWeyl.weyl_criterion_torus`
+     (+ `IsEquidistributedTorus`, `integral_mFourier_eq`): vanishing nonzero `mFourier`-character Cesàro
+     means ⇒ equidistributed on `Tᵈ`. Exact mirror of `weyl_criterion` via `mFourier`/`mFourier_zero`/
+     `span_mFourier_closure_eq_top` + Fubini integral fact + generic `norm_cesaro_le`. Axiom-clean.
+     **NEXT (assembly):** combine pieces 1+2 with `cubic_lin_indep_int` ⇒ a.e.-`W`, `2ⁿ(W,αW,α²W)`
+     equidistributes in `T³` (`d=Fin 3`); the `n`-character Cesàro mean is `(1/N)∑e(2πi·2ⁿ·ξW)` with
+     `ξ=∑nᵢαⁱ⁻¹≠0`, exactly piece 1's scalar sum at `s=ξW` (= `ae_doubling_weyl_tendsto 1` scaled).
+  3. **defect link** (NEXT FRONTIER — ties to `CubicDefect`): T³ equidist ⇒ (via `equidistributed ⇒
+     Dense`, a clean general corollary [Aristotle candidate]) joint `(f₁,f₂,f₃)` dense ⇒ not confined to
+     the two planes `{α²x+αy+z∈{C,C−1}}` (`cubic_orbit_defect_confined`) ⇒ no cubic schedule reads a.e.
+     `W`'s base-2 digits. Needs: express `fᵢ` as (piecewise-cts) functions of the `T³` orbit point, and
+     show the defect range on a dense orbit exceeds width 1 (`cubic_combined_defect_range_wide`).
   **Result:** unconditional a.e.-`W` cubic impossibility. (Specific-`W` stays open math.)
 
 **The precise reduction (worked out this lap).** A digit-reading orbit forces the joint floor coords
