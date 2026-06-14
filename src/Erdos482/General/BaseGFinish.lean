@@ -372,4 +372,65 @@ theorem ae_not_DStepRecurrenceRepresentableBaseG (g d : ℕ) (hg : 2 ≤ g) (hd 
   have hcast2 : (((g : ℤ) - 1 : ℤ) : ℝ) = (g : ℝ) - 1 := by push_cast; ring
   rw [← hcast2]; exact_mod_cast hhi
 
+/-- Pointwise: not-digit-representable ⟹ not-reads-base-`g` (the shift-computing form forces every digit
+into `{0,…,g-1}` via `floor_g_mul_sub_mem`). -/
+theorem not_DStepReadsBaseG_of_not_digit (g d : ℕ) (hg : 2 ≤ g) (W : ℝ)
+    (hW : ¬ DStepDigitRepresentableBaseG g d W) : ¬ DStepReadsBaseG g d W := by
+  have hgpos : 0 < g := by omega
+  rintro ⟨c, hread⟩
+  refine hW ⟨c, fun n => ?_⟩
+  have hdouble : ⌊W * (g : ℝ) ^ (n + 1)⌋ = ⌊(g : ℝ) * (W * (g : ℝ) ^ n)⌋ := by
+    congr 1; rw [show (g : ℝ) ^ (n + 1) = (g : ℝ) * (g : ℝ) ^ n by ring]; ring
+  rw [hread n, hdouble]
+  obtain ⟨hlo, hhi⟩ := floor_g_mul_sub_mem g hgpos (W * (g : ℝ) ^ n)
+  have hcast : (⌊(g : ℝ) * (W * (g : ℝ) ^ n)⌋ : ℝ) - (g : ℝ) * (⌊W * (g : ℝ) ^ n⌋ : ℝ)
+      = ((⌊(g : ℝ) * (W * (g : ℝ) ^ n)⌋ - (g : ℤ) * ⌊W * (g : ℝ) ^ n⌋ : ℤ) : ℝ) := by
+    push_cast; ring
+  rw [hcast]
+  refine ⟨by exact_mod_cast hlo, ?_⟩
+  have hc2 : (((g : ℤ) - 1 : ℤ) : ℝ) = (g : ℝ) - 1 := by push_cast; ring
+  rw [← hc2]; exact_mod_cast hhi
+
+/-- Pointwise: not-digit-representable ⟹ not-recurrence-representable (`gary_floor_eq` identifies the
+recurrence orbit with the floor orbit of its value). -/
+theorem not_DStepRecurrenceRepresentableBaseG_of_not_digit (g d : ℕ) (hg : 2 ≤ g) (hd : 1 ≤ d) (W : ℝ)
+    (hW : ¬ DStepDigitRepresentableBaseG g d W) : ¬ DStepRecurrenceRepresentableBaseG g d W := by
+  rintro ⟨c, orbit, hstep, hdig, htail, hWval⟩
+  set dig : ℕ → ℤ := fun k => dStepZ (grt g d) c (orbit k) d - (g : ℤ) * orbit k with hdigdef
+  have hostep : ∀ n, orbit (n + 1) = (g : ℤ) * orbit n + dig n := by
+    intro n; rw [hdigdef]; simp only; rw [hstep n]; ring
+  have hfloor : ∀ n, ⌊W * (g : ℝ) ^ n⌋ = orbit n :=
+    gary_floor_eq hg (orbit 0) dig orbit hdig rfl hostep htail W hWval
+  refine hW ⟨c, fun n => ?_⟩
+  have hcast : dStepV (grt g d) c (orbit n) d - (g : ℝ) * (orbit n : ℝ)
+      = ((dStepZ (grt g d) c (orbit n) d - (g : ℤ) * orbit n : ℤ) : ℝ) := by
+    rw [← dStepZ_cast (grt g d) c (orbit n) d hd]; push_cast; ring
+  rw [hfloor n, hcast]
+  obtain ⟨hlo, hhi⟩ := hdig n
+  refine ⟨by exact_mod_cast hlo, ?_⟩
+  have hc2 : (((g : ℤ) - 1 : ℤ) : ℝ) = (g : ℝ) - 1 := by push_cast; ring
+  rw [← hc2]; exact_mod_cast hhi
+
+/-- **All-base capstones** (prime-`d` form): the three self-referential impossibilities hold for **every**
+base `g ≥ 2` (including perfect powers), via `ae_no_dStep_schedule_reads_base_g_all`. -/
+theorem ae_not_DStepDigitRepresentableBaseG_all (g d : ℕ) (hg : 2 ≤ g) (hd : d.Prime) (hd2 : 2 ≤ d)
+    (hbound : grt g d < 2 * (g : ℝ) / ((g : ℝ) + 1)) (hperf : ∀ k : ℕ, k ^ d ≠ g) :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ DStepDigitRepresentableBaseG g d W := by
+  filter_upwards [ae_no_dStep_schedule_reads_base_g_all g d hg hd hd2 hbound hperf] with W hW
+  rintro ⟨c, hall⟩
+  obtain ⟨n, hn⟩ := hW c
+  exact hn (hall n)
+
+theorem ae_not_DStepReadsBaseG_all (g d : ℕ) (hg : 2 ≤ g) (hd : d.Prime) (hd2 : 2 ≤ d)
+    (hbound : grt g d < 2 * (g : ℝ) / ((g : ℝ) + 1)) (hperf : ∀ k : ℕ, k ^ d ≠ g) :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ DStepReadsBaseG g d W := by
+  filter_upwards [ae_not_DStepDigitRepresentableBaseG_all g d hg hd hd2 hbound hperf] with W hW
+  exact not_DStepReadsBaseG_of_not_digit g d hg W hW
+
+theorem ae_not_DStepRecurrenceRepresentableBaseG_all (g d : ℕ) (hg : 2 ≤ g) (hd : d.Prime) (hd2 : 2 ≤ d)
+    (hbound : grt g d < 2 * (g : ℝ) / ((g : ℝ) + 1)) (hperf : ∀ k : ℕ, k ^ d ≠ g) :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ DStepRecurrenceRepresentableBaseG g d W := by
+  filter_upwards [ae_not_DStepDigitRepresentableBaseG_all g d hg hd hd2 hbound hperf] with W hW
+  exact not_DStepRecurrenceRepresentableBaseG_of_not_digit g d hg (by omega) W hW
+
 end Erdos482.General

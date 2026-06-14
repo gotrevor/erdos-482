@@ -29,19 +29,30 @@ lap closed the entire analytic + assembly half that the prior handoff flagged as
   `dStepPartial_eq_dGpd_real`): the orbit bridge only ever used `W·2ⁿ` as a unit, so it generalizes to any
   real `M` (base-`g` is `M = W·gⁿ`).
 
-### ▶▶ NEXT FRONTIER — base-`g` for PERFECT-POWER bases (`g = 4, 8, 9, 16, 25, 27, …`)
-The Eisenstein lin-indep (`rpow_lin_indep_int_base`) needs a prime `p ∥ g` (multiplicity exactly 1), so it
-**misses perfect-power `g`** (e.g. `g = 4 = 2²`).  To cover **all** `g ≥ 2`: choose `d` **prime** (the
-window bound `g^{1/d} < 2g/(g+1)` only needs `d` large, and there are arbitrarily large primes), and use
-mathlib's **`X_pow_sub_C_irreducible_of_prime`** (`FieldTheory/KummerPolynomial.lean`): `Xᵈ − C a`
-irreducible over a field iff `∀ b, bᵈ ≠ a`.  Over ℚ with `a = (g:ℚ)`: need **`∀ b:ℚ, bᵈ ≠ g`** when `g`
-is not a perfect `d`-th power.  Route: `bᵈ = g` ⟹ `b` integral over ℤ (root of monic `Xᵈ − g`) ⟹
-`b ∈ ℤ` (`IsIntegrallyClosed.isIntegral_iff`) ⟹ `(b.natAbs)ᵈ = g`, contradiction.
-**⚠️ CAVEAT**: an earlier gotcha (RpowLinIndep header) notes `IsIntegrallyClosed ℤ` was problematic in the
-Gauss-lemma context of this mathlib pin — verify the instance resolves before committing; fallback is
-`irrational_nrt_of_notint_nrt` (`NumberTheory/Real/Irrational.lean`) for `g^{1/d}` irrational ⟹ no positive
-rational `d`-th root.  Then `rpow_lin_indep_int_prime` ⟹ `ae_..._base_g` for **every** base `g ≥ 2` at a
-suitable prime `d`.
+### ✅ DONE THIS LAP — base-`g` impossibility for **EVERY base `g ≥ 2`** (incl. perfect powers)
+The Eisenstein lin-indep (`rpow_lin_indep_int_base`) misses perfect-power `g` (`4 = 2²`, etc.).  **Now
+covered** via the prime-degree Kummer route (all axiom-clean):
+- `RpowLinIndep.no_rat_dth_root` (`∀ b:ℚ, bᵈ ≠ g` when `g` not a perfect `d`-th power, via
+  `IsIntegrallyClosed ℤ` — the instance **does** resolve with `import Mathlib.RingTheory.Polynomial.RationalRoot`;
+  the old "problematic" gotcha was about the *Gauss-lemma* context, not this one),
+  `not_perfect_pow_of_lt` (`2 ≤ g < 2ᵈ ⟹ ∀ k, kᵈ ≠ g`), **`rpow_lin_indep_int_prime`** (`d` prime + `g`
+  not a perfect `d`-th power ⟹ ℤ-lin-indep, via `X_pow_sub_C_irreducible_of_prime`).
+- `BaseGTorusEquidist.dXiG_ne_zero_prime` / `ae_W_dTorusG_orbit_dense_prime`.
+- `BaseGFinish.ae_no_dStep_schedule_reads_base_g_all` (every `g ≥ 2`, `d` prime, `g < 2ᵈ`, window bound)
+  + **`ae_no_dStep_schedule_reads_base_four`** (`g = 4 = 2²`, `d = 5` — a fully unconditional perfect-power
+  instance the Eisenstein form can't produce).
+
+**The base-`g` story is now complete for all `g ≥ 2`.**  Remaining open items are genuinely harder or
+out of scope (below).
+
+### ▶▶ REMAINING / OPTIONAL
+- **Prime-`d` capstones**: the three self-referential capstones (`ae_not_DStep…BaseG`) are stated via the
+  Eisenstein hypotheses; add `…_all` variants threading the prime-`d` density so the capstones also hold
+  for perfect-power bases.  Mechanical (swap `ae_not_DStepDigitRepresentableBaseG`'s density source).
+- **g=2 subsumption cross-check** (below) — kernel consistency anchor, optional.
+- **Composite-`d` for perfect-power `g`**: dropping the "`d` prime" restriction needs the full Kummer
+  criterion (`X_pow_sub_C_irreducible_iff_of_odd` / `_of_prime_pow`) — not needed for the headline (a prime
+  `d` always exists above the window threshold) but would generalize the *degree*.
 
 ### (cross-check, optional) g=2 subsumption
 `DStepDigitRepresentableBaseG 2 d W ↔ DStepDigitRepresentable d W`: the digit `x = dStepV − 2u` is an
