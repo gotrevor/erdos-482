@@ -258,4 +258,49 @@ theorem ae_dStep_not_reads_base_two (d : ℕ) (hd : 3 ≤ d) (c : ℕ → ℝ) :
   filter_upwards [ae_no_dStep_schedule_reads_base_two d hd] with W hW
   exact hW c
 
+/-- **`W` is `d`-step-digit-representable** if some `d`-periodic offset schedule `c` makes the `d`-step
+floor map emit a *valid base-2 digit* `dStepV(uₙ) − 2uₙ ∈ {0,1}` at every step of the binary block orbit
+`uₙ = ⌊W·2ⁿ⌋`.  General-degree analogue of `CubicFinish.CubicDigitRepresentable`. -/
+def DStepDigitRepresentable (d : ℕ) (W : ℝ) : Prop :=
+  ∃ c : ℕ → ℝ, ∀ n : ℕ,
+    dStepV (rrt d) c ⌊W * 2 ^ n⌋ d - 2 * (⌊W * 2 ^ n⌋ : ℝ) = 0
+      ∨ dStepV (rrt d) c ⌊W * 2 ^ n⌋ d - 2 * (⌊W * 2 ^ n⌋ : ℝ) = 1
+
+/-- **Almost no real is `d`-step-digit-representable** (`d ≥ 3`).  The general headline in its cleanest
+form: the set of `W` for which *some* fixed degree-`d` schedule reads all of `W`'s base-2 digits is
+Lebesgue-null.  Immediate from `ae_no_dStep_schedule_reads_base_two`. -/
+theorem ae_not_dStepDigitRepresentable (d : ℕ) (hd : 3 ≤ d) :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ DStepDigitRepresentable d W := by
+  filter_upwards [ae_no_dStep_schedule_reads_base_two d hd] with W hW
+  rintro ⟨c, hall⟩
+  obtain ⟨n, hn⟩ := hW c
+  exact hn (hall n)
+
+/-- **The `d`-step map correctly reads `W`'s base-2 doubling** if some schedule `c` makes the `d`-step
+floor map send each binary block `uₙ = ⌊W·2ⁿ⌋` to the next, `dStepV(uₙ) = ⌊W·2ⁿ⁺¹⌋` for all `n`.  The
+genuine self-referential condition — the map *computes* `W`'s base-2 doubling. -/
+def DStepReadsBaseTwo (d : ℕ) (W : ℝ) : Prop :=
+  ∃ c : ℕ → ℝ, ∀ n : ℕ, dStepV (rrt d) c ⌊W * 2 ^ n⌋ d = (⌊W * 2 ^ (n + 1)⌋ : ℝ)
+
+/-- **The `d`-step map computes no real's base-2 doubling, for almost every `W`** (`d ≥ 3`).  The
+self-referential capstone: the set of `W` whose base-2 doubling some degree-`d` schedule correctly
+computes (`dStepV(⌊W·2ⁿ⌋) = ⌊W·2ⁿ⁺¹⌋` ∀n) is Lebesgue-null.  Correct reading forces every emitted digit
+`dStepV(uₙ) − 2uₙ = ⌊W·2ⁿ⁺¹⌋ − 2⌊W·2ⁿ⌋ ∈ {0,1}` (`floor_two_mul_sub_mem`), i.e.
+`DStepDigitRepresentable d W`, which is a.e. false. -/
+theorem ae_not_dStepReadsBaseTwo (d : ℕ) (hd : 3 ≤ d) :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ DStepReadsBaseTwo d W := by
+  filter_upwards [ae_not_dStepDigitRepresentable d hd] with W hW
+  rintro ⟨c, hread⟩
+  refine hW ⟨c, fun n => ?_⟩
+  have hdouble : ⌊W * 2 ^ (n + 1)⌋ = ⌊2 * (W * 2 ^ n)⌋ := by
+    rw [show (2 : ℝ) ^ (n + 1) = 2 * 2 ^ n by ring]; ring_nf
+  rw [hread n, hdouble]
+  rcases floor_two_mul_sub_mem (W * 2 ^ n) with h | h
+  · left
+    have h' : ((⌊2 * (W * 2 ^ n)⌋ - 2 * ⌊W * 2 ^ n⌋ : ℤ) : ℝ) = 0 := by exact_mod_cast h
+    push_cast at h'; linarith
+  · right
+    have h' : ((⌊2 * (W * 2 ^ n)⌋ - 2 * ⌊W * 2 ^ n⌋ : ℤ) : ℝ) = 1 := by exact_mod_cast h
+    push_cast at h'; linarith
+
 end Erdos482.General
