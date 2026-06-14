@@ -46,20 +46,21 @@ The algebraic + abstract-geometric obstruction is now a **fully closed skeleton*
 3. **Geometry crux — ✅ DONE abstractly** (`exists_partial_defect_outside_window`) and **realization
    ✅ DONE** (`realizeR`/`orbitArg_realizeR`/`orbitF_realizeR`: `orbitF` hits any interior target config).
 
-**Torus plumbing — ✅ DONE** (`GeneralTorusFinish.lean`): `dGpdTorus`/`coordsOf` (partial defect as a
-`Tᵈ→ℝ` function via `CubicFinish.torusRep`), **`dGpdTorus_orbit`** (`= dStepPartial … d` along the
-orbit), **`continuousAt_dGpdTorus`** (continuous at nonzero-coord, non-jump points).
+**Torus plumbing + reduction — ✅ DONE** (`GeneralTorusFinish.lean`): `dGpdTorus`/`coordsOf`,
+**`dGpdTorus_orbit`** (`= dStepPartial … d`), **`continuousAt_dGpdTorus`**, AND the reduction is now
+EXPLICIT in Lean — **`ae_dStep_fails_of_exceeding`**: for any torus point `P` with nonzero coords +
+non-jump args whose `dGpdTorus P ∉ (C-2,C]`, a.e. `W` has a step where the `d`-step map fails to read a
+base-2 digit. The entire density + continuity + window chain is done; the headline = this theorem with
+its hypothesis discharged.
 
-**ONLY the final geometric assembly remains** (`ae_no_dStep_schedule_reads_base_two`, `d ≥ 3`):
-ingredients ALL present (`ae_W_dTorus_orbit_dense`, `continuousAt_dGpdTorus`, `dGpdTorus_orbit`,
-`dStep_partial_mem_window`, `exists_scale_outside_window`, `orbitF_realizeR`,
-`EquidistDense.exists_{lt,gt}_of_dense_continuousAt`). The single delicate step: build a `Tᵈ` point `P`
-with **all coords ≠ 0** and `orbitArg`s ∉ ℤ whose `dGpdTorus P = τ·S_d ∉ (C-2,C]`. Construction:
-`τ ∈ (0,1)` from `exists_scale_outside_window` (`S_d > 2`); representatives `ρ 0 = σ ∈ (0,1)`,
-`ρ(k+1) = fract(τ − restₖ(σ))` (so `orbitF k = τ`, `orbitArg = τ−⌊…⌋ ∉ ℤ`); choose `σ` avoiding the
-**countable** bad set `⋃_{k<d-1} {σ | τ − restₖ(σ) ∈ ℤ}` (each `= range (fun m:ℤ => (m−τ+Kₖ)/α^{k+1})`,
-countable; `Ioo 0 1` uncountable ⇒ `σ` exists with all `ρ i ∈ (0,1)`). Then chain
-`exists_{lt,gt}_of_dense_continuousAt` against `dStep_partial_mem_window` (mirror `CubicFinish` 268–316).
+**ONLY the geometry-crux hypothesis of `ae_dStep_fails_of_exceeding` remains** to get the unconditional
+uniform headline (`d ≥ 3`): build a `Tᵈ` point `P` with **all coords ≠ 0**, `orbitArg`s ∉ ℤ, and
+`dGpdTorus P = τ·S_d ∉ (C-2,C]`. Construction (all ingredients present): `τ ∈ (0,1)` from
+`exists_scale_outside_window` (`S_d > 2` via `rrt_window_gt_two`); representatives `ρ 0 = σ ∈ (0,1)`,
+`ρ(k+1) = fract(τ − restₖ(σ))` (⇒ `orbitF k = τ` so `dGpdTorus = τ·S_d`, `orbitArg = τ−⌊…⌋ ∉ ℤ`);
+choose `σ` avoiding the **countable** bad set `⋃_{k<d-1} {σ | τ − restₖ(σ) ∈ ℤ}` (each
+`= range (fun m:ℤ => (m−τ+Kₖ)/α^{k+1})`, countable; `Ioo 0 1` uncountable ⇒ such `σ` exists, all
+`ρ i ∈ (0,1)`). Then `P i := ↑(ρ i)`; feed to `ae_dStep_fails_of_exceeding`.
 
 ---
 
