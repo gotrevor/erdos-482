@@ -34,7 +34,11 @@ cubic/quartic proofs.  All `[propext, Classical.choice, Quot.sound]`-only; full 
 ### ▶▶ NEXT (general-`d` headline — purely the analytic `Tᵈ` orbit-density assembly)
 The algebraic + abstract-geometric obstruction is now a **fully closed skeleton** (the abstract crux
 `exists_partial_defect_outside_window` + range bounds are done).  The ONLY remaining gap is showing the
-*orbit* `⌊W2ⁿ⌋` actually *reaches* a bad fract-config (i.e. `Tᵈ` density a.e.-`W`).  Remaining (mirror
+*orbit* `⌊W2ⁿ⌋` actually *reaches* a bad fract-config (i.e. `Tᵈ` density a.e.-`W`).
+
+**Bridge started (`GeneralOrbit.lean`):** `dStepF_orbit` expresses each floor error `fₖ` at
+`u=⌊W2ⁿ⌋` via the doubling-orbit coordinates `{αⁱW2ⁿ}` and the previous errors — one uniform lemma
+(via `affine_rec_closed`) replacing the cubic's two hand-rolled `cubic_f{1,2}_orbit`.  Remaining (mirror
 of the cubic/quartic finish, using the already-degree-agnostic `MultidimWeyl`/`EquidistDense`/`DELEngine`):
 1. **Orbit-coordinate form of `dStepPartial`** — express `g(⌊W2ⁿ⌋)` as a continuous function of the
    `Tᵈ`-orbit coords `(\{2ⁿW\}, \{2ⁿαW\}, …, \{2ⁿα^{d-1}W\})` (general `cubicGpd`/`cubicPartialDefect_eq_Gpd`).
