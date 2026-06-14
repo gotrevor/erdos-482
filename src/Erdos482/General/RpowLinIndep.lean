@@ -5,6 +5,7 @@ import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.RingTheory.Ideal.Maximal
 import Mathlib.RingTheory.Int.Basic
 import Mathlib.FieldTheory.KummerPolynomial
+import Mathlib.FieldTheory.KummerExtension
 import Mathlib.RingTheory.Polynomial.RationalRoot
 
 /-!
@@ -268,6 +269,54 @@ theorem rpow_lin_indep_int_prime (g d : ℕ) (hd : d.Prime) (hg : ∀ k : ℕ, k
   -- `Xᵈ − g` irreducible over ℚ (Kummer, prime exponent).
   have hirrQ : Irreducible ((X : ℚ[X]) ^ d - C (g : ℚ)) :=
     X_pow_sub_C_irreducible_of_prime hd (no_rat_dth_root g d hd1 hg)
+  have haeval : (Polynomial.aeval α) ((X : ℚ[X]) ^ d - C (g : ℚ)) = 0 := by
+    rw [map_sub, map_pow, aeval_X, aeval_C]; simp [hαd]
+  have hmonicQ : ((X : ℚ[X]) ^ d - C (g : ℚ)).Monic := monic_X_pow_sub_C (g : ℚ) (by omega)
+  have hminpoly : minpoly ℚ α = (X : ℚ[X]) ^ d - C (g : ℚ) :=
+    (minpoly.eq_of_irreducible_of_monic hirrQ haeval hmonicQ).symm
+  have hdegmp : (minpoly ℚ α).degree = (d : WithBot ℕ) := by
+    rw [hminpoly, degree_X_pow_sub_C (by omega : 0 < d)]
+  set q : ℚ[X] := ∑ i : Fin d, C ((a i : ℚ)) * X ^ (i : ℕ) with hqdef
+  have haevalp : (Polynomial.aeval α) q = 0 := by
+    have hexp : (Polynomial.aeval α) q = ∑ i : Fin d, (a i : ℝ) * α ^ (i : ℕ) := by
+      rw [hqdef, map_sum]
+      refine Finset.sum_congr rfl (fun i _ => ?_)
+      simp only [map_mul, map_pow, aeval_X, map_intCast]
+    rw [hexp]; exact h
+  have hq0 : q = 0 := by
+    by_contra hqne
+    have hle := minpoly.degree_le_of_ne_zero (A := ℚ) (x := α) hqne haevalp
+    rw [hdegmp] at hle
+    have hlt : q.degree < (d : WithBot ℕ) := by rw [hqdef]; exact degree_sum_fin_lt _
+    exact absurd (lt_of_le_of_lt hle hlt) (lt_irrefl _)
+  intro j
+  have hcoeff : q.coeff (j : ℕ) = (a j : ℚ) := by
+    rw [hqdef, finset_sum_coeff, Finset.sum_eq_single j]
+    · rw [coeff_C_mul, coeff_X_pow, if_pos rfl, mul_one]
+    · intro i _ hij
+      rw [coeff_C_mul, coeff_X_pow, if_neg (fun hc => hij (Fin.val_injective hc.symm)), mul_zero]
+    · intro h'; exact absurd (Finset.mem_univ j) h'
+  have : (a j : ℚ) = 0 := by rw [← hcoeff, hq0, coeff_zero]
+  exact_mod_cast this
+
+/-- **Base-`g` ℤ-linear independence for ODD (possibly composite) degree `d`.**  Generalizes
+`rpow_lin_indep_int_prime` past prime `d`: for **odd** `d ≥ 1` such that `g` is not a perfect `p`-th power
+for any prime `p ∣ d`, the powers of `α = g^{1/d}` are ℤ-linearly independent.  `Xᵈ − g` is irreducible
+over ℚ by `X_pow_sub_C_irreducible_iff_forall_prime_of_odd` (each prime-`p` non-power input via
+`no_rat_dth_root`).  Covers e.g. `d = 9, 15, 25, 27, …`. -/
+theorem rpow_lin_indep_int_odd (g d : ℕ) (hodd : Odd d) (hd1 : 1 ≤ d)
+    (hperf : ∀ p : ℕ, p.Prime → p ∣ d → ∀ k : ℕ, k ^ p ≠ g)
+    (a : Fin d → ℤ)
+    (h : ∑ i : Fin d, (a i : ℝ) * ((g : ℝ) ^ ((1 : ℝ) / d)) ^ (i : ℕ) = 0) :
+    ∀ i, a i = 0 := by
+  set α : ℝ := (g : ℝ) ^ ((1 : ℝ) / d) with hα
+  have hd0 : (d : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
+  have hαd : α ^ d = (g : ℝ) := by
+    rw [hα, ← Real.rpow_natCast ((g : ℝ) ^ ((1 : ℝ) / d)) d,
+      ← Real.rpow_mul (by positivity), one_div, inv_mul_cancel₀ hd0, Real.rpow_one]
+  have hirrQ : Irreducible ((X : ℚ[X]) ^ d - C (g : ℚ)) :=
+    (X_pow_sub_C_irreducible_iff_forall_prime_of_odd hodd).mpr
+      (fun p hp hpd b => no_rat_dth_root g p hp.one_lt.le (hperf p hp hpd) b)
   have haeval : (Polynomial.aeval α) ((X : ℚ[X]) ^ d - C (g : ℚ)) = 0 := by
     rw [map_sub, map_pow, aeval_X, aeval_C]; simp [hαd]
   have hmonicQ : ((X : ℚ[X]) ^ d - C (g : ℚ)).Monic := monic_X_pow_sub_C (g : ℚ) (by omega)

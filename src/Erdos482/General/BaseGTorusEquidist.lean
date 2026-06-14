@@ -127,4 +127,21 @@ theorem ae_W_dTorusG_orbit_dense_prime {g d : ℕ} (hg : 2 ≤ g) (hd : d.Prime)
     ∀ᵐ W ∂(volume : Measure ℝ), Dense (Set.range (dTorusOrbitG g d W)) :=
   ae_W_dTorusG_orbit_dense hg (fun m hm => dXiG_ne_zero_prime hd hperf hm)
 
+/-- **Odd-degree lin-indep discharge** (`rpow_lin_indep_int_odd`): for **odd** `d ≥ 1` with `g` not a
+perfect `p`-th power for any prime `p ∣ d`, `dXiG g d m = 0 ⟹ m = 0`.  Extends the density brick to odd
+*composite* degrees (`d = 9, 15, 25, …`). -/
+theorem dXiG_ne_zero_odd {g d : ℕ} (hodd : Odd d) (hd1 : 1 ≤ d)
+    (hperf : ∀ p : ℕ, p.Prime → p ∣ d → ∀ k : ℕ, k ^ p ≠ g)
+    {m : Fin d → ℤ} (hm : m ≠ 0) : dXiG g d m ≠ 0 := by
+  intro h
+  have hlin := rpow_lin_indep_int_odd g d hodd hd1 hperf m (by rw [dXiG] at h; exact h)
+  exact hm (funext hlin)
+
+/-- **The base-`g` `Tᵈ` orbit is dense for a.e. `W` at ODD composite degree `d`.**  Combines
+`ae_W_dTorusG_orbit_dense` with `dXiG_ne_zero_odd`. -/
+theorem ae_W_dTorusG_orbit_dense_odd {g d : ℕ} (hg : 2 ≤ g) (hodd : Odd d) (hd1 : 1 ≤ d)
+    (hperf : ∀ p : ℕ, p.Prime → p ∣ d → ∀ k : ℕ, k ^ p ≠ g) :
+    ∀ᵐ W ∂(volume : Measure ℝ), Dense (Set.range (dTorusOrbitG g d W)) :=
+  ae_W_dTorusG_orbit_dense hg (fun m hm => dXiG_ne_zero_odd hodd hd1 hperf hm)
+
 end Erdos482.General
