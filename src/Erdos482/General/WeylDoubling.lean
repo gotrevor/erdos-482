@@ -92,4 +92,42 @@ theorem doubling_weyl_L2_mean (k : ℤ) (hk : k ≠ 0) (N : ℕ) :
           rw [Finset.sum_ite_eq' (Finset.range N) n (fun _ => (1:ℂ)), if_pos hn])
     _ = (N:ℂ) := by simp [Finset.sum_const, Finset.card_range]
 
+/-- One product term of `|∑ e(k2ⁿs)|²`: `e(k2ⁿs)·conj(e(k2ᵐs)) = e(k(2ⁿ−2ᵐ)s)`. -/
+theorem term_id (k : ℤ) (n m : ℕ) (x : ℝ) :
+    Complex.exp (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ)^n : ℤ):ℂ) * x)
+      * (starRingEnd ℂ) (Complex.exp (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ)^m : ℤ):ℂ) * x))
+      = Complex.exp (2 * ↑Real.pi * Complex.I * ((k * ((2:ℤ)^n - 2^m) : ℤ):ℂ) * x) := by
+  rw [← Complex.exp_conj, ← Complex.exp_add]
+  congr 1
+  have hconj : (starRingEnd ℂ) (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ)^m : ℤ):ℂ) * ↑x)
+      = -(2 * ↑Real.pi * Complex.I * ((k * (2:ℤ)^m : ℤ):ℂ) * ↑x) := by
+    simp only [map_mul, Complex.conj_I, Complex.conj_ofReal, map_intCast, map_ofNat]; ring
+  rw [hconj]; push_cast; ring
+
+/-- **Weyl mean square (norm form).**  `∫₀¹ ‖∑_{n<N} e^{2πi·k·2ⁿ·s}‖² ds = N` for `k ≠ 0`.  This is the
+directly-usable form of `doubling_weyl_L2_mean`: expand `‖·‖² = (·)·conj(·)` (`term_id`) into the
+complex double sum, bridge `∫(real) = ∫(complex)` (`integral_ofReal`), and apply `doubling_weyl_L2_mean`.
+Feeds DEL as `∫₀¹‖g_j‖² = 1/j²` (with `g_j = (1/j²)·∑_{n<j²}`), whose summability gives a.e. base-2
+equidistribution of `{2ⁿs}` (`PENDING_WORK.md ★★`). -/
+theorem doubling_weyl_L2_mean_norm (k : ℤ) (hk : k ≠ 0) (N : ℕ) :
+    (∫ s in (0:ℝ)..1, ‖∑ n ∈ Finset.range N,
+        Complex.exp (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ)^n : ℤ):ℂ) * s)‖ ^ 2) = (N:ℝ) := by
+  have ptwise : ∀ x : ℝ,
+      ((‖∑ n ∈ Finset.range N, Complex.exp (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ)^n : ℤ):ℂ) * x)‖ ^ 2 : ℝ):ℂ)
+        = ∑ n ∈ Finset.range N, ∑ m ∈ Finset.range N,
+            Complex.exp (2 * ↑Real.pi * Complex.I * ((k * ((2:ℤ)^n - 2^m) : ℤ):ℂ) * x) := by
+    intro x
+    rw [Complex.sq_norm, ← Complex.mul_conj, map_sum, Finset.sum_mul_sum]
+    exact Finset.sum_congr rfl (fun n _ => Finset.sum_congr rfl (fun m _ => term_id k n m x))
+  have hcplx : ((∫ s in (0:ℝ)..1, ‖∑ n ∈ Finset.range N,
+        Complex.exp (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ)^n : ℤ):ℂ) * s)‖ ^ 2 : ℝ):ℂ) = (N:ℂ) := by
+    rw [← intervalIntegral.integral_ofReal,
+      show (∫ x in (0:ℝ)..1, ((‖∑ n ∈ Finset.range N,
+          Complex.exp (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ)^n : ℤ):ℂ) * x)‖ ^ 2 : ℝ):ℂ))
+        = ∫ x in (0:ℝ)..1, ∑ n ∈ Finset.range N, ∑ m ∈ Finset.range N,
+            Complex.exp (2 * ↑Real.pi * Complex.I * ((k * ((2:ℤ)^n - 2^m) : ℤ):ℂ) * x)
+        from intervalIntegral.integral_congr (fun x _ => ptwise x)]
+    exact doubling_weyl_L2_mean k hk N
+  exact_mod_cast hcplx
+
 end Erdos482.General
