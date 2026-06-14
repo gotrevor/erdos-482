@@ -56,4 +56,52 @@ theorem dStepF_orbit (α : ℝ) (c : ℕ → ℝ) (W : ℝ) (n k : ℕ) :
     linear_combination hsum - hflr
   rw [dStepF, harg, Int.fract_add_intCast]
 
+/-- **The floor errors as an explicit recursion in the orbit-coordinate vector `r`.**  `orbitF α c r k`
+builds the `k`-th error purely from `r` (where `r i = {αⁱ·W2ⁿ}`) and the earlier errors, matching
+`dStepF_orbit`.  Defined by strong recursion (the body references `orbitF … j` for `j < k`). -/
+noncomputable def orbitF (α : ℝ) (c r : ℕ → ℝ) (k : ℕ) : ℝ :=
+  Nat.strongRecOn k (fun k IH =>
+    Int.fract (r (k + 1) - α ^ (k + 1) * r 0
+      + (∑ j ∈ (Finset.range k).attach,
+          α ^ (k - j.1) * (α * c j.1 - IH j.1 (Finset.mem_range.mp j.2))) + α * c k))
+
+/-- The defining unfolding of `orbitF` (with the plain `Finset.range` sum). -/
+theorem orbitF_eq (α : ℝ) (c r : ℕ → ℝ) (k : ℕ) :
+    orbitF α c r k = Int.fract (r (k + 1) - α ^ (k + 1) * r 0
+      + (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - orbitF α c r j)) + α * c k) := by
+  rw [orbitF, Nat.strongRecOn_eq,
+    ← Finset.sum_attach (Finset.range k) (fun j => α ^ (k - j) * (α * c j - orbitF α c r j))]
+  rfl
+
+/-- **The floor error along the orbit IS `orbitF` at the canonical coordinate vector** `r i = {αⁱW2ⁿ}`.
+Proved by strong induction via `dStepF_orbit` + `orbitF_eq`. -/
+theorem dStepF_eq_orbitF (α : ℝ) (c : ℕ → ℝ) (W : ℝ) (n k : ℕ) :
+    dStepF α c (⌊W * 2 ^ n⌋) k
+      = orbitF α c (fun i => Int.fract (α ^ i * (W * 2 ^ n))) k := by
+  induction k using Nat.strong_induction_on with
+  | _ k IH =>
+    rw [dStepF_orbit, orbitF_eq]
+    have hsum : (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - dStepF α c (⌊W * 2 ^ n⌋) j))
+        = ∑ j ∈ Finset.range k,
+            α ^ (k - j) * (α * c j - orbitF α c (fun i => Int.fract (α ^ i * (W * 2 ^ n))) j) := by
+      refine Finset.sum_congr rfl (fun j hj => ?_)
+      rw [IH j (Finset.mem_range.mp hj)]
+    rw [hsum]
+    simp only [pow_zero, one_mul]
+
+/-- The partial defect as an explicit function `dGpd` of the orbit-coordinate vector `r`. -/
+noncomputable def dGpd (α : ℝ) (c r : ℕ → ℝ) (e : ℕ) : ℝ :=
+  ∑ k ∈ Finset.range e, α ^ (e - k) * orbitF α c r k
+
+/-- **The partial defect along the base-2 orbit IS `dGpd` at the canonical orbit coordinates**
+`r i = {αⁱ·W2ⁿ}` — the degree-agnostic analogue of `cubicPartialDefect_eq_Gpd`.  This expresses the
+defect as an explicit function of the `Tᵈ`-orbit point, the object the equidistribution argument
+needs. -/
+theorem dStepPartial_eq_dGpd (α : ℝ) (c : ℕ → ℝ) (W : ℝ) (n e : ℕ) :
+    dStepPartial α c (⌊W * 2 ^ n⌋) (e + 1)
+      = dGpd α c (fun i => Int.fract (α ^ i * (W * 2 ^ n))) e := by
+  rw [dStepPartial_eq_sum, dGpd]
+  refine Finset.sum_congr rfl (fun k _ => ?_)
+  rw [dStepF_eq_orbitF]
+
 end Erdos482.General
