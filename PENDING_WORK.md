@@ -31,14 +31,18 @@ that findings doc concluded the *geometric* `{ξ·(2^{1/3})ⁿ}` a.e.-equidistri
 (only integer-`×n` endomorphism ergodicity `AddCircle.ergodic_zsmul`/`ergodic_nsmul` and irrational
 rotation are).  **But my base-2 reframing changes the needed map from `×2^{1/3}` (geometric, absent) to
 `×2` (the doubling map, which `ergodic_nsmul` at `n=2` DOES cover).**  So the a.e.-`W` route reduces to:
-`×2` ergodicity (✅ in mathlib) + Birkhoff's ergodic theorem (check `Mathlib/Dynamics/Ergodic/...`) ⟹
-a.e. `x` is base-2 normal ⟹ `{αW·2ⁿ}` equidistributes for a.e. `W`.  The remaining subtlety is the
-**joint** spread of `(f₁,f₂,f₃)` (needs `({αW·2ⁿ},{α²W·2ⁿ})` to explore a width-`>1` region of `T²` —
-a 2-dim normality / joint-distribution statement, harder than 1-dim but no longer needs the missing
-geometric Koksma).  **Next-lap concrete step:** check whether mathlib has Birkhoff + whether 1-dim base-2
-normality of `αW` ALONE suffices for some weaker but still-unconditional impossibility (e.g. `f₁` alone
-forces a contradiction at certain `c`).  This is a genuinely buildable lane now, not a missing-theorem
-wall.  Specific-`W` remains open.  *(The earlier `{α^n ξ}` text below is retained struck-through for the record; the
+`×2` ergodicity (✅ in mathlib, `AddCircle.ergodic_nsmul`) + Birkhoff's pointwise ergodic theorem ⟹
+a.e. `x` is base-2 normal ⟹ `{αW·2ⁿ}` equidistributes for a.e. `W`.
+**⚠️ CHECKED (2026-06-14): Birkhoff's pointwise ergodic theorem is NOT in mathlib.** `Mathlib/Dynamics/
+BirkhoffSum/*` has only the Birkhoff *sum* definitions + algebraic identities (`birkhoffSum_succ`, etc.),
+**not** the a.e.-convergence theorem. So path #2 still has a missing-theorem wall — the `×2` half is
+present, the convergence half must be built (large). Net: the reframing *improves* path #2 (one of two
+missing pieces is now present, and the relevant map is the standard doubling map, not exotic geometric
+Koksma) but does NOT make it a quick lemma.  The remaining subtlety beyond Birkhoff is the **joint**
+spread of `(f₁,f₂,f₃)` — needs `({αW·2ⁿ},{α²W·2ⁿ})` to explore a width-`>1` region of `T²` (2-dim
+normality).  **Next-lap concrete step:** check whether 1-dim base-2 normality of `αW` ALONE forces a
+contradiction at some `c` (a weaker but still-unconditional impossibility avoiding the 2-dim joint
+statement), and scope the effort to port Birkhoff. Specific-`W` remains open math.  *(The earlier `{α^n ξ}` text below is retained struck-through for the record; the
 `ON-LINE-REQUEST.md` item should be re-aimed at base-2 normality of `αW`.)*
 
 ~~This is an equidistribution statement about `{α^n ξ}` for `α=2^{1/3}`.  CAVEAT (corrects the findings
