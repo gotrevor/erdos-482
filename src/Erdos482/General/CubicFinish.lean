@@ -252,22 +252,25 @@ theorem cubicGpd_exceeds_window (c0 c1 c2 : ℝ) :
       (2 * c0 + cbrt2 ^ 2 * c1 + cbrt2 * c2)
   exact ⟨r1, r2, r3, ⟨h1p, h1l⟩, ⟨h2p, h2l⟩, ⟨h3p, h3l⟩, hA, hB, hval.symm⟩
 
-/-- **Unconditional a.e.-`W` cubic impossibility.**  For `α = 2^{1/3}` and *almost every* real `W`,
-no fixed 3-periodic offset schedule `(c₀,c₁,c₂)` makes the three-step cubic floor map read `W`'s base-2
-digits: there is some step `n` at which the extracted digit `cubicV3(⌊W·2ⁿ⌋) − 2⌊W·2ⁿ⌋ ∉ {0,1}`.
+/-- **Unconditional a.e.-`W` cubic impossibility, uniform over *all* schedules.**  For `α = 2^{1/3}`
+and *almost every* real `W`, **no** 3-periodic offset schedule `(c₀,c₁,c₂)` whatsoever makes the
+three-step cubic floor map read `W`'s base-2 digits: for every schedule there is a step `n` at which the
+extracted digit `cubicV3(⌊W·2ⁿ⌋) − 2⌊W·2ⁿ⌋ ∉ {0,1}`.
 
-Proof: if every digit were in `{0,1}`, then by `cubic_partial_defect_mem_window` the partial defect
-`g(⌊W·2ⁿ⌋)` stays in the width-2 window `(C−2, C]` for all `n`.  But `g` along the orbit equals the
-continuous-off-jumps function `cubicGpdTorus` of the dense (`ae_W_cubic_torus_orbit_dense`) torus orbit,
-and `cubicGpd_exceeds_window` exhibits an interior non-jump torus point where that function *leaves* the
-window.  `exists_lt_of_dense_continuousAt` (or `…gt…`) then produces an orbit step realizing the
-out-of-window value — contradiction. -/
-theorem ae_W_cubic_not_reads_base_two (c0 c1 c2 : ℝ) :
-    ∀ᵐ W ∂(volume : Measure ℝ), ∃ n : ℕ,
+The strength here — a single a.e. set defeating *every* schedule simultaneously — comes from the fact
+that the exceptional set is exactly the orbit-density set `ae_W_cubic_torus_orbit_dense`, which is
+**schedule-independent**: density of the doubling orbit `(2ⁿW, 2ⁿαW, 2ⁿα²W)` is a property of `W` alone.
+For any such `W` and any schedule, the partial defect along the orbit is the continuous-off-jumps torus
+function `cubicGpdTorus`, and `cubicGpd_exceeds_window` (valid for the window of *any* `C`) exhibits an
+interior non-jump point where it leaves the window; `exists_lt/gt_of_dense_continuousAt` realizes an
+out-of-window step — contradicting `cubic_partial_defect_mem_window`. -/
+theorem ae_no_cubic_schedule_reads_base_two :
+    ∀ᵐ W ∂(volume : Measure ℝ), ∀ c0 c1 c2 : ℝ, ∃ n : ℕ,
       ¬ (cubicV3 cbrt2 c0 c1 c2 ⌊W * 2 ^ n⌋ - 2 * ⌊W * 2 ^ n⌋ = 0
           ∨ cubicV3 cbrt2 c0 c1 c2 ⌊W * 2 ^ n⌋ - 2 * ⌊W * 2 ^ n⌋ = 1) := by
   haveI : Fact (0 < (1:ℝ)) := ⟨one_pos⟩
   filter_upwards [ae_W_cubic_torus_orbit_dense] with W hdense
+  intro c0 c1 c2
   by_contra hcon
   push_neg at hcon
   -- `hcon : ∀ n, digitₙ = 0 ∨ digitₙ = 1`.  Window confinement of the partial defect along the orbit.
@@ -310,5 +313,15 @@ theorem ae_W_cubic_not_reads_base_two (c0 c1 c2 : ℝ) :
     have hc : cubicGpdTorus cbrt2 c0 c1 P < C - 2 := by rw [hPval]; exact hlt
     obtain ⟨n, hn⟩ := exists_gt_of_dense_continuousAt hdense hcont (c := C - 2) hc
     exact absurd (hwin n).1 (not_lt.mpr hn.le)
+
+/-- **Fixed-schedule form.**  For each schedule `(c₀,c₁,c₂)`, almost every `W` has a step where the
+cubic readout fails to be a base-2 digit.  Immediate specialization of the uniform
+`ae_no_cubic_schedule_reads_base_two`. -/
+theorem ae_W_cubic_not_reads_base_two (c0 c1 c2 : ℝ) :
+    ∀ᵐ W ∂(volume : Measure ℝ), ∃ n : ℕ,
+      ¬ (cubicV3 cbrt2 c0 c1 c2 ⌊W * 2 ^ n⌋ - 2 * ⌊W * 2 ^ n⌋ = 0
+          ∨ cubicV3 cbrt2 c0 c1 c2 ⌊W * 2 ^ n⌋ - 2 * ⌊W * 2 ^ n⌋ = 1) := by
+  filter_upwards [ae_no_cubic_schedule_reads_base_two] with W hW
+  exact hW c0 c1 c2
 
 end Erdos482.General
