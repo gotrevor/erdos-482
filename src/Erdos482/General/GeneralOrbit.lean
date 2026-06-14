@@ -1,4 +1,5 @@
 import Erdos482.General.GeneralDefect
+import Mathlib.Topology.Algebra.Order.Floor
 
 /-!
 # The general degree-`d` floor errors as functions of the doubling-orbit coordinates
@@ -103,5 +104,57 @@ theorem dStepPartial_eq_dGpd (α : ℝ) (c : ℕ → ℝ) (W : ℝ) (n e : ℕ) 
   rw [dStepPartial_eq_sum, dGpd]
   refine Finset.sum_congr rfl (fun k _ => ?_)
   rw [dStepF_eq_orbitF]
+
+/-- Finite sum of functions continuous at a point is continuous at that point. -/
+private theorem continuousAt_finset_sum {ι X : Type*} [TopologicalSpace X]
+    (s : Finset ι) (f : ι → X → ℝ) {x : X} (h : ∀ i ∈ s, ContinuousAt (f i) x) :
+    ContinuousAt (fun y => ∑ i ∈ s, f i y) x := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simpa using continuousAt_const
+  | @insert a s ha IH =>
+    simp only [Finset.sum_insert ha]
+    exact (h a (Finset.mem_insert_self a s)).add (IH fun i hi => h i (Finset.mem_insert_of_mem hi))
+
+/-- The inner argument of `orbitF` at step `k` (`orbitF … k = {orbitArg … k}`). -/
+noncomputable def orbitArg (α : ℝ) (c r : ℕ → ℝ) (k : ℕ) : ℝ :=
+  r (k + 1) - α ^ (k + 1) * r 0
+    + (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - orbitF α c r j)) + α * c k
+
+theorem orbitF_eq_fract_arg (α : ℝ) (c r : ℕ → ℝ) (k : ℕ) :
+    orbitF α c r k = Int.fract (orbitArg α c r k) := by rw [orbitF_eq, orbitArg]
+
+/-- **`orbitF … k` is continuous in the coordinate vector `r`** at any base point `r₀` whose inner
+fract-arguments `orbitArg … m` (`m ≤ k`) are all non-integers.  Strong induction via `continuousAt_fract`
+and the product-topology coordinate projections (`continuous_apply`). -/
+theorem continuousAt_orbitF (α : ℝ) (c r₀ : ℕ → ℝ) :
+    ∀ k, (∀ m, m ≤ k → orbitArg α c r₀ m ≠ ((⌊orbitArg α c r₀ m⌋ : ℤ) : ℝ)) →
+      ContinuousAt (fun r => orbitF α c r k) r₀ := by
+  intro k
+  induction k using Nat.strong_induction_on with
+  | _ k IH =>
+    intro h
+    have harg : ContinuousAt (fun r : ℕ → ℝ => orbitArg α c r k) r₀ := by
+      unfold orbitArg
+      refine ((((continuous_apply (k + 1)).continuousAt).sub
+        (((continuous_apply 0).continuousAt).const_mul _)).add ?_).add continuousAt_const
+      refine continuousAt_finset_sum _ _ (fun j hj => ?_)
+      rw [Finset.mem_range] at hj
+      exact (((continuousAt_const).sub (IH j hj (fun m hm => h m (hm.trans hj.le)))).const_mul _)
+    have hfun : (fun r : ℕ → ℝ => orbitF α c r k) = (fun r => Int.fract (orbitArg α c r k)) := by
+      funext r; rw [orbitF_eq_fract_arg]
+    rw [hfun]
+    exact ContinuousAt.comp (g := Int.fract) (f := fun r : ℕ → ℝ => orbitArg α c r k)
+      (continuousAt_fract (h k le_rfl)) harg
+
+/-- **The partial-defect function `dGpd` is continuous in the coordinate vector** at any point whose
+inner fract-arguments are non-integers — the degree-agnostic analogue of `continuousAt_cubicGpd`. -/
+theorem continuousAt_dGpd (α : ℝ) (c r₀ : ℕ → ℝ) (e : ℕ)
+    (h : ∀ m, m < e → orbitArg α c r₀ m ≠ ((⌊orbitArg α c r₀ m⌋ : ℤ) : ℝ)) :
+    ContinuousAt (fun r => dGpd α c r e) r₀ := by
+  unfold dGpd
+  refine continuousAt_finset_sum _ _ (fun k hk => ?_)
+  rw [Finset.mem_range] at hk
+  exact (continuousAt_orbitF α c r₀ k (fun m hm => h m (lt_of_le_of_lt hm hk))).const_mul _
 
 end Erdos482.General
