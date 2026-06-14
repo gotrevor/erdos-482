@@ -25,4 +25,32 @@ theorem cubicV3_eq_dStepV (α c0 c1 c2 : ℝ) (u : ℤ) :
   simp only [cubicV3, dStepV, cubicSched]
   norm_num
 
+/-- The general schedule constant at `d = 3` is the cubic `C = 2c₀ + α²c₁ + αc₂` (using `α³ = 2`). -/
+theorem cubic_dStepC_eq (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) :
+    dStepC α (cubicSched c0 c1 c2) 3 = 2 * c0 + α ^ 2 * c1 + α * c2 := by
+  have s0 : cubicSched c0 c1 c2 0 = c0 := rfl
+  have s1 : cubicSched c0 c1 c2 1 = c1 := rfl
+  have s2 : cubicSched c0 c1 c2 2 = c2 := rfl
+  unfold dStepC
+  rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_zero,
+    s0, s1, s2]
+  simp only [Nat.sub_zero, Nat.reduceSub, pow_one, zero_add]
+  linear_combination c0 * hα
+
+/-- The general combined defect at `d = 3` is the cubic `cubicDefect`. -/
+theorem cubic_dStepDefect_eq (α c0 c1 c2 : ℝ) (u : ℤ) :
+    dStepDefect α (cubicSched c0 c1 c2) u 3 = cubicDefect α c0 c1 c2 u := by
+  simp only [dStepDefect, dStepF, dStepV, cubicDefect, cubicSched, Finset.sum_range_succ,
+    Finset.sum_range_zero]
+  norm_num
+
+/-- **Faithfulness capstone: the general defect identity reproduces the cubic `cubicV3_sub_eq`.**  The
+abstract `dStep_defect_identity` at `d = 3` is exactly the independently-proven cubic identity
+`cubicV3 − 2u = (2c₀+α²c₁+αc₂) − cubicDefect`. -/
+theorem cubicV3_sub_eq_via_general (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) (u : ℤ) :
+    ((cubicV3 α c0 c1 c2 u : ℤ) : ℝ) - 2 * (u : ℝ)
+      = (2 * c0 + α ^ 2 * c1 + α * c2) - cubicDefect α c0 c1 c2 u := by
+  have hid := dStep_defect_identity α (cubicSched c0 c1 c2) u 3 hα
+  rw [cubicV3_eq_dStepV, hid, cubic_dStepC_eq α c0 c1 c2 hα, cubic_dStepDefect_eq]; ring
+
 end Erdos482.General
