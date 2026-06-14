@@ -9,11 +9,16 @@ SWAPPED recurrence — corrected 2026-06-13, see newest baton), Cor 3.5 the Beat
 result `SelfRefWall.lean`: the self-referential digit recurrence `⌊√g(u+c)⌋` works **iff g=2, c=½**.
 **Open frontier**: cubic/higher-degree self-reference (research; `ON-LINE-REQUEST.md`).
 
+**Live frontier (2026-06-14): the cubic self-referential a.e.-`W` impossibility (path #2).** This lap
+built the entire analytic backbone — DEL engine, 1-D + multidim Weyl equidistribution criteria, a.e.
+doubling equidistribution (`ae_doubling_orbit_equidistributed`), scaling transfer — all axiom-clean
+(build 🟢 8281). Remaining: periodicity bridge + final `T³` assembly + the `CubicDefect` two-plane link.
+
 This is a THIN POINTER. The durable state lives in:
 - **[`STATUS.md`](STATUS.md)** — the living overview + axiom ledger (refreshed each review lap).
-- **Newest baton** — [`HANDOFF-2026-06-13-correction.md`](HANDOFF-2026-06-13-correction.md) (Thm 3.4
-  faithfulness fix + SelfRefWall + what's next).
-- **[`PENDING_WORK.md`](PENDING_WORK.md)** — §0′ St06 status / attack notes.
+- **Newest baton** — [`HANDOFF-2026-06-14-0719.md`](HANDOFF-2026-06-14-0719.md) (cubic path-#2 backbone
+  built: steps a+b+c.1+c.2 done; exact next steps + whnf/Fubini gotchas).
+- **[`PENDING_WORK.md`](PENDING_WORK.md)** — ★★ authoritative (a)→(b)→(c) roadmap, status-marked.
 
 ## Standing rules
 - **DO NOT push** — work stays on `st06`; Trevor reviews/merges/pushes. Commit every green build.
