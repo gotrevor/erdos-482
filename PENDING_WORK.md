@@ -49,12 +49,16 @@ the a.e.-`W` unconditional cubic. Corrects the prior handoff (which framed the w
      (orbit on `ℝ/ℤ` depends only on `s mod 1`; `2ⁿ(s+m)≡2ⁿs`), then for fixed `ξ≠0`, a.e.-`W`:
      `IsEquidistributed (orbit (ξW))` (bad `W`-set `= ξ⁻¹·`bad `s`-set, null — scaling preserves null).
      mathlib: `MeasureTheory.measurePreserving_mul_left`/null-set scaling; small lemmas.
-  2. **multidimensional Weyl criterion** (BIG, mathlib-absent — main remaining brick): a sequence in
-     `T³` (= `Fin 3 → AddCircle 1` or the triple product) is equidistributed iff every nonzero
-     character `∏ fourier kᵢ` has vanishing Cesàro mean. Generalizes `weyl_criterion` via torus
-     Stone–Weierstrass (`ContinuousMap.starSubalgebra_topologicalClosure_eq_top_of_separatesPoints` +
-     product-character separation). THEN: combine pieces 1+2 with `cubic_lin_indep_int` ⇒ a.e.-`W`,
-     `2ⁿ(W,αW,α²W)` equidistributes in `T³` (the scalar Weyl sum `∑e(2ⁿξW)` is exactly piece 1's).
+  2. **multidimensional Weyl criterion** (DE-RISKED 2026-06-14 — `mFourier` IS in mathlib): a sequence
+     in `UnitAddTorus d = d → AddCircle 1` is equidistributed iff every nonzero character `mFourier n`
+     (`n : d→ℤ`, `= ∏ᵢ fourier (nᵢ)`) has vanishing Cesàro mean. **This is a near-MIRROR of the 1-D
+     `weyl_criterion`** using `Mathlib.Analysis.Fourier.AddCircleMulti`: `mFourier`, `mFourier_zero`
+     (`=1`), `mFourier_norm` (`=1` ⇒ the uniform `norm_cesaro_le` bound carries over),
+     `span_mFourier_closure_eq_top` (torus Stone–Weierstrass — the density step). Integral fact
+     `∫ mFourier n = δ_{n,0}` via the product/`orthonormal_mFourier` API. `UnitAddTorus d` volume is the
+     product probability Haar. THEN: combine pieces 1+2 with `cubic_lin_indep_int` ⇒ a.e.-`W`,
+     `2ⁿ(W,αW,α²W)` equidistributes in `T³` (`d=Fin 3`); the `n`-character Cesàro mean is
+     `(1/N)∑e(2πi·2ⁿ·ξW)` with `ξ=∑nᵢαⁱ⁻¹≠0`, exactly piece 1's scalar sum at `s=ξW`.
   3. **defect link** (ties to `CubicDefect`): T³ equidistribution ⇒ joint `(f₁,f₂,f₃)` not confined to
      the two planes `{α²x+αy+z∈{C,C−1}}` (`cubic_orbit_defect_confined`) ⇒ no cubic schedule reads
      a.e. `W`'s base-2 digits. Needs: express `fᵢ` as (piecewise-continuous) functions of the `T³`
