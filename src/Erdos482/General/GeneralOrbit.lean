@@ -157,4 +157,38 @@ theorem continuousAt_dGpd (α : ℝ) (c r₀ : ℕ → ℝ) (e : ℕ)
   rw [Finset.mem_range] at hk
   exact (continuousAt_orbitF α c r₀ k (fun m hm => h m (lt_of_le_of_lt hm hk))).const_mul _
 
+/-- An explicit coordinate vector realizing a target floor-error configuration `t`.  `r 0 = 0` and
+`r (k+1)` is solved so that `orbitArg = t k` (`orbitF_realizeR`). -/
+noncomputable def realizeR (α : ℝ) (c t : ℕ → ℝ) : ℕ → ℝ
+  | 0 => 0
+  | (k + 1) => t k - (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - t j)) - α * c k
+
+/-- **`orbitF` realizes any interior target configuration.**  For a target `t` with `tₖ ∈ [0,1)`
+(`k < e`), the coordinate vector `realizeR` makes every inner arg `orbitArg … k = tₖ` (hence `∉ ℤ` when
+`tₖ ≠ 0`) and `orbitF … k = tₖ`.  The general analogue of the cubic's `fract_shift_realize`. -/
+theorem orbitArg_realizeR (α : ℝ) (c t : ℕ → ℝ) (e : ℕ)
+    (ht : ∀ k, k < e → t k ∈ Set.Ico (0 : ℝ) 1) :
+    ∀ k, k < e → orbitArg α c (realizeR α c t) k = t k := by
+  intro k
+  induction k using Nat.strong_induction_on with
+  | _ k IH =>
+    intro hk
+    have hsum : (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - orbitF α c (realizeR α c t) j))
+        = ∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - t j) := by
+      refine Finset.sum_congr rfl (fun j hj => ?_)
+      rw [Finset.mem_range] at hj
+      rw [orbitF_eq_fract_arg, IH j hj (hj.trans hk), Int.fract_eq_self.mpr (ht j (hj.trans hk))]
+    rw [orbitArg, show realizeR α c t 0 = 0 from rfl,
+      show realizeR α c t (k + 1)
+        = t k - (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - t j)) - α * c k from rfl,
+      hsum]
+    ring
+
+theorem orbitF_realizeR (α : ℝ) (c t : ℕ → ℝ) (e : ℕ)
+    (ht : ∀ k, k < e → t k ∈ Set.Ico (0 : ℝ) 1) :
+    ∀ k, k < e → orbitF α c (realizeR α c t) k = t k := by
+  intro k hk
+  rw [orbitF_eq_fract_arg, orbitArg_realizeR α c t e ht k hk]
+  exact Int.fract_eq_self.mpr (ht k hk)
+
 end Erdos482.General
