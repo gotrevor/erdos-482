@@ -84,4 +84,18 @@ theorem l2_bridge (g : ℝ → ℂ) (hg : Continuous g) :
   · exact Continuous.integrableOn_Ioc (by continuity)
   · exact Filter.Eventually.of_forall fun x => sq_nonneg _
 
+/-- **a.e. transfer under nonzero scaling** (step (c) piece 1).  If `P` holds for a.e. `s` (Lebesgue),
+then for any `c ≠ 0`, `P (c·W)` holds for a.e. `W` — the bad `W`-set is the preimage of the bad
+`s`-set under `W ↦ c·W`, which scaling preserves as null (`addHaar_preimage_smul`).  Transfers the a.e.
+doubling equidistribution to a.e.-`W` after the substitution `s = ξW` (`ξ = a+bα+cα² ≠ 0`).
+Provenance: Aristotle `10ed15fc`, verified in-kernel + axiom-clean. -/
+theorem ae_comp_mul_left {c : ℝ} (hc : c ≠ 0) {P : ℝ → Prop}
+    (hP : ∀ᵐ s ∂(volume : Measure ℝ), P s) :
+    ∀ᵐ W ∂(volume : Measure ℝ), P (c * W) := by
+  rw [MeasureTheory.ae_iff] at *
+  erw [show {a : ℝ | ¬ P (c * a)} = (fun x => c * x) ⁻¹' {a : ℝ | ¬ P a} from rfl,
+    MeasureTheory.Measure.addHaar_preimage_smul]
+  · aesop
+  · assumption
+
 end Erdos482.General
