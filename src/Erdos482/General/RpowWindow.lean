@@ -70,4 +70,18 @@ theorem rrt_window_gt_two (d : ℕ) (hd : 3 ≤ d) :
   rw [lt_div_iff₀ hpos]
   linarith
 
+/-- **A width-2 window cannot cover a width-`>2` interval.**  For any center `C` and any `W > 2`, some
+`t ∈ [0, W)` lies outside the half-open window `(C-2, C]`.  This is the abstract geometric escape the
+dense partial-defect orbit exploits: the orbit's value ranges over `[0, S_d)` with `S_d > 2`
+(`rrt_window_gt_two`), but a base-2 digit pins it to `(C-2, C]` (`dStep_partial_mem_window`), so some
+orbit point must produce a non-base-2 digit. -/
+theorem window_not_cover (C W : ℝ) (hW : 2 < W) :
+    ∃ t, t ∈ Set.Ico (0 : ℝ) W ∧ t ∉ Set.Ioc (C - 2) C := by
+  by_cases h0 : (0 : ℝ) ∈ Set.Ioc (C - 2) C
+  · rw [Set.mem_Ioc] at h0
+    refine ⟨(C + W) / 2, ?_, ?_⟩
+    · rw [Set.mem_Ico]; constructor <;> linarith [h0.1, h0.2]
+    · rw [Set.mem_Ioc]; rintro ⟨_, ht⟩; linarith [h0.1]
+  · exact ⟨0, by rw [Set.mem_Ico]; exact ⟨le_rfl, by linarith⟩, h0⟩
+
 end Erdos482.General
