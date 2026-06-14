@@ -8,13 +8,22 @@ captured by `ae_no_dStep_schedule_reads_base_two` (every `d≥3`) and `ae_no_dSt
 (every base `g≥2`)). The repo is `sorry`-free, custom-axiom-free, 0 math axioms — nothing to discharge.
 
 **Highest-value next work = CONSOLIDATION** (the value the grind laps can't see from inside the trees):
-1. **`Statement.lean`** — a single top-level audit surface stating/re-exporting every headline with a
-   citation docstring. Cheap, high trust-value, doable now. ← **start here**
-2. **Isolate the mathlib-absent equidistribution/Weyl/Borel-normality layer** as a clean reusable module
-   + `notes/UPSTREAM-EQUIDISTRIBUTION.md` PR-prep brief (PR itself needs Trevor + networked session per the
-   AI-contribution policy).
+1. ✅ **DONE (2026-06-14)** — **`src/Erdos482/Statement.lean`**: single top-level audit surface,
+   every headline re-exported as an `alias` with citation + plain-English docstring (I. #482 core,
+   II. St05 `erdos482_resolution`, III. St06 Thm 3.1/3.3/3.4/Cor 3.5/Ex 1.1, IV. impossibility
+   `ae_no_dStep_schedule_reads_base_{two,g_all,three}`). All re-exports `#print axioms`-clean; wired
+   into the lib root; build green 8305.
+2. ◑ **BRIEF DONE (2026-06-14)** — **`notes/UPSTREAM-EQUIDISTRIBUTION.md`**: full inventory of the
+   mathlib-absent Weyl/equidistribution/Borel-normality layer (decl · file · statement), suggested
+   two-PR upstream shape, and the honest fixed-seed boundary. The remaining *code* refactor (strip
+   project glue into a clean standalone module) + the PR itself need Trevor (subject expert) +
+   networked session per the AI-contribution policy — this brief de-risks that.
 3. **Fixed-`W`** impossibility = famous OPEN problem (Mahler 3/2 / lacunary equidistribution at a fixed
    seed). Cite, don't grind. Already documented below.
+
+**Both consolidation deliverables landed this lap.** Next grind lap (if not Trevor-driven upstreaming):
+the remaining cleanup in item 2's checklist (deprecation-warning sweep `push_neg → push Not`; optionally
+extract the equidistribution layer into a glue-free `Mathlib/Dynamics/Equidistribution/`-shaped module).
 
 ---
 
