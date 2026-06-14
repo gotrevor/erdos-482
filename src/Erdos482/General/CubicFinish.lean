@@ -324,4 +324,22 @@ theorem ae_W_cubic_not_reads_base_two (c0 c1 c2 : ℝ) :
   filter_upwards [ae_no_cubic_schedule_reads_base_two] with W hW
   exact hW c0 c1 c2
 
+/-- **`W` is cubic-digit-representable** if some 3-periodic offset schedule `(c₀,c₁,c₂)` makes the
+three-step cubic floor map `⌊α(⌊α(⌊α(u+c₀)⌋+c₁)⌋+c₂)⌋` (`α=2^{1/3}`) emit a *valid base-2 digit*
+`cubicV3(uₙ) − 2uₙ ∈ {0,1}` at **every** step of the binary block orbit `uₙ = ⌊W·2ⁿ⌋`. -/
+def CubicDigitRepresentable (W : ℝ) : Prop :=
+  ∃ c0 c1 c2 : ℝ, ∀ n : ℕ,
+    cubicV3 cbrt2 c0 c1 c2 ⌊W * 2 ^ n⌋ - 2 * ⌊W * 2 ^ n⌋ = 0
+      ∨ cubicV3 cbrt2 c0 c1 c2 ⌊W * 2 ^ n⌋ - 2 * ⌊W * 2 ^ n⌋ = 1
+
+/-- **Almost no real is cubic-digit-representable.**  The headline impossibility in its cleanest form:
+the set of `W` for which *some* fixed cubic schedule reads all of `W`'s base-2 digits is Lebesgue-null.
+Immediate from the uniform `ae_no_cubic_schedule_reads_base_two`. -/
+theorem ae_not_cubicDigitRepresentable :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ CubicDigitRepresentable W := by
+  filter_upwards [ae_no_cubic_schedule_reads_base_two] with W hW
+  rintro ⟨c0, c1, c2, hall⟩
+  obtain ⟨n, hn⟩ := hW c0 c1 c2
+  exact hn (hall n)
+
 end Erdos482.General
