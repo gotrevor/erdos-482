@@ -202,4 +202,46 @@ theorem cubic_block_orbit_base_two_bounds (α c0 c1 c2 : ℝ) (orbit : ℕ → �
     rw [hstep k, hval]
     rcases hbit k with hd | hd <;> rw [hd] <;> omega
 
+/-- **Orbit-level defect confinement (the sharp geometric obstruction).**  If the three-step cubic map
+reads base-2 digits along its *whole* orbit (`orbit (n+1) = cubicV3 (orbit n)` with every digit
+`cubicV3 − 2·orbit ∈ {0,1}`), then **every** combined defect along the orbit equals one of exactly two
+reals, `C` or `C − 1`, where `C := 2c₀ + α²c₁ + αc₂` is the schedule constant.  In other words the
+orbit point `(f₁,f₂,f₃) ∈ [0,1)³` is pinned to the union of the two parallel affine hyperplanes
+`{α²x + αy + z = C}` and `{… = C − 1}` for all time.  This is the precise statement the residual
+equidistribution question must contradict: since the defect *range* `α²f₁+αf₂+f₃` has width `α²+α+1 > 1`
+(`cubic_combined_defect_range_wide`), an orbit that explored that range would have to leave this measure-
+zero two-plane set.  Immediate from `cubicV3_sub_eq` + the digit being an integer in `{0,1}`. -/
+theorem cubic_orbit_defect_confined (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) (orbit : ℕ → ℤ)
+    (hbit : ∀ n, cubicV3 α c0 c1 c2 (orbit n) - 2 * orbit n = 0
+        ∨ cubicV3 α c0 c1 c2 (orbit n) - 2 * orbit n = 1) :
+    ∀ n, cubicDefect α c0 c1 c2 (orbit n) = (2 * c0 + α ^ 2 * c1 + α * c2)
+        ∨ cubicDefect α c0 c1 c2 (orbit n) = (2 * c0 + α ^ 2 * c1 + α * c2) - 1 := by
+  intro n
+  have e := cubicV3_sub_eq α c0 c1 c2 hα (orbit n)
+  rcases hbit n with hd | hd
+  · left
+    have : ((cubicV3 α c0 c1 c2 (orbit n) : ℝ) - 2 * (orbit n : ℝ)) = 0 := by
+      have := congrArg (Int.cast : ℤ → ℝ) hd; push_cast at this ⊢; linarith [this]
+    rw [this] at e; linarith [e]
+  · right
+    have : ((cubicV3 α c0 c1 c2 (orbit n) : ℝ) - 2 * (orbit n : ℝ)) = 1 := by
+      have := congrArg (Int.cast : ℤ → ℝ) hd; push_cast at this ⊢; linarith [this]
+    rw [this] at e; linarith [e]
+
+/-- **No two orbit points realise a wide defect pair (orbit-level form of the ceiling).**  Along any
+digit-reading orbit, the combined defects at *any* two times differ by at most `1`.  This is the clean
+hook to chain a future equidistribution/normality lemma against: equidistribution of the orbit defect in
+an interval of length `> 1` (which `cubic_combined_defect_range_wide` shows is the full achievable range)
+would produce two times whose defects differ by `> 1`, contradicting this — closing the cubic
+unconditionally.  Proof: both defects lie in the two-point set `{C, C−1}` (`cubic_orbit_defect_confined`),
+whose diameter is `1`. -/
+theorem cubic_orbit_no_wide_defect_pair (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) (orbit : ℕ → ℤ)
+    (hbit : ∀ n, cubicV3 α c0 c1 c2 (orbit n) - 2 * orbit n = 0
+        ∨ cubicV3 α c0 c1 c2 (orbit n) - 2 * orbit n = 1) :
+    ∀ m n, |cubicDefect α c0 c1 c2 (orbit m) - cubicDefect α c0 c1 c2 (orbit n)| ≤ 1 := by
+  intro m n
+  rcases cubic_orbit_defect_confined α c0 c1 c2 hα orbit hbit m with hm | hm <;>
+    rcases cubic_orbit_defect_confined α c0 c1 c2 hα orbit hbit n with hn | hn <;>
+    rw [hm, hn] <;> rw [abs_le] <;> constructor <;> linarith
+
 end Erdos482.General
