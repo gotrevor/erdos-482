@@ -93,6 +93,11 @@ theorem cbrt2_cube : cbrt2 ^ 3 = 2 := by
   rw [cbrt2, ← Real.rpow_natCast ((2:ℝ) ^ ((1:ℝ) / 3)) 3, ← Real.rpow_mul (by norm_num)]
   norm_num
 
+/-- `1 < cbrt2` (`cbrt2 = 2^{1/3}`, base `> 1`, exponent `> 0`). -/
+theorem one_lt_cbrt2 : 1 < cbrt2 := by
+  rw [cbrt2, Real.one_lt_rpow_iff_of_pos (by norm_num)]
+  left; constructor <;> norm_num
+
 /-! ### The geometric crux: the partial defect leaves every digit window.
 
 For any schedule `(c₀,c₁,c₂)` there is an interior, non-jump point of the canonical fractional-coordinate
@@ -101,10 +106,139 @@ cube `(0,1)³` at which the partial-defect function `cubicGpd` *leaves* the digi
 near a corner of `(0,1)²` so that `cubicGpd = α²fA + αfB` exceeds `C` (when `C < α²+α`) or falls below
 `C−2` (when `C ≥ α²+α`); realize `(fA,fB)` by solving the two `fract` equations for `(r₁,r₂,r₃)`.
 
-Disclosed as an `axiom` pending the in-flight machine proof (Aristotle job `7b1ff2ad`, "gpdwin", which
-proves exactly this realization).  Once harvested/verified it discharges this statement; the entire
-density contradiction below is already wired through it. -/
-axiom cubicGpd_exceeds_window (c0 c1 c2 : ℝ) :
+Proof harvested from Aristotle job `7b1ff2ad` ("gpdwin"), verified in our kernel + `#print axioms`-clean.
+-/
+
+/-- **`fract`-shift realization.**  For any shift `K` and non-degenerate target window `(lo, hi) ⊆ [0,1]`,
+there is `r ∈ (0,1)` whose shifted fractional part `fract (r + K)` lands strictly inside `(lo, hi)`.
+Witness `r = fract (f − K)` for a target `f` in the window (so `fract (r+K) = f`); strict positivity of
+`r` from two candidate targets `< 1` apart (both giving `r = 0` would force a nonzero integer in `(0,1)`). -/
+theorem fract_shift_realize (K lo hi : ℝ) (hlo : 0 ≤ lo) (hhi : hi ≤ 1) (hlt : lo < hi) :
+    ∃ r : ℝ, 0 < r ∧ r < 1 ∧ lo < Int.fract (r + K) ∧ Int.fract (r + K) < hi := by
+  have realize : ∀ f : ℝ, 0 ≤ f → f < 1 → Int.fract (Int.fract (f - K) + K) = f := by
+    intro f h0 h1
+    rw [← Int.self_sub_floor (f - K)]
+    rw [show f - K - (⌊f-K⌋:ℝ) + K = f - (⌊f-K⌋:ℝ) by ring]
+    rw [Int.fract_sub_intCast]
+    exact Int.fract_eq_self.mpr ⟨h0, h1⟩
+  set f1 := (lo + hi)/2 with hf1
+  set f2 := (lo + f1)/2 with hf2
+  have hf1lo : lo < f1 := by rw [hf1]; linarith
+  have hf1hi : f1 < hi := by rw [hf1]; linarith
+  have hf2lo : lo < f2 := by rw [hf2]; linarith
+  have hf2f1 : f2 < f1 := by rw [hf2]; linarith
+  have hf10 : 0 ≤ f1 := le_trans hlo (le_of_lt hf1lo)
+  have hf11 : f1 < 1 := lt_of_lt_of_le hf1hi hhi
+  have hf20 : 0 ≤ f2 := le_trans hlo (le_of_lt hf2lo)
+  have hf21 : f2 < 1 := lt_trans hf2f1 hf11
+  set r1 := Int.fract (f1 - K) with hr1
+  set r2 := Int.fract (f2 - K) with hr2
+  have hr1nn : 0 ≤ r1 := Int.fract_nonneg _
+  have hr1lt : r1 < 1 := Int.fract_lt_one _
+  have hr2nn : 0 ≤ r2 := Int.fract_nonneg _
+  have hr2lt : r2 < 1 := Int.fract_lt_one _
+  have hval1 : Int.fract (r1 + K) = f1 := realize f1 hf10 hf11
+  have hval2 : Int.fract (r2 + K) = f2 := realize f2 hf20 hf21
+  rcases eq_or_lt_of_le hr1nn with h1z | h1pos
+  · have hr2pos : 0 < r2 := by
+      rcases eq_or_lt_of_le hr2nn with h2z | h2pos
+      · exfalso
+        have e1 : Int.fract (f1 - K) = 0 := by rw [← hr1, ← h1z]
+        have e2 : Int.fract (f2 - K) = 0 := by rw [← hr2, ← h2z]
+        set x := f1 - K
+        set y := f2 - K
+        have hxy_pos : 0 < x - y := by simp only [x, y]; linarith
+        have hxy_ub : x - y < 1 := by simp only [x, y]; linarith
+        have hx' : x = (⌊x⌋:ℝ) := by have := Int.self_sub_floor x; rw [e1] at this; linarith
+        have hy' : y = (⌊y⌋:ℝ) := by have := Int.self_sub_floor y; rw [e2] at this; linarith
+        have heq : x - y = (((⌊x⌋ - ⌊y⌋ : ℤ)):ℝ) := by push_cast; linarith [hx', hy']
+        rw [heq] at hxy_pos hxy_ub
+        have hh0 : (0:ℤ) < ⌊x⌋ - ⌊y⌋ := by exact_mod_cast hxy_pos
+        have hh1 : (⌊x⌋ - ⌊y⌋ : ℤ) < 1 := by exact_mod_cast hxy_ub
+        omega
+      · exact h2pos
+    exact ⟨r2, hr2pos, hr2lt, by rw [hval2]; exact hf2lo, by rw [hval2]; linarith⟩
+  · exact ⟨r1, h1pos, hr1lt, by rw [hval1]; exact hf1lo, by rw [hval1]; exact hf1hi⟩
+
+/-- **The partial defect leaves every window (general `α`).**  For `1 < α`, `α³ = 2`, any schedule
+`(c₀,c₁)` and any constant `C`, there is `(r₁,r₂,r₃) ∈ (0,1)³` with the two inner `fract`-arguments
+non-integers and `cubicGpd α c0 c1 r1 r2 r3 ∉ (C−2, C]`. -/
+theorem cubicGpd_exceeds_window_general (α c0 c1 : ℝ) (hα : 1 < α) (hα3 : α ^ 3 = 2) (C : ℝ) :
+    ∃ r1 r2 r3 : ℝ, 0 < r1 ∧ r1 < 1 ∧ 0 < r2 ∧ r2 < 1 ∧ 0 < r3 ∧ r3 < 1
+      ∧ (r2 - α * r1 + α * c0 ≠ (⌊r2 - α * r1 + α * c0⌋ : ℤ))
+      ∧ (r3 - α ^ 2 * r1 - α * Int.fract (r2 - α * r1 + α * c0) + α ^ 2 * c0 + α * c1
+          ≠ (⌊r3 - α ^ 2 * r1 - α * Int.fract (r2 - α * r1 + α * c0) + α ^ 2 * c0 + α * c1⌋ : ℤ))
+      ∧ (cubicGpd α c0 c1 r1 r2 r3 < C - 2 ∨ C < cubicGpd α c0 c1 r1 r2 r3) := by
+  have hαpos : 0 < α := by linarith
+  have hα2 : 1 < α^2 := by nlinarith
+  have hsum : 2 < α^2 + α := by nlinarith
+  have hsumpos : 0 < α^2 + α := by linarith
+  have fne : ∀ x:ℝ, Int.fract x ≠ 0 → x ≠ ((⌊x⌋:ℤ):ℝ) := by
+    intro x hx h; apply hx; have hsf := Int.self_sub_floor x; linarith
+  set K1 := α*c0 - α*(1/2) with hK1
+  by_cases hC : C < α^2 + α
+  · -- value > C; choose fA, fB near 1
+    set lo := max 0 (C/(α^2+α)) with hlodef
+    have hlo0 : 0 ≤ lo := le_max_left _ _
+    have hlolt : lo < 1 := by
+      apply max_lt
+      · norm_num
+      · rw [div_lt_one hsumpos]; exact hC
+    have hloge : C/(α^2+α) ≤ lo := le_max_right _ _
+    have hmul : C ≤ lo*(α^2+α) := (div_le_iff₀ hsumpos).mp hloge
+    obtain ⟨r2, hr2pos, hr2lt, hfAlo, hfAhi⟩ := fract_shift_realize K1 lo 1 hlo0 (le_refl 1) hlolt
+    set fA := Int.fract (r2 + K1) with hfA
+    set K2 := α^2*c0 + α*c1 - α^2*(1/2) - α*fA with hK2
+    obtain ⟨r3, hr3pos, hr3lt, hfBlo, hfBhi⟩ := fract_shift_realize K2 lo 1 hlo0 (le_refl 1) hlolt
+    set fB := Int.fract (r3 + K2) with hfB
+    have e1 : Int.fract (r2 - α*(1/2) + α*c0) = fA := by rw [hfA, hK1]; congr 1; ring
+    have hval : cubicGpd α c0 c1 (1/2) r2 r3 = α^2*fA + α*fB := by
+      unfold cubicGpd
+      rw [e1, show r3 - α^2*(1/2:ℝ) - α*fA + α^2*c0 + α*c1 = r3 + K2 by rw [hK2]; ring, ← hfB]
+    refine ⟨1/2, r2, r3, by norm_num, by norm_num, hr2pos, hr2lt, hr3pos, hr3lt, ?_, ?_, ?_⟩
+    · apply fne; rw [e1]; linarith
+    · apply fne
+      rw [show r3 - α^2*(1/2:ℝ) - α*Int.fract (r2 - α*(1/2)+α*c0) + α^2*c0 + α*c1 = r3 + K2 by
+            rw [e1, hK2]; ring, ← hfB]
+      linarith
+    · right
+      rw [hval]
+      nlinarith [mul_pos (show (0:ℝ)<α^2 by positivity) (sub_pos.mpr hfAlo),
+                 mul_pos hαpos (sub_pos.mpr hfBlo), hmul]
+  · -- value < C - 2; choose fA, fB near 0
+    push_neg at hC
+    have hC2 : 0 < C - 2 := by linarith
+    set hi := min (1/2) ((C-2)/(α^2+α)) with hidef
+    have hipos : 0 < hi := by
+      apply lt_min
+      · norm_num
+      · positivity
+    have hile : hi ≤ 1 := le_trans (min_le_left _ _) (by norm_num)
+    have hile2 : hi ≤ (C-2)/(α^2+α) := min_le_right _ _
+    have hmul2 : hi*(α^2+α) ≤ C-2 := (le_div_iff₀ hsumpos).mp hile2
+    obtain ⟨r2, hr2pos, hr2lt, hfAlo, hfAhi⟩ := fract_shift_realize K1 0 hi (le_refl 0) hile hipos
+    set fA := Int.fract (r2 + K1) with hfA
+    set K2 := α^2*c0 + α*c1 - α^2*(1/2) - α*fA with hK2
+    obtain ⟨r3, hr3pos, hr3lt, hfBlo, hfBhi⟩ := fract_shift_realize K2 0 hi (le_refl 0) hile hipos
+    set fB := Int.fract (r3 + K2) with hfB
+    have e1 : Int.fract (r2 - α*(1/2) + α*c0) = fA := by rw [hfA, hK1]; congr 1; ring
+    have hval : cubicGpd α c0 c1 (1/2) r2 r3 = α^2*fA + α*fB := by
+      unfold cubicGpd
+      rw [e1, show r3 - α^2*(1/2:ℝ) - α*fA + α^2*c0 + α*c1 = r3 + K2 by rw [hK2]; ring, ← hfB]
+    refine ⟨1/2, r2, r3, by norm_num, by norm_num, hr2pos, hr2lt, hr3pos, hr3lt, ?_, ?_, ?_⟩
+    · apply fne; rw [e1]; linarith
+    · apply fne
+      rw [show r3 - α^2*(1/2:ℝ) - α*Int.fract (r2 - α*(1/2)+α*c0) + α^2*c0 + α*c1 = r3 + K2 by
+            rw [e1, hK2]; ring, ← hfB]
+      linarith
+    · left
+      rw [hval]
+      nlinarith [mul_pos (show (0:ℝ)<α^2 by positivity) (sub_pos.mpr hfAhi),
+                 mul_pos hαpos (sub_pos.mpr hfBhi), hmul2]
+
+/-- **The geometric crux, specialized to `α = cbrt2` and the cubic window `C = 2c₀+α²c₁+αc₂`.**
+Discharges the obligation consumed by `ae_W_cubic_not_reads_base_two`. -/
+theorem cubicGpd_exceeds_window (c0 c1 c2 : ℝ) :
     ∃ r1 r2 r3 : ℝ, (0 < r1 ∧ r1 < 1) ∧ (0 < r2 ∧ r2 < 1) ∧ (0 < r3 ∧ r3 < 1) ∧
       (r2 - cbrt2 * r1 + cbrt2 * c0 ≠ (⌊r2 - cbrt2 * r1 + cbrt2 * c0⌋ : ℤ)) ∧
       (r3 - cbrt2 ^ 2 * r1
@@ -112,7 +246,11 @@ axiom cubicGpd_exceeds_window (c0 c1 c2 : ℝ) :
         ≠ (⌊r3 - cbrt2 ^ 2 * r1
               - cbrt2 * Int.fract (r2 - cbrt2 * r1 + cbrt2 * c0) + cbrt2 ^ 2 * c0 + cbrt2 * c1⌋ : ℤ)) ∧
       ((2 * c0 + cbrt2 ^ 2 * c1 + cbrt2 * c2) < cubicGpd cbrt2 c0 c1 r1 r2 r3 ∨
-        cubicGpd cbrt2 c0 c1 r1 r2 r3 < (2 * c0 + cbrt2 ^ 2 * c1 + cbrt2 * c2) - 2)
+        cubicGpd cbrt2 c0 c1 r1 r2 r3 < (2 * c0 + cbrt2 ^ 2 * c1 + cbrt2 * c2) - 2) := by
+  obtain ⟨r1, r2, r3, h1p, h1l, h2p, h2l, h3p, h3l, hA, hB, hval⟩ :=
+    cubicGpd_exceeds_window_general cbrt2 c0 c1 one_lt_cbrt2 cbrt2_cube
+      (2 * c0 + cbrt2 ^ 2 * c1 + cbrt2 * c2)
+  exact ⟨r1, r2, r3, ⟨h1p, h1l⟩, ⟨h2p, h2l⟩, ⟨h3p, h3l⟩, hA, hB, hval.symm⟩
 
 /-- **Unconditional a.e.-`W` cubic impossibility.**  For `α = 2^{1/3}` and *almost every* real `W`,
 no fixed 3-periodic offset schedule `(c₀,c₁,c₂)` makes the three-step cubic floor map read `W`'s base-2
