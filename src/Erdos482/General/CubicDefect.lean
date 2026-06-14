@@ -1,5 +1,6 @@
 import Mathlib.Algebra.Order.Floor.Ring
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Mathlib.NumberTheory.Real.Irrational
 
 /-!
 # The cubic three-step defect identity — where the cubic obstruction actually lives
@@ -149,5 +150,28 @@ theorem cubic_valid_digits_defects_close (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) 
   by_contra hgt
   push_neg at hgt
   exact cubic_threestep_digit_pair_fails α c0 c1 c2 hα u u' hgt ⟨hu, hu'⟩
+
+/-- `2^{1/3}` is irrational — the base prerequisite for any equidistribution argument on this frontier
+(e.g. attack-path #2 in `PENDING_WORK.md`: density/equidistribution of the first internal-floor error
+`{α·u}` over integers needs `α` irrational; the full obstruction needs the stronger, open
+fixed-`ξ` equidistribution of `{α^n ξ}`). -/
+theorem irrational_cbrt_two : Irrational ((2 : ℝ) ^ ((1 : ℝ) / 3)) := by
+  have hx3 : ((2 : ℝ) ^ ((1 : ℝ) / 3)) ^ (3 : ℕ) = 2 := by
+    rw [← Real.rpow_natCast ((2 : ℝ) ^ ((1 : ℝ) / 3)) 3, ← Real.rpow_mul (by norm_num)]
+    norm_num
+  have h1 : (1 : ℝ) < (2 : ℝ) ^ ((1 : ℝ) / 3) := by
+    have h : (2 : ℝ) ^ (0 : ℝ) < (2 : ℝ) ^ ((1 : ℝ) / 3) :=
+      Real.rpow_lt_rpow_of_exponent_lt (by norm_num) (by norm_num)
+    rwa [Real.rpow_zero] at h
+  have h2 : (2 : ℝ) ^ ((1 : ℝ) / 3) < 2 := by
+    have h : (2 : ℝ) ^ ((1 : ℝ) / 3) < (2 : ℝ) ^ (1 : ℝ) :=
+      Real.rpow_lt_rpow_of_exponent_lt (by norm_num) (by norm_num)
+    rwa [Real.rpow_one] at h
+  refine irrational_nrt_of_notint_nrt 3 2 (by push_cast; exact hx3) ?_ (by norm_num)
+  rintro ⟨y, hy⟩
+  rw [hy] at h1 h2
+  have : (1 : ℤ) < y := by exact_mod_cast h1
+  have : y < (2 : ℤ) := by exact_mod_cast h2
+  omega
 
 end Erdos482.General
