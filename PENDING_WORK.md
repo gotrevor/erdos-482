@@ -46,16 +46,20 @@ The algebraic + abstract-geometric obstruction is now a **fully closed skeleton*
 3. **Geometry crux — ✅ DONE abstractly** (`exists_partial_defect_outside_window`) and **realization
    ✅ DONE** (`realizeR`/`orbitArg_realizeR`/`orbitF_realizeR`: `orbitF` hits any interior target config).
 
-**ONLY the final geometric assembly remains** (`ae_no_dStep_schedule_reads_base_two`, `d ≥ 3`, uniform
-over schedules): construct a `Tᵈ` point `P` with **nonzero coords** (so `torusRep` is `ContinuousAt`
-each `P i`) whose `dGpd` value leaves the window `(C-2, C]`, then chain density (step 2) + continuity
-(step 1) via `EquidistDense.exists_{lt,gt}_of_dense_continuousAt` against `dStep_partial_mem_window`.
-The delicate part is the **nonzero-coordinate** realization (the cubic's `fract_shift_realize` +
-`cubicGpd_exceeds_window` spent ~125 lines on `d=3`): `realizeR` sets `r 0 = 0`, so the first torus coord
-is `0` — needs a variant landing all coords in `(0,1)` and non-integer (so the `orbitArg`s stay off `ℤ`),
-or a perturbation within the open super-window set. Define `dGpdTorus d α c (a : Fin d → AddCircle)
-:= dGpd α c (fun i => if h:i<d then torusRep (a ⟨i,h⟩) else 0) (d-1)` and `dGpdTorus_orbit`
-(= `dStepPartial … d` via `dStepPartial_eq_dGpd` + `torusRep_coe`), then mirror `CubicFinish` lines 268+.
+**Torus plumbing — ✅ DONE** (`GeneralTorusFinish.lean`): `dGpdTorus`/`coordsOf` (partial defect as a
+`Tᵈ→ℝ` function via `CubicFinish.torusRep`), **`dGpdTorus_orbit`** (`= dStepPartial … d` along the
+orbit), **`continuousAt_dGpdTorus`** (continuous at nonzero-coord, non-jump points).
+
+**ONLY the final geometric assembly remains** (`ae_no_dStep_schedule_reads_base_two`, `d ≥ 3`):
+ingredients ALL present (`ae_W_dTorus_orbit_dense`, `continuousAt_dGpdTorus`, `dGpdTorus_orbit`,
+`dStep_partial_mem_window`, `exists_scale_outside_window`, `orbitF_realizeR`,
+`EquidistDense.exists_{lt,gt}_of_dense_continuousAt`). The single delicate step: build a `Tᵈ` point `P`
+with **all coords ≠ 0** and `orbitArg`s ∉ ℤ whose `dGpdTorus P = τ·S_d ∉ (C-2,C]`. Construction:
+`τ ∈ (0,1)` from `exists_scale_outside_window` (`S_d > 2`); representatives `ρ 0 = σ ∈ (0,1)`,
+`ρ(k+1) = fract(τ − restₖ(σ))` (so `orbitF k = τ`, `orbitArg = τ−⌊…⌋ ∉ ℤ`); choose `σ` avoiding the
+**countable** bad set `⋃_{k<d-1} {σ | τ − restₖ(σ) ∈ ℤ}` (each `= range (fun m:ℤ => (m−τ+Kₖ)/α^{k+1})`,
+countable; `Ioo 0 1` uncountable ⇒ `σ` exists with all `ρ i ∈ (0,1)`). Then chain
+`exists_{lt,gt}_of_dense_continuousAt` against `dStep_partial_mem_window` (mirror `CubicFinish` 268–316).
 
 ---
 
