@@ -24,6 +24,7 @@ import Erdos482.General.RpowLinIndep
 import Erdos482.General.RpowWindow
 import Erdos482.General.GeneralDefect
 import Erdos482.General.GeneralDefectCheck
+import Erdos482.General.GeneralOrbit
 
 /-!
 # Erdős–Graham #482 — the general resolution (any `w > 0`, any base `g ≥ 2`)
