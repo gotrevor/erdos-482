@@ -33,10 +33,18 @@ unformalized — the doc over-claimed. *(Filed for cross-check: `ON-LINE-REQUEST
    mathlib; check `Mathlib/Dynamics/`). Gives "for a.e. `W`, no fixed schedule reads `W`'s base-2 digits
    via the cubic map" — a true unconditional theorem about the *family*, sidestepping the open specific-`ξ`
    case. Higher infrastructure cost.
-3. **Finite/uniform escape (probably FALSE, but cheap to test).** Numerically probe whether, for *every*
-   schedule `(c₀,c₁,c₂)`, the defect escapes `[C,C+1]` within a uniformly bounded number of steps `N`.
-   If yes (uniform `N`), a finite decidable check gives an unconditional proof. Numerics so far (one
-   triple fails at `j=64`) suggest `N` is NOT uniform → path likely dead, but confirm before discarding.
+3. **Finite/uniform escape (NOW THE MOST PROMISING UNCONDITIONAL ROUTE — was mis-rated "probably false").**
+   Probe whether, for *every* schedule `(c₀,c₁,c₂)`, the block-digit `v₃−2u` escapes `{0,1}` within a
+   uniformly bounded number of blocks `N`. If `sup N < ∞`, a finite decidable check gives an
+   **unconditional** cubic impossibility — no equidistribution needed, sidestepping the open `{α^n ξ}`
+   problem entirely. **2026-06-14 evidence (`tools/sandbox/cubic_uniform_escape_probe.py`, float64):**
+   random schedules fail in ≤52 blocks (mean 0.9); the literature triple `(1/6,1/3,4/3)` fails at ~51–64;
+   a 31³ grid (span ±0.06) around it, varied starts, found **nothing past ~51**. So `sup N` *looks*
+   bounded (~64) — but this is float64 + coarse grid, so a measure-zero special-algebraic schedule could
+   survive far longer (Liouville-like). **Next concrete step:** rerun the probe with `mpmath` high
+   precision, adaptive/finer search near survivors, and varied `u₀`; if the bound holds (~64), pursue the
+   finite proof (this is the win); if survival is unbounded under fine-tuning, fall back to path #1
+   (done) + path #2. This decides whether the cubic is unconditionally closeable.
 
 **⚠️ This file below is now largely historical — see [`STATUS.md`](STATUS.md) for the authoritative state.**
 The project is **COMPLETE and axiom-clean** (zero `sorry`, zero custom axioms): the headline
