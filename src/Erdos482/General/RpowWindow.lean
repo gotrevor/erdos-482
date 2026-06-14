@@ -53,10 +53,24 @@ theorem rrt_lt_four_thirds (d : ℕ) (hd : 3 ≤ d) : (2 : ℝ) ^ ((1 : ℝ) / d
       mul_one_div, div_self hdne, Real.rpow_one]
   rwa [hrhs] at hlt
 
+/-- **Abstract geometric window-width bound (any base `g`).**  If `α > 1`, `αᵈ = g`, and the escape
+condition `α < 2g/(g+1)` holds, then the partial-defect window width `∑_{1≤j<d} αʲ` exceeds the base
+`g`.  The base-`g` brick: a base-`g` digit confines the defect to a window of width `g`, but the orbit's
+defect ranges over `[0, ∑_{1≤j<d} αʲ)`, so this width bound drives the impossibility.  Proof: the
+geometric sum collapses to `(g − α)/(α−1)`, and `(g − α)/(α−1) > g ⟺ α(g+1) < 2g ⟺ α < 2g/(g+1)`.
+Specializes to `rrt_window_gt_two` (`g = 2`, bound `α < 4/3`). -/
+theorem geom_window_gt_base (α : ℝ) (d : ℕ) (g : ℝ) (hα1 : 1 < α) (hd : 1 ≤ d)
+    (hαd : α ^ d = g) (hbound : α < 2 * g / (g + 1)) (hg : 0 < g) :
+    g < ∑ j ∈ Finset.Ico 1 d, α ^ j := by
+  have hpos : 0 < α - 1 := by linarith
+  have hg1 : 0 < g + 1 := by linarith
+  have hexp : α * (g + 1) < 2 * g := (lt_div_iff₀ hg1).mp hbound
+  rw [geom_sum_Ico (by linarith : α ≠ 1) hd, hαd, pow_one, lt_div_iff₀ hpos]
+  nlinarith [hexp]
+
 /-- **The partial-defect window width exceeds `2` for every `d ≥ 3`** (`α = 2^{1/d}`):
-`2 < α + α² + … + α^{d-1}`.  The general-`d` analogue of `cubic_combined_defect_range_wide`.  Proof:
-`α^d = 2`, the geometric sum collapses to `1/(α-1) − 1`, and `1/(α-1) − 1 > 2 ⟺ α < 4/3`
-(`rrt_lt_four_thirds`). -/
+`2 < α + α² + … + α^{d-1}`.  The general-`d` analogue of `cubic_combined_defect_range_wide`.  The base-2
+instance of `geom_window_gt_base` (`g = 2`, escape bound `α < 4/3 = 2·2/(2+1)`, `rrt_lt_four_thirds`). -/
 theorem rrt_window_gt_two (d : ℕ) (hd : 3 ≤ d) :
     (2 : ℝ) < ∑ j ∈ Finset.Ico 1 d, ((2 : ℝ) ^ ((1 : ℝ) / d)) ^ j := by
   set α : ℝ := (2 : ℝ) ^ ((1 : ℝ) / d) with hα
@@ -66,19 +80,12 @@ theorem rrt_window_gt_two (d : ℕ) (hd : 3 ≤ d) :
   have hαd : α ^ d = 2 := by
     rw [hα, ← Real.rpow_natCast ((2 : ℝ) ^ ((1 : ℝ) / d)) d,
       ← Real.rpow_mul (by norm_num : (0 : ℝ) ≤ 2), one_div, inv_mul_cancel₀ hdne, Real.rpow_one]
-  -- `α > 1` (else `α^d ≤ 1 < 2`).
   have hα1 : 1 < α := by
     by_contra hc
-    have hle : α ≤ 1 := not_lt.mp hc
-    have : α ^ d ≤ 1 ^ d := pow_le_pow_left₀ hαpos.le hle d
+    have : α ^ d ≤ 1 ^ d := pow_le_pow_left₀ hαpos.le (not_lt.mp hc) d
     rw [hαd, one_pow] at this; linarith
-  have hαlt : α < 4 / 3 := rrt_lt_four_thirds d hd
-  have hpos : 0 < α - 1 := by linarith
-  -- geometric sum over `Ico 1 d`: `∑_{1≤j<d} αʲ = (αᵈ - α¹)/(α-1) = (2-α)/(α-1)`.
-  rw [geom_sum_Ico (by linarith : α ≠ 1) (show 1 ≤ d by omega), hαd, pow_one]
-  -- `2 < (2-α)/(α-1) ⟺ 2(α-1) < 2-α ⟺ α < 4/3`.
-  rw [lt_div_iff₀ hpos]
-  linarith
+  exact geom_window_gt_base α d 2 hα1 (by omega) hαd
+    (by rw [show (2 : ℝ) * 2 / (2 + 1) = 4 / 3 by norm_num]; exact rrt_lt_four_thirds d hd) (by norm_num)
 
 /-- **A width-2 window cannot cover a width-`>2` interval.**  For any center `C` and any `W > 2`, some
 `t ∈ [0, W)` lies outside the half-open window `(C-2, C]`.  This is the abstract geometric escape the
