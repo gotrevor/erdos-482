@@ -36,7 +36,13 @@ Proof skeleton: if all digits ∈{0,1} then (`cubic_partial_defect_mem_window`) 
    (a) build `F = cubicGpd ∘ (canonical reps)` and prove `ContinuousAt` at interior non-jump `p*` via the
    AddCircle interior-chart continuity (`AddCircle.continuousAt_toIcoMod`-style), or (b) transfer the
    `T³` density to a real-cube density `Dense (range (realOrbit W))` and apply the threshold tool on a
-   cube-subtype.  **(a) is cleaner.**  Needs: rep map `AddCircle 1 → ℝ` continuous at nonzero pts.
+   cube-subtype.  **(a) is cleaner.**  **API verified this lap (scratch):** `ρ x := (AddCircle.equivIco 1 0 x : ℝ)`
+   satisfies `ρ (↑t) = Int.fract t` via `AddCircle.coe_equivIco_mk_apply` + `simp` (PROVEN), and
+   `ContinuousAt ρ x` for `x ≠ 0` via `AddCircle.continuousAt_equivIco hx` ∘ `continuous_subtype_val`
+   (use explicit `(g:=)(f:=)` in `ContinuousAt.comp` to dodge the HO-unification mismatch — same trick as
+   `continuousAt_cubicGpd`).  Then `F a := cubicGpd α c0 c1 (ρ (a 0)) (ρ (a 1)) (ρ (a 2))`,
+   `F (cubicTorusOrbit W n) = cubicGpd(reps_n)`, `ContinuousAt F p*` where `p*` coords ≠ 0 (Aristotle's `p*`
+   has coords in (0,1) ⟹ ≠ 0 as AddCircle pts ✓) and the two fract-args non-integer (`continuousAt_cubicGpd`).
 3. **final assembly**: pick `p*` from (1) (its coords are in (0,1) so live in the orbit's closure),
    apply `exists_lt_of_dense_continuousAt` (a.e. `W` via `ae_W_cubic_torus_orbit_dense`), get the
    out-of-window `n`, contradict `cubic_partial_defect_mem_window`.  Then `cubic_block_orbit_base_two_bounds`
