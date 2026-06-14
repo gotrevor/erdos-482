@@ -24,12 +24,18 @@ cubic/quartic proofs.  All `[propext, Classical.choice, Quot.sound]`-only; full 
   `dStepC`/`dStepDefect` defs, **`dStep_defect_identity`** (`v_d = 2u + C − D`, `C=∑α^{d-k}cₖ`,
   `D=∑α^{d-1-k}fₖ`), `dStepPartial` + `dStep_last_arg`/`dStep_last_fract_forced` (last floor forced
   `f_e={C−g}`), `dStep_digit_eq_floor` (`digit = ⌊C−g⌋`), **`dStep_partial_mem_window`** (a base-2
-  digit confines `g ∈ (C-2,C]`).
+  digit confines `g ∈ (C-2,C]`).  Plus `dStepPartial_eq_sum` (`g = ∑_{k<e} α^{e-k} fₖ`) and the range
+  bounds `dStepPartial_{nonneg,lt_window}` (the orbit's `g ∈ [0, S_d)`).
+- **`RpowWindow.lean` (abstract crux)** — `sum_pos_coeff_realize` (a positive-coefficient sum surjects
+  onto `[0, S)`, witness `fₖ=t/S`) and **`exists_partial_defect_outside_window`** (for `d≥3` and any
+  `C`, some reachable fract-config has partial defect ∉ `(C-2,C]`).  So **no fixed `C` makes every
+  reachable partial defect a base-2 digit** — the algebraic core of the impossibility is CLOSED.
 
-### ▶▶ NEXT (general-`d` headline — analytic assembly; the engine is already degree-agnostic)
-The algebraic+abstract-geometric obstruction is now a closed skeleton.  Remaining to the uniform
-headline (mirror of the cubic/quartic finish, using the already-degree-agnostic
-`MultidimWeyl`/`EquidistDense`/`DELEngine`):
+### ▶▶ NEXT (general-`d` headline — purely the analytic `Tᵈ` orbit-density assembly)
+The algebraic + abstract-geometric obstruction is now a **fully closed skeleton** (the abstract crux
+`exists_partial_defect_outside_window` + range bounds are done).  The ONLY remaining gap is showing the
+*orbit* `⌊W2ⁿ⌋` actually *reaches* a bad fract-config (i.e. `Tᵈ` density a.e.-`W`).  Remaining (mirror
+of the cubic/quartic finish, using the already-degree-agnostic `MultidimWeyl`/`EquidistDense`/`DELEngine`):
 1. **Orbit-coordinate form of `dStepPartial`** — express `g(⌊W2ⁿ⌋)` as a continuous function of the
    `Tᵈ`-orbit coords `(\{2ⁿW\}, \{2ⁿαW\}, …, \{2ⁿα^{d-1}W\})` (general `cubicGpd`/`cubicPartialDefect_eq_Gpd`).
 2. **General `Tᵈ` equidistribution/density** for a.e. `W` via `rpow_lin_indep_int` (⇒ `ξ=∑nᵢαⁱ≠0` ⇒
