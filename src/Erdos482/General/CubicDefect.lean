@@ -174,6 +174,67 @@ theorem irrational_cbrt_two : Irrational ((2 : ℝ) ^ ((1 : ℝ) / 3)) := by
   have : y < (2 : ℤ) := by exact_mod_cast h2
   omega
 
+/-- No integer ratio `p/q` equals `α = 2^{1/3}` (it is irrational). -/
+theorem cbrt_ne_ratio (p q : ℤ) : ((p : ℝ) / q) ≠ (2:ℝ) ^ ((1:ℝ)/3) := by
+  intro he
+  exact irrational_cbrt_two ⟨(p : ℚ) / q, by rw [← he]; push_cast; ring⟩
+
+/-- `b³ = 2·c³` in `ℤ` forces `c = 0` — `2` is not a cube in `ℚ`. -/
+theorem cube_two_int (b c : ℤ) (h : b ^ 3 = 2 * c ^ 3) : c = 0 := by
+  by_contra hc
+  have hcr : (c : ℝ) ≠ 0 := by exact_mod_cast hc
+  have hr : ((b : ℝ) / c) ^ 3 = 2 := by
+    have hbc : (b : ℝ) ^ 3 = 2 * (c : ℝ) ^ 3 := by exact_mod_cast h
+    field_simp; linarith [hbc]
+  have h23 : ((2:ℝ) ^ ((1:ℝ)/3)) ^ 3 = 2 := by
+    rw [← Real.rpow_natCast ((2:ℝ)^((1:ℝ)/3)) 3, ← Real.rpow_mul (by norm_num)]; norm_num
+  have hpow : ((b:ℝ)/c) ^ 3 = ((2:ℝ)^((1:ℝ)/3)) ^ 3 := by rw [hr, h23]
+  exact cbrt_ne_ratio b c ((Odd.strictMono_pow (⟨1, by norm_num⟩ : Odd 3)).injective hpow)
+
+/-- **Linear independence of `{1, α, α²}` over `ℤ`** for `α = 2^{1/3}`.  For integers `a b c`, if
+`a + b·α + c·α² = 0` then `a = b = c = 0`.  Equivalently `α` has degree `3` over `ℚ` (minimal
+polynomial `X³ − 2`).  This is the prerequisite for Weyl equidistribution of the pair `({α·u}, {α²·u})`
+over the integers — the residual obstruction on the cubic self-referential frontier needs the joint
+distribution of the internal-floor coordinates, whose first nontrivial input is exactly this
+non-degeneracy.  Elementary proof (no `minpoly` machinery): from `cα²+bα+a = 0` derive the second
+relation `bα²+aα+2c = 0` (multiply by `α`, use `α³=2`), eliminate `α²` to get `(b²−ca)α = 2c²−ab`; if
+`b²≠ca` then `α` is rational (contra), else `b³ = 2c³` forces `c = 0` (`cube_two_int`), then `b = a = 0`. -/
+theorem cubic_lin_indep_int (a b c : ℤ)
+    (h : (a : ℝ) + b * ((2:ℝ) ^ ((1:ℝ)/3)) + c * ((2:ℝ) ^ ((1:ℝ)/3)) ^ 2 = 0) :
+    a = 0 ∧ b = 0 ∧ c = 0 := by
+  set A : ℝ := (2:ℝ) ^ ((1:ℝ)/3) with hAdef
+  have hA3 : A ^ 3 = 2 := by
+    rw [hAdef, ← Real.rpow_natCast ((2:ℝ)^((1:ℝ)/3)) 3, ← Real.rpow_mul (by norm_num)]; norm_num
+  have h2 : (b : ℝ) * A ^ 2 + a * A + 2 * c = 0 := by
+    have := congrArg (· * A) h
+    simp only [zero_mul] at this
+    linear_combination A * h - c * hA3
+  have hcomb : ((b : ℝ) ^ 2 - c * a) * A = 2 * c ^ 2 - a * b := by linear_combination b * h - c * h2
+  by_cases hbca : (b : ℤ) ^ 2 - c * a = 0
+  · have hbca_r : (b : ℝ) ^ 2 - c * a = 0 := by exact_mod_cast hbca
+    rw [hbca_r, zero_mul] at hcomb
+    have hz : (2 : ℝ) * c ^ 2 - a * b = 0 := hcomb.symm
+    have hi1 : (b : ℤ) ^ 2 = c * a := by linarith [hbca]
+    have hi2 : (2 : ℤ) * c ^ 2 = a * b := by
+      have hr2 : (2:ℝ) * c ^ 2 = a * b := by linarith [hz]
+      exact_mod_cast hr2
+    have hb3 : (b : ℤ) ^ 3 = 2 * c ^ 3 := by linear_combination b * hi1 - c * hi2
+    have hc0 : c = 0 := cube_two_int b c hb3
+    subst hc0
+    have hb0 : b = 0 := by nlinarith [hi1]
+    subst hb0
+    refine ⟨?_, rfl, rfl⟩
+    have : (a : ℝ) = 0 := by simpa using h
+    exact_mod_cast this
+  · exfalso
+    have hbca_r : ((b : ℝ) ^ 2 - c * a) ≠ 0 := by exact_mod_cast hbca
+    have hA : A = (2 * c ^ 2 - a * b) / ((b : ℝ) ^ 2 - c * a) := by
+      rw [eq_div_iff hbca_r]; linear_combination hcomb
+    have hnum : (2 * (c:ℝ) ^ 2 - a * b) = (((2 * c ^ 2 - a * b : ℤ)) : ℝ) := by push_cast; ring
+    have hden : ((b : ℝ) ^ 2 - c * a) = (((b ^ 2 - c * a : ℤ)) : ℝ) := by push_cast; ring
+    rw [hnum, hden] at hA
+    exact cbrt_ne_ratio (2 * c ^ 2 - a * b) (b ^ 2 - c * a) hA.symm
+
 /-- **The block orbit is a base-2 expansion** (`⌊W·2ⁿ⌋`), not geometric base-`α`.  If the three-step
 cubic map reads valid base-2 digits along an orbit — `orbit (n+1) = cubicV3 (orbit n)` with every digit
 `cubicV3 − 2·orbit ∈ {0,1}` — then `2ⁿ·orbit₀ ≤ orbit n ≤ 2ⁿ·orbit₀ + (2ⁿ − 1)`, i.e.
