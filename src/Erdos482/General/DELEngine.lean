@@ -70,4 +70,18 @@ theorem ae_tendsto_zero_of_summable_sq
   obtain ⟨ a, ha ⟩ := hx; use a; intro b hb; specialize ha b hb; rw [ ← ENNReal.toReal_lt_toReal ] at * <;> norm_num at *;
   exact lt_of_le_of_lt ( Real.le_sqrt_of_sq_le ha.le ) ( by rw [ Real.sqrt_inv, Real.sqrt_sq ( by positivity ) ] ; simpa [ ENNReal.toReal_add, Nat.cast_add_one_ne_zero ] using hk )
 
+/-- **Bochner ↔ lower-integral bridge.**  For continuous `g : ℝ → ℂ`, the `ℝ≥0∞` lower integral of
+`‖g‖²` over `[0,1]` equals `ENNReal.ofReal` of the real Bochner interval integral `∫₀¹ ‖g‖²`.  This
+turns the explicit Weyl mean square (`WeylDoubling.doubling_weyl_L2_normalized`, a real interval
+integral) into the `∫⁻ ‖g_j‖₊²` form the DEL engine's hypothesis demands.  Provenance: Aristotle
+`190d0b98`, verified in-kernel + axiom-clean. -/
+theorem l2_bridge (g : ℝ → ℂ) (hg : Continuous g) :
+    (∫⁻ x in Set.Icc (0:ℝ) 1, ‖g x‖₊ ^ 2 ∂volume)
+      = ENNReal.ofReal (∫ s in (0:ℝ)..1, ‖g s‖ ^ 2) := by
+  rw [intervalIntegral.integral_of_le zero_le_one, MeasureTheory.ofReal_integral_eq_lintegral_ofReal]
+  · rw [MeasureTheory.Measure.restrict_congr_set MeasureTheory.Ioc_ae_eq_Icc]
+    simp +decide [← ENNReal.ofReal_coe_nnreal]
+  · exact Continuous.integrableOn_Ioc (by continuity)
+  · exact Filter.Eventually.of_forall fun x => sq_nonneg _
+
 end Erdos482.General
