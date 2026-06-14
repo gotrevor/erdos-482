@@ -108,6 +108,77 @@ theorem cubicV3_sub_eq (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) (u : ℤ) :
   simp only [cubicV3, cubicDefect]
   linarith [hd]
 
+/-- The **two-floor partial defect** `g = α²·f₁ + α·f₂` (the first two internal-floor errors only).
+The full combined defect collapses to a floor of this (`cubicDefect_eq_C_sub_floor`): the third floor
+error is *forced*, `f₃ = {C − g}`, so the digit depends on the orbit only through `g`. -/
+noncomputable def cubicPartialDefect (α c0 c1 c2 : ℝ) (u : ℤ) : ℝ :=
+  α ^ 2 * Int.fract (α * ((u : ℝ) + c0))
+    + α * Int.fract (α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1))
+
+/-- **The third floor error is forced.**  `f₃ = {C − g}`, where `C = 2c₀+α²c₁+αc₂` is the schedule
+constant and `g = α²f₁+αf₂` the partial defect.  (Because `α(v₂+c₂) = 2u + C − g` with `2u ∈ ℤ`, so its
+fractional part is `{C − g}`.)  Pure algebra from `α³ = 2`. -/
+theorem cubic_f3_eq (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) (u : ℤ) :
+    Int.fract (α * (((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ) + c2))
+      = Int.fract ((2 * c0 + α ^ 2 * c1 + α * c2) - cubicPartialDefect α c0 c1 c2 u) := by
+  have harg : α * (((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ) + c2)
+      = ((2 * c0 + α ^ 2 * c1 + α * c2) - cubicPartialDefect α c0 c1 c2 u) + 2 * (u : ℝ) := by
+    simp only [cubicPartialDefect]
+    have hv1 : ((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ)
+        = α * ((u : ℝ) + c0) - Int.fract (α * ((u : ℝ) + c0)) := (Int.self_sub_fract _).symm
+    have hv2 : ((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ)
+        = α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)
+            - Int.fract (α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)) := (Int.self_sub_fract _).symm
+    linear_combination α * hv2 + α ^ 2 * hv1 + (u + c0) * hα
+  rw [harg, show (2 * (u : ℝ)) = ((2 * u : ℤ) : ℝ) by push_cast; ring, Int.fract_add_intCast]
+
+/-- **The combined defect collapses to a floor of the partial defect.**
+`cubicDefect = C − ⌊C − g⌋`, with `C = 2c₀+α²c₁+αc₂` and `g = α²f₁+αf₂`.  Consequently the extracted
+digit is exactly `cubicV3 − 2u = ⌊C − g⌋` (`cubic_digit_eq_floor`): the whole cubic readout is governed
+by the *two*-floor quantity `g`, whose range `[0, α²+α)` has width `α²+α > 2`. -/
+theorem cubicDefect_eq_C_sub_floor (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) (u : ℤ) :
+    cubicDefect α c0 c1 c2 u
+      = (2 * c0 + α ^ 2 * c1 + α * c2)
+        - (⌊(2 * c0 + α ^ 2 * c1 + α * c2) - cubicPartialDefect α c0 c1 c2 u⌋ : ℤ) := by
+  have hsplit : cubicDefect α c0 c1 c2 u
+      = cubicPartialDefect α c0 c1 c2 u
+        + Int.fract (α * (((⌊α * (((⌊α * ((u : ℝ) + c0)⌋ : ℤ) : ℝ) + c1)⌋ : ℤ) : ℝ) + c2)) := by
+    simp only [cubicDefect, cubicPartialDefect, add_assoc]
+  rw [hsplit, cubic_f3_eq α c0 c1 c2 hα u]
+  simp only [Int.fract]; ring_nf
+
+/-- **The extracted digit is a floor of the partial defect**: `cubicV3 − 2u = ⌊C − g⌋`,
+`C = 2c₀+α²c₁+αc₂`, `g = α²f₁+αf₂`.  So reading a base-2 digit is exactly the condition `⌊C−g⌋ ∈ {0,1}`,
+i.e. `g ∈ (C−2, C]` (`cubic_partial_defect_mem_window`). -/
+theorem cubic_digit_eq_floor (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) (u : ℤ) :
+    cubicV3 α c0 c1 c2 u - 2 * u
+      = ⌊(2 * c0 + α ^ 2 * c1 + α * c2) - cubicPartialDefect α c0 c1 c2 u⌋ := by
+  have h1 := cubicV3_sub_eq α c0 c1 c2 hα u
+  rw [cubicDefect_eq_C_sub_floor α c0 c1 c2 hα u] at h1
+  have hr : ((cubicV3 α c0 c1 c2 u - 2 * u : ℤ) : ℝ)
+      = ((⌊(2 * c0 + α ^ 2 * c1 + α * c2) - cubicPartialDefect α c0 c1 c2 u⌋ : ℤ) : ℝ) := by
+    push_cast; push_cast at h1; linarith
+  exact_mod_cast hr
+
+/-- **A base-2 digit confines the partial defect to a width-2 window**: if `cubicV3 − 2u ∈ {0,1}` then
+`g = α²f₁+αf₂ ∈ (C−2, C]` with `C = 2c₀+α²c₁+αc₂`.  (The digit is `⌊C−g⌋`, so `⌊C−g⌋ ∈ {0,1}` iff
+`0 ≤ C−g < 2`.)  Since the partial-defect *range* `[0, α²+α)` has width `α²+α > 2`, an orbit that
+explored that range would leave this window — the precise (now two-floor, width-2) form of the
+obstruction. -/
+theorem cubic_partial_defect_mem_window (α c0 c1 c2 : ℝ) (hα : α ^ 3 = 2) (u : ℤ)
+    (hdig : cubicV3 α c0 c1 c2 u - 2 * u = 0 ∨ cubicV3 α c0 c1 c2 u - 2 * u = 1) :
+    (2 * c0 + α ^ 2 * c1 + α * c2) - 2 < cubicPartialDefect α c0 c1 c2 u
+      ∧ cubicPartialDefect α c0 c1 c2 u ≤ (2 * c0 + α ^ 2 * c1 + α * c2) := by
+  have hfloor := cubic_digit_eq_floor α c0 c1 c2 hα u
+  set C := 2 * c0 + α ^ 2 * c1 + α * c2 with hC
+  rw [hfloor] at hdig
+  -- ⌊C - g⌋ ∈ {0,1}  ⟹  0 ≤ C - g < 2
+  have hle : ((⌊C - cubicPartialDefect α c0 c1 c2 u⌋ : ℤ) : ℝ) ≤ C - cubicPartialDefect α c0 c1 c2 u :=
+    Int.floor_le _
+  have hlt : C - cubicPartialDefect α c0 c1 c2 u < (⌊C - cubicPartialDefect α c0 c1 c2 u⌋ : ℤ) + 1 :=
+    Int.lt_floor_add_one _
+  rcases hdig with h | h <;> rw [h] at hle hlt <;> push_cast at hle hlt <;> constructor <;> linarith
+
 /-- **Conditional cubic impossibility (the honest ceiling).**  Fix `α` with `α³ = 2` and any offset
 schedule `(c₀,c₁,c₂)`.  *If* the orbit realises two starts `u, u'` whose combined internal-floor
 defects differ by more than `1`, *then* the two extracted digits `cubicV3 − 2u` and `cubicV3' − 2u'`
