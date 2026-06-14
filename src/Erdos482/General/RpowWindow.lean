@@ -170,4 +170,35 @@ theorem exists_scale_outside_window (S C : ℝ) (hS : 2 < S) :
         rw [div_mul_cancel₀ _ (ne_of_gt hSpos)] at hle
         linarith
 
+/-- **A strict-interior scaling escapes the window (strict form).**  For `S > 2` and any `C`, there is
+`τ ∈ (0,1)` with `τ·S` *strictly* outside the half-open window `(C-2, C]`: either `τ·S < C-2` or
+`C < τ·S`.  This is the form the final general-`d` assembly needs (`ae_dStep_fails_of_exceeding` wants
+the strict disjunction `< C-2 ∨ C <`), stronger than `exists_scale_outside_window`'s `∉ Ioc` (which only
+gives `≤ C-2`). -/
+theorem exists_scale_outside_window_strict (S C : ℝ) (hS : 2 < S) :
+    ∃ τ, τ ∈ Set.Ioo (0 : ℝ) 1 ∧ (τ * S < C - 2 ∨ C < τ * S) := by
+  have hSpos : (0 : ℝ) < S := by linarith
+  have hSne : S ≠ 0 := ne_of_gt hSpos
+  by_cases hC : C ≤ 0
+  · exact ⟨1 / 2, ⟨by norm_num, by norm_num⟩, Or.inr (by linarith)⟩
+  · have hC : 0 < C := not_le.mp hC
+    by_cases hCS : C < S
+    · refine ⟨(C / S + 1) / 2, ⟨?_, ?_⟩, Or.inr ?_⟩
+      · have : (0 : ℝ) < C / S := div_pos hC hSpos; linarith
+      · have : C / S < 1 := (div_lt_one hSpos).mpr hCS; linarith
+      · have hτS : (C / S + 1) / 2 * S = (C + S) / 2 := by field_simp
+        rw [hτS]; linarith
+    · have hCS : S ≤ C := not_lt.mp hCS
+      have hC2 : 0 < C - 2 := by linarith
+      set m : ℝ := min ((C - 2) / S) 1 with hm
+      have hmpos : 0 < m := lt_min (div_pos hC2 hSpos) one_pos
+      have hmle1 : m ≤ 1 := min_le_right _ _
+      have hmS : m * S ≤ C - 2 := by
+        have hml : m ≤ (C - 2) / S := min_le_left _ _
+        calc m * S ≤ (C - 2) / S * S := by nlinarith
+          _ = C - 2 := by field_simp
+      refine ⟨m / 2, ⟨by linarith, by linarith⟩, Or.inl ?_⟩
+      have hhalf : m / 2 * S = m * S / 2 := by ring
+      rw [hhalf]; linarith
+
 end Erdos482.General

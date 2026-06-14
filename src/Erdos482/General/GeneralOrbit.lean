@@ -191,6 +191,41 @@ theorem orbitF_realizeR (α : ℝ) (c t : ℕ → ℝ) (e : ℕ)
   rw [orbitF_eq_fract_arg, orbitArg_realizeR α c t e ht k hk]
   exact Int.fract_eq_self.mpr (ht k hk)
 
+/-- **A nonzero-`r 0` realizer producing a constant `orbitF = τ`.**  Like `realizeR` but with a free
+seed `σ` for `r 0` and the higher coordinates taken modulo `1` (`Int.fract`), so they too land in
+`[0,1)`.  This makes every `orbitF … k = τ` (constant) regardless of `σ`; choosing `σ` outside a
+countable bad set keeps every coordinate strictly positive (so the torus point has nonzero coords). -/
+noncomputable def realizeR0 (α : ℝ) (c : ℕ → ℝ) (τ σ : ℝ) : ℕ → ℝ
+  | 0 => σ
+  | (k + 1) => Int.fract (τ + α ^ (k + 1) * σ
+      - (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - τ)) - α * c k)
+
+/-- **`orbitF` at the `realizeR0` seed is the constant `τ`.**  For `τ ∈ [0,1)`, every `orbitF α c
+(realizeR0 α c τ σ) k = τ`, *independently of the seed* `σ`.  The inner argument is `τ` shifted by an
+integer (`-⌊X⌋`), so its fractional part is `τ`.  Proof by strong induction. -/
+theorem orbitF_realizeR0 (α : ℝ) (c : ℕ → ℝ) (τ σ : ℝ) (hτ : τ ∈ Set.Ico (0 : ℝ) 1) :
+    ∀ k, orbitF α c (realizeR0 α c τ σ) k = τ := by
+  intro k
+  induction k using Nat.strong_induction_on with
+  | _ k IH =>
+    rw [orbitF_eq_fract_arg, orbitArg]
+    have hsum : (∑ j ∈ Finset.range k,
+          α ^ (k - j) * (α * c j - orbitF α c (realizeR0 α c τ σ) j))
+        = ∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - τ) := by
+      refine Finset.sum_congr rfl (fun j hj => ?_)
+      rw [Finset.mem_range] at hj; rw [IH j hj]
+    rw [hsum, show realizeR0 α c τ σ 0 = σ from rfl,
+      show realizeR0 α c τ σ (k + 1) = Int.fract (τ + α ^ (k + 1) * σ
+          - (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - τ)) - α * c k) from rfl]
+    set X : ℝ := τ + α ^ (k + 1) * σ
+      - (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - τ)) - α * c k with hX
+    rw [show Int.fract X - α ^ (k + 1) * σ
+          + (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - τ)) + α * c k
+        = ((-⌊X⌋ : ℤ) : ℝ) + τ by
+        have hsf : X - Int.fract X = ((⌊X⌋ : ℤ) : ℝ) := Int.self_sub_fract X
+        push_cast; rw [hX] at hsf ⊢; linarith]
+    rw [Int.fract_intCast_add, Int.fract_eq_self.mpr hτ]
+
 /-- **`orbitF … k` depends only on the coordinates `r 0, …, r (k+1)`.** -/
 theorem orbitF_congr (α : ℝ) (c r r' : ℕ → ℝ) (k : ℕ) (h : ∀ i, i ≤ k + 1 → r i = r' i) :
     orbitF α c r k = orbitF α c r' k := by

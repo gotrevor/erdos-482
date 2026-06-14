@@ -2,6 +2,8 @@ import Erdos482.General.GeneralOrbit
 import Erdos482.General.GeneralTorusEquidist
 import Erdos482.General.CubicFinish
 import Erdos482.General.RpowWindow
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Mathlib.Analysis.Real.Cardinality
 
 /-!
 # Torus-level plumbing for the general degree-`d` finish
@@ -102,5 +104,158 @@ theorem ae_dStep_fails_of_exceeding (d : ℕ) (hd : 1 ≤ d) (c : ℕ → ℝ)
     exact absurd (hwin n).1 (not_lt.mpr hn.le)
   · obtain ⟨n, hn⟩ := exists_lt_of_dense_continuousAt hdense hcont hgt
     exact absurd (hwin n).2 (not_le.mpr hn)
+
+/-- **The geometry crux, discharged.**  For `α = 2^{1/d}` (`d ≥ 3`) and any schedule `c`, there is a
+torus point `P : Tᵈ` with *all coordinates nonzero*, all inner fract-arguments non-integers, and
+partial-defect value `dGpdTorus P` strictly outside the digit window `(C-2, C]` (`C = dStepC … d`).
+
+This is the *nonzero-coordinate realization* the handoff flagged as the last gap.  Construction: take the
+constant defect target `τ` from `exists_scale_outside_window_strict` (using the width bound `S_d > 2`,
+`rrt_window_gt_two`), then build the coordinate vector `realizeR0 α c τ σ` with a free seed `σ` for the
+0-th coordinate.  Every `orbitF` is then the constant `τ ∈ (0,1)` (`orbitF_realizeR0`) regardless of
+`σ`, so `dGpdTorus = τ·S_d ∉ window` and (since `τ ≠ 0`) every inner arg is a non-integer.  The seed `σ`
+is chosen in the *uncountable* `(0,1)` outside the *countable* bad set making any higher coordinate zero
+(each bad set is the affine-preimage of `ℤ`, a countable range), so every torus coordinate is nonzero. -/
+theorem exists_exceeding_torus_point (d : ℕ) (hd : 3 ≤ d) (c : ℕ → ℝ) :
+    ∃ P : Fin d → AddCircle (1 : ℝ), (∀ i, P i ≠ 0)
+      ∧ (∀ k, k < d - 1 →
+          orbitArg (rrt d) c (coordsOf d P) k
+            ≠ ((⌊orbitArg (rrt d) c (coordsOf d P) k⌋ : ℤ) : ℝ))
+      ∧ (dGpdTorus d (rrt d) c P < dStepC (rrt d) c d - 2 ∨
+          dStepC (rrt d) c d < dGpdTorus d (rrt d) c P) := by
+  obtain ⟨e, rfl⟩ : ∃ e, d = e + 1 := ⟨d - 1, by omega⟩
+  set α : ℝ := rrt (e + 1) with hαdef
+  have hαpos : 0 < α := rrt_pos (e + 1)
+  have hαne : α ^ (e + 1) ≠ 0 := pow_ne_zero _ (ne_of_gt hαpos)
+  -- window width `S > 2`
+  set S : ℝ := ∑ k ∈ Finset.range e, α ^ (e - k) with hSdef
+  have hSsum : S = ∑ j ∈ Finset.Ico 1 (e + 1), α ^ j := by
+    rw [hSdef, Finset.sum_Ico_eq_sum_range, Nat.add_sub_cancel,
+      ← Finset.sum_range_reflect (fun k => α ^ (1 + k)) e]
+    refine Finset.sum_congr rfl (fun k hk => ?_)
+    rw [Finset.mem_range] at hk; congr 1; omega
+  have hSgt : 2 < S := by rw [hSsum]; exact rrt_window_gt_two (e + 1) (by omega)
+  -- the escaping scale `τ`
+  obtain ⟨τ, hτ, hτout⟩ := exists_scale_outside_window_strict S (dStepC α c (e + 1)) hSgt
+  have hτico : τ ∈ Set.Ico (0 : ℝ) 1 := ⟨hτ.1.le, hτ.2⟩
+  -- the countable bad set and the chosen seed `σ`
+  set K : ℕ → ℝ := fun k => (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - τ)) + α * c k with hKdef
+  set g : ℕ → ℤ → ℝ := fun k m => ((m : ℝ) - τ + K k) / α ^ (k + 1) with hgdef
+  set B : Set ℝ := ⋃ k : Fin e, Set.range (g k.val) with hBdef
+  have hBcount : B.Countable := Set.countable_iUnion (fun k => Set.countable_range _)
+  have huncount : ¬ (Set.Ioo (0 : ℝ) 1).Countable := by
+    rw [Cardinal.Real.Ioo_countable_iff]; norm_num
+  obtain ⟨σ, hσio, hσB⟩ : ∃ σ, σ ∈ Set.Ioo (0 : ℝ) 1 ∧ σ ∉ B := by
+    by_contra hcon; push_neg at hcon
+    exact huncount (hBcount.mono (fun x hx => hcon x hx))
+  -- the realizer and its coordinate properties
+  set r : ℕ → ℝ := realizeR0 α c τ σ with hrdef
+  have hr_ico : ∀ i, r i ∈ Set.Ico (0 : ℝ) 1 := by
+    intro i
+    rw [hrdef]; cases i with
+    | zero => exact ⟨hσio.1.le, hσio.2⟩
+    | succ k => exact ⟨Int.fract_nonneg _, Int.fract_lt_one _⟩
+  have hr_pos : ∀ i, i ≤ e → 0 < r i := by
+    intro i hi
+    rw [hrdef]
+    cases i with
+    | zero => exact hσio.1
+    | succ k =>
+      have hk : k < e := by omega
+      have hval : realizeR0 α c τ σ (k + 1)
+          = Int.fract (τ + α ^ (k + 1) * σ
+              - (∑ j ∈ Finset.range k, α ^ (k - j) * (α * c j - τ)) - α * c k) := rfl
+      rw [hval]
+      refine lt_of_le_of_ne (Int.fract_nonneg _) (Ne.symm ?_)
+      rw [Int.fract_ne_zero_iff]
+      rintro ⟨m, hm⟩
+      apply hσB
+      rw [hBdef, Set.mem_iUnion]
+      refine ⟨⟨k, hk⟩, m, ?_⟩
+      simp only [hgdef, hKdef]
+      rw [div_eq_iff (pow_ne_zero (k + 1) (ne_of_gt hαpos))]
+      linear_combination hm
+  -- the torus point
+  set P : Fin (e + 1) → AddCircle (1 : ℝ) := fun i => ((r i.val : ℝ) : AddCircle (1 : ℝ)) with hPdef
+  have hcoord : ∀ i, i ≤ e → coordsOf (e + 1) P i = r i := by
+    intro i hi
+    have hlt : i < e + 1 := by omega
+    simp only [coordsOf, dif_pos hlt, hPdef, torusRep_coe]
+    exact Int.fract_eq_self.mpr (hr_ico i)
+  refine ⟨P, ?_, ?_, ?_⟩
+  · -- all coordinates nonzero
+    intro i
+    have hi : i.val ≤ e := Nat.lt_succ_iff.mp i.isLt
+    simp only [hPdef, Ne, AddCircle.coe_eq_zero_iff_of_mem_Ico (hr_ico i.val)]
+    exact (hr_pos i.val hi).ne'
+  · -- inner args non-integer (since `orbitF = τ ≠ 0`)
+    intro k hk
+    have hF : orbitF α c (coordsOf (e + 1) P) k = τ := by
+      rw [orbitF_congr α c (coordsOf (e + 1) P) r k (fun i hi => hcoord i (by omega)), hrdef]
+      exact orbitF_realizeR0 α c τ σ hτico k
+    intro heq
+    have hfr : Int.fract (orbitArg α c (coordsOf (e + 1) P) k) = 0 := by
+      rw [heq]; exact Int.fract_intCast _
+    rw [← orbitF_eq_fract_arg, hF] at hfr
+    exact hτ.1.ne' hfr
+  · -- value `= S·τ` strictly outside the window
+    have hval : dGpdTorus (e + 1) α c P = S * τ := by
+      have hterm : ∀ k ∈ Finset.range e,
+          α ^ (e - k) * orbitF α c (realizeR0 α c τ σ) k = α ^ (e - k) * τ := by
+        intro k _; rw [orbitF_realizeR0 α c τ σ hτico k]
+      rw [dGpdTorus, Nat.add_sub_cancel,
+        dGpd_congr α c (coordsOf (e + 1) P) r e (fun i hi => hcoord i hi)]
+      unfold dGpd
+      rw [hrdef, Finset.sum_congr rfl hterm, ← Finset.sum_mul, ← hSdef]
+    rw [hval]
+    rcases hτout with h | h
+    · exact Or.inl (by rw [mul_comm S τ]; exact h)
+    · exact Or.inr (by rw [mul_comm S τ]; exact h)
+
+/-- **The unconditional uniform general-`d` impossibility** (`d ≥ 3`, `α = 2^{1/d}`).  For *almost
+every* real `W`, **no** `d`-periodic offset schedule `c` whatsoever makes the `d`-step floor map read
+`W`'s base-2 digits: for every `c` there is a step `n` at which the extracted digit
+`dStepV(⌊W·2ⁿ⌋) − 2⌊W·2ⁿ⌋ ∉ {0,1}`.
+
+This is the general-degree analogue of `CubicFinish.ae_no_cubic_schedule_reads_base_two`, now uniform in
+the degree.  The single exceptional null set is the schedule-independent orbit-density set
+(`ae_W_dTorus_orbit_dense`); for each `W` there and each `c`, the geometry crux
+(`exists_exceeding_torus_point`) exhibits a non-jump torus point where the partial defect leaves the
+width-2 digit window, and density + continuity realize an out-of-window orbit step — contradicting the
+window confinement `dStep_partial_mem_window`. -/
+theorem ae_no_dStep_schedule_reads_base_two (d : ℕ) (hd : 3 ≤ d) :
+    ∀ᵐ W ∂(volume : Measure ℝ), ∀ c : ℕ → ℝ, ∃ n : ℕ,
+      ¬ (dStepV (rrt d) c (⌊W * 2 ^ n⌋) d - 2 * (⌊W * 2 ^ n⌋ : ℝ) = 0
+          ∨ dStepV (rrt d) c (⌊W * 2 ^ n⌋) d - 2 * (⌊W * 2 ^ n⌋ : ℝ) = 1) := by
+  obtain ⟨e, rfl⟩ : ∃ e, d = e + 1 := ⟨d - 1, by omega⟩
+  have hα : (rrt (e + 1)) ^ (e + 1) = 2 := rrt_pow_self (e + 1) (by omega)
+  filter_upwards [ae_W_dTorus_orbit_dense (d := e + 1) (by omega)] with W hdense
+  intro c
+  obtain ⟨P, hne, harg, hexc⟩ := exists_exceeding_torus_point (e + 1) (by omega) c
+  have hcont : ContinuousAt (dGpdTorus (e + 1) (rrt (e + 1)) c) P :=
+    continuousAt_dGpdTorus (e + 1) (rrt (e + 1)) c P hne harg
+  by_contra hcon
+  simp only [not_exists, not_not] at hcon
+  have hwin : ∀ n : ℕ, dStepC (rrt (e + 1)) c (e + 1) - 2
+        < dGpdTorus (e + 1) (rrt (e + 1)) c (dTorusOrbit (e + 1) W n)
+      ∧ dGpdTorus (e + 1) (rrt (e + 1)) c (dTorusOrbit (e + 1) W n)
+        ≤ dStepC (rrt (e + 1)) c (e + 1) := by
+    intro n
+    rw [dGpdTorus_orbit (e + 1) (by omega)]
+    exact dStep_partial_mem_window (rrt (e + 1)) c (⌊W * 2 ^ n⌋) e hα (hcon n)
+  rcases hexc with hlt | hgt
+  · obtain ⟨n, hn⟩ := exists_gt_of_dense_continuousAt hdense hcont hlt
+    exact absurd (hwin n).1 (not_lt.mpr hn.le)
+  · obtain ⟨n, hn⟩ := exists_lt_of_dense_continuousAt hdense hcont hgt
+    exact absurd (hwin n).2 (not_le.mpr hn)
+
+/-- **Fixed-schedule form.**  For each `d`-periodic schedule `c` (`d ≥ 3`), almost every `W` has a step
+where the `d`-step readout fails to be a base-2 digit.  Immediate from the uniform version. -/
+theorem ae_dStep_not_reads_base_two (d : ℕ) (hd : 3 ≤ d) (c : ℕ → ℝ) :
+    ∀ᵐ W ∂(volume : Measure ℝ), ∃ n : ℕ,
+      ¬ (dStepV (rrt d) c (⌊W * 2 ^ n⌋) d - 2 * (⌊W * 2 ^ n⌋ : ℝ) = 0
+          ∨ dStepV (rrt d) c (⌊W * 2 ^ n⌋) d - 2 * (⌊W * 2 ^ n⌋ : ℝ) = 1) := by
+  filter_upwards [ae_no_dStep_schedule_reads_base_two d hd] with W hW
+  exact hW c
 
 end Erdos482.General
