@@ -264,4 +264,37 @@ theorem ae_no_quartic_schedule_reads_base_two :
     obtain ⟨n, hn⟩ := exists_gt_of_dense_continuousAt hdense hcont (c := C - 2) hc
     exact absurd (hwin n).1 (not_lt.mpr hn.le)
 
+/-- **`W` is quartic-digit-representable** if some 4-periodic schedule digit-represents it (every
+`quarticV4(⌊W·2ⁿ⌋) − 2⌊W·2ⁿ⌋ ∈ {0,1}`). -/
+def QuarticDigitRepresentable (W : ℝ) : Prop :=
+  ∃ c0 c1 c2 c3 : ℝ, ∀ n : ℕ,
+    quarticV4 qrt2 c0 c1 c2 c3 ⌊W * 2 ^ n⌋ - 2 * ⌊W * 2 ^ n⌋ = 0
+      ∨ quarticV4 qrt2 c0 c1 c2 c3 ⌊W * 2 ^ n⌋ - 2 * ⌊W * 2 ^ n⌋ = 1
+
+/-- **Almost no real is quartic-digit-representable.** -/
+theorem ae_not_quarticDigitRepresentable :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ QuarticDigitRepresentable W := by
+  filter_upwards [ae_no_quartic_schedule_reads_base_two] with W hW
+  rintro ⟨c0, c1, c2, c3, hall⟩
+  obtain ⟨n, hn⟩ := hW c0 c1 c2 c3
+  exact hn (hall n)
+
+/-- **The quartic map correctly reads `W`'s base-2 digits** if some schedule sends each binary block
+`⌊W·2ⁿ⌋` to the next, `quarticV4(⌊W·2ⁿ⌋) = ⌊W·2ⁿ⁺¹⌋`. -/
+def QuarticReadsBaseTwo (W : ℝ) : Prop :=
+  ∃ c0 c1 c2 c3 : ℝ, ∀ n : ℕ, quarticV4 qrt2 c0 c1 c2 c3 ⌊W * 2 ^ n⌋ = ⌊W * 2 ^ (n + 1)⌋
+
+/-- **The quartic four-step map computes no real's base-2 doubling, for almost every `W`.** -/
+theorem ae_not_quarticReadsBaseTwo :
+    ∀ᵐ W ∂(volume : Measure ℝ), ¬ QuarticReadsBaseTwo W := by
+  filter_upwards [ae_not_quarticDigitRepresentable] with W hW
+  rintro ⟨c0, c1, c2, c3, hread⟩
+  refine hW ⟨c0, c1, c2, c3, fun n => ?_⟩
+  have hpow : (2 : ℝ) ^ (n + 1) = 2 * 2 ^ n := by ring
+  have hdouble : ⌊W * 2 ^ (n + 1)⌋ = ⌊2 * (W * 2 ^ n)⌋ := by rw [hpow]; ring_nf
+  rw [hread n, hdouble]
+  rcases floor_two_mul_sub_mem (W * 2 ^ n) with h | h
+  · left; omega
+  · right; omega
+
 end Erdos482.General
