@@ -1,5 +1,53 @@
 # PENDING_WORK — Erdős #482 / Stoll
 
+## ★★★ STATE 2026-06-14 (~lap baton, build 🟢 8286) — equidistribution backbone DONE; defect-link in progress
+
+**This lap built the ENTIRE analytic backbone of the a.e.-`W` cubic + the algebraic half of the geometry
+finish.**  All axiom-clean (`[propext, Classical.choice, Quot.sound]`).  New decls:
+
+- **`DoublingEquidist`**: `ae_of_ae_restrict_Icc01_of_periodic` (periodicity bridge a.e.-[0,1]→a.e.-ℝ for
+  unit-periodic predicates), `ae_doubling_orbit_equidistributed_real`, `ae_doubling_weyl_tendsto_real`
+  (full-ℝ per-frequency doubling Weyl vanishing).
+- **`EquidistDense`**: `isEquidistributed_dense` (general equidist⇒dense, Aristotle `3e68d32f`),
+  `isEquidistributedTorus_dense`, `exists_lt_of_dense_continuousAt`/`exists_gt_…` (threshold tools),
+  `dense_continuousOn_image_subset` (confinement tool, Aristotle `291bb0fb`).
+- **`CubicTorusEquidist`**: `ae_W_cubic_torus_orbit_equidistributed` + **`ae_W_cubic_torus_orbit_dense`**
+  — *for a.e. `W`, the orbit `n ↦ (2ⁿW, 2ⁿαW, 2ⁿα²W) mod 1` is equidistributed (hence DENSE) in `T³`.*
+  Via the Weyl reduction (`mFourier_orbit_eq`, `cubicXi_ne_zero`, `ae_comp_mul_left` scaling).
+- **`CubicDefect`** (THE reduction): `cubic_f3_eq` (3rd floor error is forced `f₃={C−g}`),
+  `cubicDefect_eq_C_sub_floor` (`cubicDefect = C − ⌊C−g⌋`), `cubic_digit_eq_floor` (digit `= ⌊C−g⌋`),
+  **`cubic_partial_defect_mem_window`** (a base-2 digit ⟺ `g = α²f₁+αf₂ ∈ (C−2, C]`, a width-2 window).
+  `g` ranges over `[0, α²+α)`, **width `α²+α ≈ 2.85 > 2`** — sharper than the old width-1 framing.
+- **`CubicDefectLink`**: `cubic_f1_orbit`/`cubic_f2_orbit` (`f₁,f₂` as fns of orbit coords `(r₁,r₂,r₃)`),
+  `cubicGpd` + `cubicPartialDefect_eq_Gpd` (`g(⌊W2ⁿ⌋) = cubicGpd α c0 c1 {W2ⁿ} {αW2ⁿ} {α²W2ⁿ}`),
+  **`continuousAt_cubicGpd`** (`cubicGpd` is `ContinuousAt` any point whose two inner `fract`-args are
+  non-integers — `continuousAt_fract` + `ContinuousAt.comp`).
+
+### ▶▶ THE FINISH (3 well-scoped pieces remain; all tools now exist)
+The unconditional a.e.-`W` cubic impossibility = "for a.e. `W`, ∃n with `cubicV3(⌊W2ⁿ⌋)−2⌊W2ⁿ⌋ ∉ {0,1}`".
+Proof skeleton: if all digits ∈{0,1} then (`cubic_partial_defect_mem_window`) `cubicGpd(reps_n) ∈ (C−2,C]`
+∀n; but the dense orbit + `continuousAt_cubicGpd` + a value-exceeding point forces some `cubicGpd > C`
+(or `< C−2`) — contradiction (`exists_lt_of_dense_continuousAt`).  Remaining:
+1. **`cubicGpd_exceeds_window`** (geometric crux, **Aristotle `7b1ff2ad` IN FLIGHT**): for any `C`, ∃
+   `(r₁,r₂,r₃)∈(0,1)³` with the two `fract`-args non-integer and `cubicGpd ∉ (C−2,C]`.  (Realize any
+   `(fA,fB)∈(0,1)²` via `r₁=½`, solve `r₂,r₃`; case-split `C ≶ α²+α`; the width-`>2` range argument.)
+2. **rep-density / `F`-on-`T³` continuity glue**: to apply `exists_lt_of_dense_continuousAt` need an
+   `F : T³ → ℝ` with `F(cubicTorusOrbit W n) = cubicGpd(reps_n)` and `ContinuousAt F p*`.  Either
+   (a) build `F = cubicGpd ∘ (canonical reps)` and prove `ContinuousAt` at interior non-jump `p*` via the
+   AddCircle interior-chart continuity (`AddCircle.continuousAt_toIcoMod`-style), or (b) transfer the
+   `T³` density to a real-cube density `Dense (range (realOrbit W))` and apply the threshold tool on a
+   cube-subtype.  **(a) is cleaner.**  Needs: rep map `AddCircle 1 → ℝ` continuous at nonzero pts.
+3. **final assembly**: pick `p*` from (1) (its coords are in (0,1) so live in the orbit's closure),
+   apply `exists_lt_of_dense_continuousAt` (a.e. `W` via `ae_W_cubic_torus_orbit_dense`), get the
+   out-of-window `n`, contradict `cubic_partial_defect_mem_window`.  Then `cubic_block_orbit_base_two_bounds`
+   ties the floor orbit `⌊W2ⁿ⌋` to a digit-reading orbit for the headline statement.
+
+**NEXT-LAP FIRST MOVE**: `aristotle list` → harvest `cubicGpd_exceeds_window` (`7b1ff2ad`); verify
+in-kernel + axioms; port into `CubicDefectLink`.  Then do piece 2 (the `F`-on-`T³` continuity — the
+AddCircle interior-chart rep; check `AddCircle.continuousOn`/`toIcoMod` API) and piece 3 assembly.
+
+---
+
 ## ★★ SHARPENED ROADMAP (2026-06-14 ~07:00) — the a.e.-W cubic reduces to *a.e. equidistribution of {2ⁿs}*
 
 This lap proved three axiom-clean bricks and, in doing so, pinned the EXACT remaining infrastructure for
