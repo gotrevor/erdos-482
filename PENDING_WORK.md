@@ -5,7 +5,7 @@
 This lap proved three axiom-clean bricks and, in doing so, pinned the EXACT remaining infrastructure for
 the a.e.-`W` unconditional cubic. Corrects the prior handoff (which framed the wall as "a Birkhoff port").
 
-**Done this lap (all axiom-clean, build 🟢 8276):**
+**Done this lap (all axiom-clean, build 🟢 8277):**
 1. `CubicDefect.cubic_orbit_defect_confined` / `_no_wide_defect_pair` — the orbit-level ceiling: a
    digit-reading orbit pins every combined defect to the two-point set `{C, C−1}` (two parallel
    hyperplanes in `[0,1)³`); any two defects differ by `≤ 1`.
@@ -14,6 +14,22 @@ the a.e.-`W` unconditional cubic. Corrects the prior handoff (which framed the w
    Weyl-sum reduction below needs.
 3. `DoublingOrbit.ae_dense_orbit_doubling` — a.e. `x∈ℝ/ℤ` has a DENSE `×2`-orbit, from
    `AddCircle.ergodic_nsmul` alone (no Birkhoff). `ae_orbit_mem_of_isOpen` is the reusable core.
+4. `DoublingOrbit.ae_fract_dense_real` — ℝ-line form: a.e. real `t` has dense `{2ⁿt mod 1}` (pull #3
+   back along measure-preserving `ℝ→ℝ/ℤ`). With `t=αW`: dense for a.e. `W`. (Aristotle `17030c67`.)
+5. `WeylDoubling.doubling_weyl_L2_mean` — **the Weyl mean square** `∫₀¹|∑_{n<N} e(k2ⁿs)|² ds = N`
+   (`k≠0`), via `char_int` (character orthogonality) + `two_pow_inj` (diagonal). The abstract
+   `weyl_double_sum_integral` dodges a defeq/whnf elaboration wall on inline-arithmetic casts.
+   **This is the mean-square bound that feeds DEL.**
+
+**Remaining for a.e.-`W` cubic (now a finite assembly, no open math):**
+- (a) `[in flight, Aristotle bd44d316]` abstract DEL engine: `∑_j ∫₀¹‖g_j‖² < ∞ ⇒ g_j → 0 a.e.`
+  (Markov + Borel–Cantelli — both in mathlib).
+- (b) apply (a) to `g_j = (1/j²)∑_{n<j²} e(k2ⁿ·)` (mean sq `1/j²` summable, from #5) ⇒
+  `(1/N_j)∑ e(k2ⁿs) → 0` a.e. along `N_j=j²`; fill gaps by `|S_{N+1}−S_N| = 1` ⇒ a.e. `{2ⁿs}`
+  equidistributes (Weyl criterion, all `k≠0`).
+- (c) lift to `T³` via brick #2 (`ξ=a+bα+cα²≠0`): a.e. `W`, `2ⁿ(W,αW,α²W)` equidistributes ⇒ joint
+  `(f₁,f₂,f₃)` dense in `[0,1)³` ⇒ escapes the two-plane confinement (#1) ⇒ no cubic schedule reads
+  a.e. `W`'s base-2 digits. **Unconditional a.e.-`W` cubic impossibility.** (Specific-`W` stays open.)
 
 **The precise reduction (worked out this lap).** A digit-reading orbit forces the joint floor coords
 `(f₁,f₂,f₃)` — which are functions of `2ⁿ(W, αW, α²W) mod 1` — to stay on the two-plane set
@@ -38,8 +54,13 @@ mathlib) along the subsequence `N_j=j²` + monotonicity. The first concrete sub-
 orthogonality integral (clean, bounded — good Aristotle candidate). mathlib has `strong_law_ae` (SLLN)
 and Borel–Cantelli; it lacks the pointwise Birkhoff theorem but the DEL route does not use it.
 
-**Aristotle in flight:** `fractdense` (`17030c67`) — the ℝ-line pullback of #3 (circle-valued form).
-Provenance: `cubiclinindep` (`e608a9e2`) independently re-proved brick #2 axiom-clean.
+**Why DENSITY (#3,#4) is NOT enough alone** (kept, still true): the orbit's initial points lie on the
+measure-zero curve `(W,αW,α²W)`, and single-coordinate density doesn't break the two-plane confinement —
+so step (c) needs the *equidistribution* level (Weyl + #5's mean square + #2), not just density. The
+density bricks #3/#4 are reusable and the ergodic warm-up; the real closer is the DEL chain (a)→(b)→(c).
+
+**Aristotle:** `aeL2bc` (`bd44d316`) IN FLIGHT — the DEL engine, step (a). Provenance: `fractdense`
+(`17030c67`) → ported as #4; `cubiclinindep` (`e608a9e2`) independently re-proved #2 axiom-clean.
 
 ---
 
