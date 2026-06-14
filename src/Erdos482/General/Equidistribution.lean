@@ -126,6 +126,18 @@ theorem cesaro_fill_of_subseq_sq (a : ℕ → ℂ) (hb : ∀ n, ‖a n‖ ≤ 1)
     _ ≤ ∑ _k ∈ Finset.Ico m n, (1:ℝ) := Finset.sum_le_sum (fun k _ => hb k)
     _ = ((n - m : ℕ) : ℝ) := by simp
 
+/-- **Fourier monomial on the doubling orbit = the explicit Weyl exponential.**
+`fourier k (↑(2ⁿ·s)) = e^{2πi·(k·2ⁿ)·s}` on `ℝ/ℤ` (`T = 1`).  This bridges the abstract
+`weyl_criterion` (whose input is `∑ fourier k (xₙ)` for `xₙ = ↑(2ⁿs)`) to the explicit doubling
+exponential sum whose mean square is computed in `WeylDoubling` — the seam of path #2's step (b). -/
+theorem fourier_doubling_eq (k : ℤ) (n : ℕ) (s : ℝ) :
+    (fourier k) (((2:ℝ) ^ n * s : ℝ) : AddCircle (1:ℝ))
+      = Complex.exp (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ) ^ n : ℤ) : ℂ) * s) := by
+  rw [fourier_coe_apply]
+  congr 1
+  push_cast
+  ring
+
 /-- **Cesàro averages are sup-norm bounded** (`N ≥ 1`): `‖(1/N)∑_{n<N} f(xₙ)‖ ≤ ‖f‖`.  The uniform
 bound that lets the equidistribution property pass from the dense Fourier span to all continuous `f`. -/
 theorem norm_cesaro_le (x : ℕ → AddCircle (1:ℝ)) (f : C(AddCircle (1:ℝ), ℂ)) {N : ℕ} (hN : 1 ≤ N) :
