@@ -130,4 +130,24 @@ theorem doubling_weyl_L2_mean_norm (k : ℤ) (hk : k ≠ 0) (N : ℕ) :
     exact doubling_weyl_L2_mean k hk N
   exact_mod_cast hcplx
 
+/-- **Normalized Weyl mean square** — exactly `∫₀¹‖g_N‖²` for `g_N := (1/N)·∑_{n<N} e(k2ⁿ·)`:
+`∫₀¹ ‖(N:ℂ)⁻¹·∑_{n<N} e^{2πi·k·2ⁿ·s}‖² ds = 1/N`.  Along `N_j = j²` this is `1/j²`, summable — so the
+DEL engine (`∑_j ∫‖g_j‖² < ∞ ⇒ g_j → 0 a.e.`) yields `(1/N_j)∑_{n<N_j} e(k2ⁿs) → 0` a.e., i.e. a.e.
+base-2 equidistribution of `{2ⁿs}` (the remaining analytic input for the cubic frontier's path #2). -/
+theorem doubling_weyl_L2_normalized (k : ℤ) (hk : k ≠ 0) (N : ℕ) :
+    (∫ s in (0:ℝ)..1, ‖(N:ℂ)⁻¹ * ∑ n ∈ Finset.range N,
+        Complex.exp (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ)^n : ℤ):ℂ) * s)‖ ^ 2)
+      = (N:ℝ)⁻¹ := by
+  rcases Nat.eq_zero_or_pos N with hN | hN
+  · subst hN; simp
+  · have hNne : (N:ℝ) ≠ 0 := by positivity
+    have hpt : ∀ s : ℝ, ‖(N:ℂ)⁻¹ * ∑ n ∈ Finset.range N,
+          Complex.exp (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ)^n : ℤ):ℂ) * s)‖ ^ 2
+        = ((N:ℝ)⁻¹)^2 * ‖∑ n ∈ Finset.range N,
+            Complex.exp (2 * ↑Real.pi * Complex.I * ((k * (2:ℤ)^n : ℤ):ℂ) * s)‖ ^ 2 := by
+      intro s; rw [norm_mul, mul_pow, norm_inv, Complex.norm_natCast]
+    simp_rw [hpt]
+    rw [intervalIntegral.integral_const_mul, doubling_weyl_L2_mean_norm k hk N]
+    field_simp
+
 end Erdos482.General
