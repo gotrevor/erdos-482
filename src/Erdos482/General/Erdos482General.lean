@@ -9,9 +9,11 @@ import Erdos482.General.SelfRefWall
 import Erdos482.General.CubicDefect
 import Erdos482.General.DoublingOrbit
 import Erdos482.General.WeylDoubling
+import Erdos482.General.BaseGWeyl
 import Erdos482.General.Equidistribution
 import Erdos482.General.DELEngine
 import Erdos482.General.DoublingEquidist
+import Erdos482.General.BaseGEquidist
 import Erdos482.General.MultidimWeyl
 import Erdos482.General.EquidistDense
 import Erdos482.General.CubicTorusEquidist
@@ -26,6 +28,7 @@ import Erdos482.General.GeneralDefect
 import Erdos482.General.GeneralDefectCheck
 import Erdos482.General.GeneralOrbit
 import Erdos482.General.GeneralTorusEquidist
+import Erdos482.General.BaseGTorusEquidist
 import Erdos482.General.GeneralTorusFinish
 import Erdos482.General.GeneralSubsumes
 
