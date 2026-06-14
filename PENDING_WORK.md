@@ -21,14 +21,26 @@ geometric crux.  **Four** headline forms (all axiom-clean):
 - **`BinaryExpansion.lean`** — `binary_floor_eq` (a binary block orbit recovers `⌊W·2ⁿ⌋` of its value;
   inductive `binTail` proof, axiom-clean).  Proven locally (beat Aristotle `b8320752`, cancelled).
 
-### ▶▶ NEXT FRONTIERS (the cubic impossibility is fully done; these EXTEND it)
-1. **Degree-`d` generalization** (`α = 2^{1/d}`): same machinery (ℤ-independence of `{1,α,…,α^{d-1}}`;
-   `T^d` equidistribution from `MultidimWeyl`; defect-window reduction) ⇒ analogous a.e.-`W` impossibility
-   for the `d`-step self-referential floor map.  **Started**: `quartic_lin_indep_int` (the `d=4` algebraic
-   backbone, `{1,2^{1/4},2^{2/4},2^{3/4}}` ℤ-indep via `ℚ⊂ℚ(√2)⊂ℚ(2^{1/4})`) submitted to Aristotle
-   `2dcaaab1` IN FLIGHT.  General-`d` needs `Irreducible (Xᵈ−2)` over ℚ (Eisenstein at 2; mathlib's
-   Kummer `X_pow_sub_C_irreducible` TODO at `p=2`, so quartic needs Eisenstein directly).  This is a
-   multi-lap port: re-derive the `d`-floor defect/window + `T^d` orbit setup paralleling the cubic files.
+### ✅✅ QUARTIC (degree-4) ALSO COMPLETE & axiom-clean (this lap)
+The **entire** degree-4 generalization is done — `ae_no_quartic_schedule_reads_base_two` (+ the
+`ae_not_quartic{DigitRepresentable,ReadsBaseTwo}` capstones), all `[propext, Classical.choice,
+Quot.sound]`-only.  Files (all parallel to the cubic):
+- `QuarticDefect.lean`: `qrt2`/`qrt2_quartic`/`one_lt_qrt2`, 4-step defect identity, g-collapse + window
+  (`quartic_partial_defect_mem_window`), AND **`quartic_lin_indep_int`** proven locally via **infinite
+  2-adic descent** (`quartic_norm_descent`) + the `α²=√2`-irrationality reduction — no Eisenstein needed,
+  axiom-free.  (Beat Aristotle `2dcaaab1`, which stalled at 2%; cancelled.)
+- `QuarticDefectLink.lean`: orbit-coord identities `quartic_f{1,2,3}_orbit`, `quarticGpd`, continuity.
+- `QuarticTorusEquidist.lean`: a.e.-`W` `T⁴` equidistribution/density (Weyl reduction via
+  `quartic_lin_indep_int`).
+- `QuarticFinish.lean`: geometry crux `quarticGpd_exceeds_window`, `quarticGpdTorus` glue, the assembly.
+
+### ▶▶ NEXT FRONTIERS
+1. **General degree-`d`** (`α = 2^{1/d}`): cubic + quartic prove the pattern is mechanical.  The reusable
+   engine (`MultidimWeyl`/`EquidistDense`/`DELEngine`) is already degree-agnostic.  A *uniform* `d`-step
+   formalization (parametrized over `d`, replacing the hand-rolled per-degree files) would be the elegant
+   capstone — needs: `{1,α,…,α^{d-1}}` ℤ-indep (general `Irreducible (Xᵈ−2)`; the per-degree descent
+   doesn't obviously generalize — Eisenstein/Kummer is the principled route), a `d`-fold `linear_combination`
+   defect identity, and a `Fin d` orbit/geometry assembly.  Or just hand-roll `d=5,6,…` as needed.
 2. **Fixed-`W` version** — OPEN MATH (cf. `{(3/2)ⁿ}` not even known dense); needs Borel normality, not
    in mathlib.  Not attemptable; a literature/infrastructure lap at best.
 
