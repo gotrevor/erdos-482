@@ -54,10 +54,20 @@ out of scope (below).
   `ae_not_DStepDigitRepresentableBaseG_two_via_base_two` (re-derives the base-`g` `g=2` impossibility from
   the independently-built base-2 `ae_not_dStepDigitRepresentable`).
 
+- **Odd composite degrees** (`RpowLinIndep.rpow_lin_indep_int_odd`,
+  `BaseGTorusEquidist.dXiG_ne_zero_odd` / `ae_W_dTorusG_orbit_dense_odd`): lin-indep + density brick for
+  **odd composite `d`** (`9, 15, 25, …`) when `g` is not a perfect `p`-th power for any prime `p ∣ d`, via
+  `X_pow_sub_C_irreducible_iff_forall_prime_of_odd`.
+
 ### ▶▶ REMAINING / OPTIONAL (genuinely harder or out of scope)
-- **Composite-`d` for perfect-power `g`**: dropping the "`d` prime" restriction needs the full Kummer
-  criterion (`X_pow_sub_C_irreducible_iff_of_odd` / `_of_prime_pow`) — not needed for the headline (a prime
-  `d` always exists above the window threshold) but would generalize the *degree* at perfect-power bases.
+- **`_odd` headline + capstones**: thread `ae_W_dTorusG_orbit_dense_odd` into a headline mirroring
+  `ae_no_dStep_schedule_reads_base_g_all` (mechanical — the density brick is the only new input; would be
+  cleaner after refactoring the headline proof to take the density a.e.-statement as a parameter).
+- **Even composite-`d` for perfect-power `g`**: the `p = 2` prime-power case needs
+  `X_pow_sub_C_irreducible_of_prime_pow` (`p ≠ 2` only) or the `4 ∤ n` analysis — niche; a prime `d`
+  always suffices for the headline.
+- **Fixed-`W` version** — OPEN MATH (Borel normality of a specific number; cf. `{(3/2)ⁿ}` not even known
+  dense).  Not attemptable in mathlib.
 - **Fixed-`W` version** — OPEN MATH (Borel normality of a specific number; cf. `{(3/2)ⁿ}` not even known
   dense).  Not attemptable in mathlib.
 
