@@ -84,4 +84,51 @@ theorem window_not_cover (C W : ℝ) (hW : 2 < W) :
     · rw [Set.mem_Ioc]; rintro ⟨_, ht⟩; linarith [h0.1]
   · exact ⟨0, by rw [Set.mem_Ico]; exact ⟨le_rfl, by linarith⟩, h0⟩
 
+/-- **A positive-coefficient sum realizes every value in `[0, S)`.**  If `cₖ > 0` for `k < n` (`n ≥ 1`)
+and `t ∈ [0, ∑ cₖ)`, there is a coefficient vector `f` with each `fₖ ∈ [0,1)` and `∑ cₖ fₖ = t`
+(witness: the uniform `fₖ = t/S`).  Applied with `cₖ = α^{d-1-k}`, this says the partial-defect map
+`(fₖ) ↦ ∑ α^{d-1-k} fₖ` surjects onto `[0, S_d)`; combined with `window_not_cover` (and `S_d > 2`,
+`rrt_window_gt_two`) it gives the abstract geometry crux: a reachable partial defect outside any width-2
+digit window. -/
+theorem sum_pos_coeff_realize (n : ℕ) (hn : 0 < n) (c : ℕ → ℝ)
+    (hc : ∀ k ∈ Finset.range n, 0 < c k) (t : ℝ)
+    (ht : t ∈ Set.Ico (0 : ℝ) (∑ k ∈ Finset.range n, c k)) :
+    ∃ f : ℕ → ℝ, (∀ k ∈ Finset.range n, f k ∈ Set.Ico (0 : ℝ) 1)
+      ∧ ∑ k ∈ Finset.range n, c k * f k = t := by
+  set S := ∑ k ∈ Finset.range n, c k with hS
+  have hSpos : 0 < S := Finset.sum_pos hc (Finset.nonempty_range_iff.mpr (by omega))
+  rw [Set.mem_Ico] at ht
+  refine ⟨fun _ => t / S, fun k _ => ?_, ?_⟩
+  · rw [Set.mem_Ico]
+    exact ⟨div_nonneg ht.1 hSpos.le, (div_lt_one hSpos).mpr ht.2⟩
+  · rw [← Finset.sum_mul, ← hS, mul_comm, div_mul_cancel₀ t (ne_of_gt hSpos)]
+
+/-- **The abstract geometry crux for general `d ≥ 3`.**  For `α = 2^{1/d}` and any schedule constant
+`C`, there is a reachable fract-configuration `f` (each `fₖ ∈ [0,1)`) whose partial defect
+`g = ∑_{k<d-1} α^{d-1-k} fₖ` lies *outside* the width-2 base-2-digit window `(C-2, C]`.  In other
+words, no fixed `C` makes *every* reachable partial defect a valid base-2 digit — the algebraic core of
+the general-`d` impossibility (the remaining work is purely showing the orbit *reaches* such a `g`,
+i.e. `Tᵈ` density).  Proof: the partial defect surjects onto `[0, S_d)` (`sum_pos_coeff_realize`) with
+`S_d > 2` (`rrt_window_gt_two`, after an index reflection), and a width-2 window can't cover it
+(`window_not_cover`). -/
+theorem exists_partial_defect_outside_window (d : ℕ) (hd : 3 ≤ d) (C : ℝ) :
+    ∃ f : ℕ → ℝ, (∀ k ∈ Finset.range (d - 1), f k ∈ Set.Ico (0 : ℝ) 1)
+      ∧ (∑ k ∈ Finset.range (d - 1), ((2 : ℝ) ^ ((1 : ℝ) / d)) ^ (d - 1 - k) * f k)
+          ∉ Set.Ioc (C - 2) C := by
+  set α : ℝ := (2 : ℝ) ^ ((1 : ℝ) / d) with hα
+  set e := d - 1 with he
+  have hαpos : 0 < α := Real.rpow_pos_of_pos (by norm_num) _
+  -- index reflection: `∑_{k<e} α^{e-k} = ∑_{1≤j<d} α^j > 2`.
+  have hSsum : ∑ k ∈ Finset.range e, α ^ (e - k) = ∑ j ∈ Finset.Ico 1 d, α ^ j := by
+    rw [Finset.sum_Ico_eq_sum_range, ← he, ← Finset.sum_range_reflect (fun k => α ^ (1 + k)) e]
+    refine Finset.sum_congr rfl (fun k hk => ?_)
+    rw [Finset.mem_range] at hk
+    congr 1; omega
+  have hSgt : 2 < ∑ k ∈ Finset.range e, α ^ (e - k) := by
+    rw [hSsum]; exact rrt_window_gt_two d hd
+  obtain ⟨t, htin, htout⟩ := window_not_cover C (∑ k ∈ Finset.range e, α ^ (e - k)) hSgt
+  obtain ⟨f, hf, hsum⟩ := sum_pos_coeff_realize e (by omega) (fun k => α ^ (e - k))
+    (fun k _ => pow_pos hαpos _) t htin
+  exact ⟨f, hf, by rw [hsum]; exact htout⟩
+
 end Erdos482.General
