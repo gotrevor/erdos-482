@@ -1,6 +1,56 @@
 # PENDING_WORK — Erdős #482 / Stoll
 
-## ★★★★★ STATE 2026-06-14 (build 🟢 8298) — **GENERAL degree-`d` IMPOSSIBILITY: COMPLETE, UNCONDITIONAL & AXIOM-CLEAN**
+## ★★★★★ STATE 2026-06-14 (build 🟢 8303) — **BASE-`g` GENERAL-DEGREE IMPOSSIBILITY: COMPLETE & AXIOM-CLEAN**
+
+The base-`g` generalization is now **DONE with full parity to the base-2 story** — headline + all three
+self-referential capstones, all `[propext, Classical.choice, Quot.sound]`-only; build 🟢 8303.  This
+lap closed the entire analytic + assembly half that the prior handoff flagged as remaining.
+
+**New deliverables (this lap, all axiom-clean):**
+- **Analytic engine** (`BaseGWeyl`, `BaseGEquidist`): ported the DEL/Weyl a.e.-equidistribution from base 2
+  (doubling) to base `g ≥ 2`.  `g_pow_inj`, `baseG_weyl_L2_mean/_norm/_normalized` (Weyl mean square via
+  `weyl_double_sum_integral` reused), `fourier_baseG_eq`, `ae_baseG_weyl_tendsto(_real)`,
+  **`ae_baseG_orbit_equidistributed(_real)`** (base-`g` Borel normality).  The analysis was base-agnostic
+  except `n ↦ gⁿ` injectivity; the periodicity bridge `ae_of_ae_restrict_Icc01_of_periodic` reused verbatim.
+- **Torus density** (`BaseGTorusEquidist`): `dTorusOrbitG` (`gⁿαⁱW`),
+  **`ae_W_dTorusG_orbit_dense_eisenstein`** — a.e.-`W` density of the base-`g` `Tᵈ` orbit, unconditional
+  for any `(g,d)` with an Eisenstein prime.
+- **Lin-indep** (`RpowLinIndep.rpow_lin_indep_int_base`): `{1,g^{1/d},…,g^{(d-1)/d}}` ℤ-lin-indep via
+  Eisenstein at a prime `p` with `p ∣ g`, `p² ∤ g` (covers all `d`; any `g` with a multiplicity-1 prime
+  factor — squarefree `g`, or `6,10,12,…`).
+- **Assembly** (`BaseGFinish`): `dGpdTorusG_orbit`, **`exists_exceeding_torus_point_base`** (geometry
+  crux, `S_d > g` via `geom_window_gt_base` + `exists_scale_outside_window_strict_base`),
+  **`ae_no_dStep_schedule_reads_base_g`** (uniform headline: a.e.-`W`, no degree-`d` schedule reads `W`'s
+  base-`g` digits), the three capstones (`ae_not_DStep{DigitRepresentable,ReadsBaseG,
+  RecurrenceRepresentable}BaseG`, last via `GaryExpansion.gary_floor_eq` = base-`g` `binary_floor_eq`),
+  and a **fully unconditional base-3 instance** `ae_no_dStep_schedule_reads_base_three` (`3^{1/3} < 3/2`,
+  `grt_lt_bound`).
+- **Real-multiplier orbit bridge** (`GeneralOrbit.dStepF_orbit_real`/`dStepF_eq_orbitF_real`/
+  `dStepPartial_eq_dGpd_real`): the orbit bridge only ever used `W·2ⁿ` as a unit, so it generalizes to any
+  real `M` (base-`g` is `M = W·gⁿ`).
+
+### ▶▶ NEXT FRONTIER — base-`g` for PERFECT-POWER bases (`g = 4, 8, 9, 16, 25, 27, …`)
+The Eisenstein lin-indep (`rpow_lin_indep_int_base`) needs a prime `p ∥ g` (multiplicity exactly 1), so it
+**misses perfect-power `g`** (e.g. `g = 4 = 2²`).  To cover **all** `g ≥ 2`: choose `d` **prime** (the
+window bound `g^{1/d} < 2g/(g+1)` only needs `d` large, and there are arbitrarily large primes), and use
+mathlib's **`X_pow_sub_C_irreducible_of_prime`** (`FieldTheory/KummerPolynomial.lean`): `Xᵈ − C a`
+irreducible over a field iff `∀ b, bᵈ ≠ a`.  Over ℚ with `a = (g:ℚ)`: need **`∀ b:ℚ, bᵈ ≠ g`** when `g`
+is not a perfect `d`-th power.  Route: `bᵈ = g` ⟹ `b` integral over ℤ (root of monic `Xᵈ − g`) ⟹
+`b ∈ ℤ` (`IsIntegrallyClosed.isIntegral_iff`) ⟹ `(b.natAbs)ᵈ = g`, contradiction.
+**⚠️ CAVEAT**: an earlier gotcha (RpowLinIndep header) notes `IsIntegrallyClosed ℤ` was problematic in the
+Gauss-lemma context of this mathlib pin — verify the instance resolves before committing; fallback is
+`irrational_nrt_of_notint_nrt` (`NumberTheory/Real/Irrational.lean`) for `g^{1/d}` irrational ⟹ no positive
+rational `d`-th root.  Then `rpow_lin_indep_int_prime` ⟹ `ae_..._base_g` for **every** base `g ≥ 2` at a
+suitable prime `d`.
+
+### (cross-check, optional) g=2 subsumption
+`DStepDigitRepresentableBaseG 2 d W ↔ DStepDigitRepresentable d W`: the digit `x = dStepV − 2u` is an
+integer, so `0 ≤ x ≤ 1 ⟺ x ∈ {0,1}`; plus `grt 2 d = rrt d`.  A kernel-checked consistency anchor à la
+`GeneralSubsumes`.
+
+---
+
+## ARCHIVE — ★★★★★ STATE 2026-06-14 (build 🟢 8298) — **GENERAL degree-`d` IMPOSSIBILITY (base 2): COMPLETE, UNCONDITIONAL & AXIOM-CLEAN**
 
 The geometry crux is **discharged**.  `GeneralTorusFinish.exists_exceeding_torus_point` (the
 nonzero-coordinate realization) is proven and fed into the assembly, so the general-`d` headline is now
