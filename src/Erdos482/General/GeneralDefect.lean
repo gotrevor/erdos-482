@@ -100,6 +100,34 @@ theorem dStep_defect_identity (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (d : ℕ) (
 noncomputable def dStepPartial (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (d : ℕ) : ℝ :=
   dStepDefect α c u d - dStepF α c u (d - 1)
 
+/-- **The partial defect in explicit sum form**: `g = ∑_{k<e} α^{e-k} fₖ` (`d = e+1`).  Unfolds the
+`dStepPartial = D − f_e` definition (the last term of `D`, `α^0 f_e = f_e`, cancels).  This is the form
+the realization/window lemmas (`sum_pos_coeff_realize`, `exists_partial_defect_outside_window`) consume,
+bridging the defect engine to the geometry. -/
+theorem dStepPartial_eq_sum (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (e : ℕ) :
+    dStepPartial α c u (e + 1) = ∑ k ∈ Finset.range e, α ^ (e - k) * dStepF α c u k := by
+  rw [dStepPartial, Nat.add_sub_cancel, dStepDefect, Finset.sum_range_succ]
+  have hlast : α ^ (e + 1 - 1 - e) = 1 := by rw [show e + 1 - 1 - e = 0 by omega, pow_zero]
+  rw [hlast, one_mul, add_sub_cancel_right]
+  refine Finset.sum_congr rfl (fun k hk => ?_)
+  rw [Finset.mem_range] at hk
+  rw [show e + 1 - 1 - k = e - k by omega]
+
+/-- **The partial defect is nonnegative** (each `α^{e-k} ≥ 0`, `fₖ = {…} ≥ 0`). -/
+theorem dStepPartial_nonneg (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (e : ℕ) (hα : 0 ≤ α) :
+    0 ≤ dStepPartial α c u (e + 1) := by
+  rw [dStepPartial_eq_sum]
+  exact Finset.sum_nonneg (fun k _ => mul_nonneg (pow_nonneg hα _) (Int.fract_nonneg _))
+
+/-- **The partial defect stays below the window width** `S_d = ∑_{k<e} α^{e-k}` (`= ∑_{1≤j<d} α^j`):
+each `fₖ < 1` and `α^{e-k} > 0`.  So the orbit's partial defect always lies in `[0, S_d)`; for `d ≥ 3`
+`S_d > 2` (`rrt_window_gt_two`), so a dense orbit must leave any width-2 digit window. -/
+theorem dStepPartial_lt_window (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (e : ℕ) (hα : 0 < α) (he : 0 < e) :
+    dStepPartial α c u (e + 1) < ∑ k ∈ Finset.range e, α ^ (e - k) := by
+  rw [dStepPartial_eq_sum]
+  refine Finset.sum_lt_sum_of_nonempty (Finset.nonempty_range_iff.mpr (by omega)) (fun k _ => ?_)
+  exact mul_lt_of_lt_one_right (pow_pos hα _) (Int.fract_lt_one _)
+
 /-- **The argument of the last floor is `(C − g) + 2u`.**  Because `α(v_e + c_e) = v_{e+1} + f_e` and
 the defect identity gives `v_{e+1} = 2u + C − D = 2u + C − (g + f_e)`.  The kernel of the g-collapse. -/
 theorem dStep_last_arg (α : ℝ) (c : ℕ → ℝ) (u : ℤ) (e : ℕ) (hα : α ^ (e + 1) = 2) :
