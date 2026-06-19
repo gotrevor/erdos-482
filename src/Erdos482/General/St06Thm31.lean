@@ -348,7 +348,8 @@ theorem st06_example11_from_thm31 (n : ℕ) (hn : 1 ≤ n) :
     n hn
   -- the recurrence-argument shift `↑2/(↑3−1)` is `1`
   rw [show ((2 : ℤ) : ℝ) / (((3 : ℕ) : ℝ) - 1) = 1 by norm_num] at key
-  convert key using 2
+  -- v4.31's `convert` over-splits the `(3:ℝ)`-vs-`↑3` coercion into extra goals; close them
+  convert key using 2 <;> first | rfl | norm_num | push_cast
 
 /-! ## Subcone `𝒟₁` (cone `𝒜₁`: `l < 0`) — shows the master handles negative `l` -/
 
