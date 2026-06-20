@@ -56,3 +56,7 @@ README). Aristotle closed the pair-5 Diophantine lemmas (e.g. `sqrt2_badly_appro
 induction (`thm13_closed`) it could not close, and that was proved by hand.
 
 Built on [mathlib](https://github.com/leanprover-community/mathlib4).
+
+## License
+
+[Apache License 2.0](LICENSE), Copyright 2026 Trevor Morris
