@@ -131,9 +131,9 @@ The paper is free; its free home is just down/JS-walled from a scripted fetch. I
    should render + offer a free PDF in a real browser, since AA opens old issues). **This is the
    one Trevor should click.** Earlier-session direct guess `impan.pl/download/pdf/aa125-1-8` just
    loops to the homepage right now.
-2. **Email the author** — Thomas Stoll, IECL Université de Lorraine, `thomas.stoll@univ-lorraine.fr`
-   (homepage: <https://iecl.univ-lorraine.fr/membre-iecl/stoll-thomas-2/> — lists the paper, no PDF).
-   Authors reliably send their own 2006 papers on request.
+2. **The author's institutional homepage** — Thomas Stoll, IECL Université de Lorraine
+   (<https://iecl.univ-lorraine.fr/membre-iecl/stoll-thomas-2/> — lists the paper, no PDF).
+   Contact details, if ever needed, are his to publish, not ours to republish.
 3. **Cornell alumni EZproxy** fallback if it's ever gated:
    `https://login.proxy.library.cornell.edu/login?url=https://doi.org/10.4064/aa125-1-8`.
 4. **zbMATH record** (free, no full text): <https://zbmath.org/?q=an:1167.11302>.
