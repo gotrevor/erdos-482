@@ -1,5 +1,20 @@
 # erdos-482 — Graham–Pollak binary-digits identity (Erdős #482), formalized in Lean 4 / mathlib
 
+> [!IMPORTANT]
+> **The maintained formalization now lives in [gotrevor/lean-gallery](https://github.com/gotrevor/lean-gallery).**
+>
+> The headlines were re-homed to [`LeanGallery/NumberTheory/Erdos482/`](https://github.com/gotrevor/lean-gallery/tree/main/LeanGallery/NumberTheory/Erdos482)
+> as `LeanGallery.NumberTheory.Erdos482.graham_pollak`, `…cor33_unconditional`, and
+> `…General.erdos482_resolution`. There they are kept building against current mathlib, gated in CI
+> by a `#print axioms` audit that asserts the exact triple `[propext, Classical.choice, Quot.sound]`,
+> and checked statement-for-statement by [`comparator`](https://github.com/leanprover/comparator)
+> against a Mathlib-only rendering — so a stranger can verify the result without trusting this author.
+>
+> **This repository is the original development.** It is kept public for its writeup, its source
+> notes on the three Stoll papers, and provenance, but it is pinned to Lean v4.31.0 and is not
+> forward-ported: read it as a snapshot, and take the gallery as the source of truth for the current
+> statements and proofs.
+
 A Lean 4 / mathlib formalization of [Erdős problem #482](https://www.erdosproblems.com/482).
 The problem is marked **SOLVED** on erdosproblems.com, which lists **no formalized statement** — so
 this is (as far as that database knows) the first Lean formalization of #482.
