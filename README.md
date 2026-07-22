@@ -1,62 +1,50 @@
-# erdos-482 — Graham–Pollak binary-digits identity (Erdős #482), formalized in Lean 4 / mathlib
+# Erdős Problem #482 — moved to lean-gallery ➡️
 
-A Lean 4 / mathlib formalization of [Erdős problem #482](https://www.erdosproblems.com/482).
-The problem is marked **SOLVED** on erdosproblems.com, which lists **no formalized statement** — so
-this is (as far as that database knows) the first Lean formalization of #482.
+This repository held a Lean 4 / mathlib formalization of
+[Erdős problem #482](https://www.erdosproblems.com/482) — the Graham–Pollak identity, where the
+recurrence `a₁ = 1`, `a(n+1) = ⌊√2·(aₙ + ½)⌋` reads off the binary expansion of `√2` — together with
+Stoll's generalizations and a full base-`g` resolution.
 
-## The problem
+**It now lives in [gotrevor/lean-gallery](https://github.com/gotrevor/lean-gallery).**
 
-> Define `a₁ = 1` and `a(n+1) = ⌊√2·(aₙ + ½)⌋`. Then `a(2n+1) − 2·a(2n−1)` is the n-th digit in the
-> binary expansion of √2. Find similar results for `θ = √m` and other algebraic numbers.
+| What | Where |
+|---|---|
+| The Lean proof | [`LeanGallery/NumberTheory/Erdos482/`](https://github.com/gotrevor/lean-gallery/tree/main/LeanGallery/NumberTheory/Erdos482) |
+| The headline theorems | `LeanGallery.NumberTheory.Erdos482.graham_pollak`, `…cor33_unconditional`, `…General.erdos482_resolution` |
+| Writeups, the two errata, notes, reproduction scripts, Aristotle provenance, development record | [`docs/Erdos482/`](https://github.com/gotrevor/lean-gallery/tree/main/docs/Erdos482) |
 
-Source: `[ErGr80, p.96]`. The √2 result is due to **Graham and Pollak** (*Math. Mag.* **43** (1970),
-143–145). The generalizations formalized here come from two **Thomas Stoll** papers, which should be
-kept distinct (see [`papers/SOURCES.md`](papers/SOURCES.md)):
+Everything moved — 130 files, including every Aristotle problem submission and the session handoffs.
+Nothing was dropped, and this repository's git history remains the original record.
 
-- the **(α, l)-pair family** (Theorem 3.2, Corollary 3.3) — *A fancy way to obtain the binary digits of
-  759250125√2*, **Amer. Math. Monthly 117** (2010), no. 7, 611–617
-  ([arXiv:0902.4168](https://arxiv.org/abs/0902.4168));
-- the **general base-`g` resolution** (any real `w > 0`, any base `g ≥ 2`) — **[St05]**, *J. Integer Seq.*
-  **8** (2005), Art. 05.3.2.
+## The two errata
 
-(A third Stoll paper, **[St06]** — *On a problem of Erdős and Graham concerning digits*, *Acta Arith.*
-**125** (2006), 89–100 — gives further/sharper results; it is not formalized here, and is not on the
-critical path for #482.) The only genuinely new content in the formalization is **one fractional-part
-inequality** (`0 ≤ {x} − √2{x/2} + √2/2 < 1`, eq (7) of arXiv:0902.4168); mathlib supplies `Int.fract`,
-`irrational_sqrt_two`, `Real.digits`, and the rest.
+Both were found *by formalizing*, and both are now in the gallery:
 
-## What is proven
+- [Two items in **Theorem 3.2**, pair `i = 5`](https://github.com/gotrevor/lean-gallery/blob/main/docs/Erdos482/STOLL-PAIR5-ERRATUM.md)
+  of T. Stoll, *A fancy way to obtain the binary digits of 759250125√2*, **Amer. Math. Monthly 117**
+  (2010), no. 7, 611–617.
+- [**Theorem 3.1**](https://github.com/gotrevor/lean-gallery/blob/main/docs/Erdos482/notes/ST06-THM31-ERRATUM.md)
+  of T. Stoll, *On a problem of Erdős and Graham concerning digits*, **Acta Arith. 125** (2006), 89–100.
 
-`lake build` is green, with **zero `sorry` and zero custom axioms** (every theorem bottoms out at
-`[propext, Classical.choice, Quot.sound]`).
+Reported as findings about published mathematics, in the ordinary way one reports an erratum.
 
-- **Headline** — the Graham–Pollak √2 identity (`graham_pollak`), plus its restatement against
-  mathlib's `Real.digits` and a concrete first-six-digits certificate.
-- **Stoll's Theorem 3.2** — binary-digit identities for the GP-style `(α, l)` pairs: the general core
-  plus all seven non-special pairs over their full ε-intervals. Pair 5 (`t₅ = √2` itself) is the special
-  case and is formalized at `ε = ½` (the Graham–Pollak case); the detailed analysis of pair 5 is in
-  [`NOTES-FOR-STOLL.md`](NOTES-FOR-STOLL.md).
-- **Stoll's Corollary 3.3** — the unconditional title result, digits of `759250125·√2`
-  (`cor33_unconditional`).
+## Why move it
 
-See [`STATUS.md`](STATUS.md) for the full theorem inventory + axiom ledger, and
-[`NOTES-FOR-STOLL.md`](NOTES-FOR-STOLL.md) for the detailed pair-5 analysis, with exact-arithmetic
-computations and reproduction scripts in [`tools/sandbox/`](tools/sandbox/).
+In the gallery the result is **maintained and independently checkable**, which it was not here:
 
-## Acknowledgments
+- it builds against current Mathlib (this repo was pinned to an old toolchain and would eventually
+  stop compiling, which reads to a visitor as a broken formalization);
+- CI gates it on `#print axioms` asserting the exact triple `[propext, Classical.choice, Quot.sound]`;
+- [`comparator`](https://github.com/leanprover/comparator) verifies the statements against a
+  Mathlib-only rendering, replaying the proofs through the Lean kernel **and** the independent
+  [`nanoda`](https://github.com/ammkrn/nanoda_lib) kernel inside a sandbox — so a stranger can check
+  the result without trusting, or running, this author's code.
 
-This formalization was carried out by Trevor Morris together with an AI assistant (Claude), which
-composed the Lean proofs and the accompanying analysis.
+## Why the repo is still here
 
-Several supporting lemmas were proved with **Harmonic's Aristotle** auto-formalization system and then
-re-checked by the Lean kernel — no result is trusted on Aristotle's (or any tool's) say-so; the
-development is axiom-clean. The submitted problems are in [`tools/aristotle/`](tools/aristotle/) (see its
-README). Aristotle closed the pair-5 Diophantine lemmas (e.g. `sqrt2_badly_approximable`,
-`fract_two_mul`, `fract_sqrt2_pow_ne_half`, `pair5_band_branch`); the St05 Theorem 1.3 closed-form
-induction (`thm13_closed`) it could not close, and that was proved by hand.
-
-Built on [mathlib](https://github.com/leanprover-community/mathlib4).
+The URL is stable, and its git history holds the full development record. Both are worth more than
+the disk they occupy.
 
 ## License
 
-[Apache License 2.0](LICENSE), Copyright 2026 Trevor Morris
+[Apache License 2.0](LICENSE), Copyright 2026 Trevor Morris.
